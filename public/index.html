@@ -9,61 +9,6 @@
   <title>Nexus Web Hub - Universal WebApps Catalog</title>
   
   <style>
-    /* ==========================================
-       TRANSPARENCY BANNER
-       ========================================== */
-    .transparency-banner {
-      background: rgba(138, 43, 226, 0.1);
-      border: 2px solid rgba(138, 43, 226, 0.3);
-      border-radius: var(--radius-md);
-      padding: var(--space-md);
-      margin: var(--space-lg) auto;
-      max-width: 1400px;
-      backdrop-filter: blur(10px);
-    }
-    
-    .transparency-banner h3 {
-      color: var(--accent-violet);
-      margin-bottom: var(--space-xs);
-      display: flex;
-      align-items: center;
-      gap: var(--space-xs);
-    }
-    
-    .transparency-banner p {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
-    
-    .transparency-banner a {
-      color: var(--accent-cyan);
-      text-decoration: underline;
-    }
-    
-    .transparency-banner .commitments {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--space-sm);
-      margin-top: var(--space-md);
-    }
-    
-    .commitment-item {
-      display: flex;
-      align-items: start;
-      gap: var(--space-xs);
-      font-size: 0.9rem;
-    }
-    
-    .commitment-item .icon {
-      color: var(--success);
-      font-size: 1.2rem;
-      flex-shrink: 0;
-    }
-    
-    /* ==========================================
-       GLOBAL STYLES & RESET
-       ========================================== */
     * {
       margin: 0;
       padding: 0;
@@ -71,7 +16,6 @@
     }
     
     :root {
-      /* Colors */
       --bg-primary: #0a0e27;
       --bg-secondary: #1a1f3a;
       --bg-card: rgba(26, 31, 58, 0.8);
@@ -82,25 +26,14 @@
       --accent-gold: #FFD700;
       --success: #10b981;
       --error: #ef4444;
-      --warning: #f59e0b;
-      
-      /* Gradients */
-      --gradient-primary: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
-      --gradient-gold: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-      
-      /* Spacing */
       --space-xs: 0.5rem;
       --space-sm: 1rem;
       --space-md: 1.5rem;
       --space-lg: 2rem;
       --space-xl: 3rem;
-      
-      /* Border Radius */
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
-      
-      /* Shadows */
       --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
       --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
       --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -109,14 +42,13 @@
     }
     
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
       line-height: 1.6;
       overflow-x: hidden;
     }
     
-    /* Starfield Background */
     body::before {
       content: '';
       position: fixed;
@@ -127,9 +59,7 @@
       background-image: 
         radial-gradient(2px 2px at 20px 30px, white, transparent),
         radial-gradient(2px 2px at 60px 70px, white, transparent),
-        radial-gradient(1px 1px at 50px 50px, white, transparent),
-        radial-gradient(1px 1px at 130px 80px, white, transparent),
-        radial-gradient(2px 2px at 90px 10px, white, transparent);
+        radial-gradient(1px 1px at 50px 50px, white, transparent);
       background-size: 200px 200px;
       opacity: 0.3;
       z-index: -1;
@@ -141,9 +71,6 @@
       50% { opacity: 0.5; }
     }
     
-    /* ==========================================
-       HEADER & NAVIGATION
-       ========================================== */
     header {
       background: rgba(26, 31, 58, 0.95);
       backdrop-filter: blur(10px);
@@ -171,11 +98,11 @@
       gap: var(--space-sm);
       font-size: 1.5rem;
       font-weight: bold;
-      background: var(--gradient-primary);
+      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
       text-decoration: none;
+      cursor: pointer;
     }
     
     .nav-links {
@@ -184,18 +111,21 @@
       align-items: center;
     }
     
-    .nav-links a {
+    .nav-links a, .nav-links button {
       color: var(--text-primary);
       text-decoration: none;
       transition: all 0.3s;
       padding: var(--space-xs) var(--space-sm);
       border-radius: var(--radius-sm);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
     }
     
-    .nav-links a:hover {
+    .nav-links a:hover, .nav-links button:hover {
       background: rgba(0, 217, 255, 0.1);
       color: var(--accent-cyan);
-      box-shadow: var(--glow-cyan);
     }
     
     .btn {
@@ -211,14 +141,14 @@
     }
     
     .btn-primary {
-      background: var(--gradient-primary);
+      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
       color: white;
       box-shadow: var(--shadow-sm);
     }
     
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: var(--shadow-md), var(--glow-violet);
+      box-shadow: var(--shadow-md);
     }
     
     .btn-secondary {
@@ -230,12 +160,8 @@
     .btn-secondary:hover {
       background: var(--accent-cyan);
       color: var(--bg-primary);
-      box-shadow: var(--glow-cyan);
     }
     
-    /* ==========================================
-       HERO SECTION
-       ========================================== */
     .hero {
       text-align: center;
       padding: var(--space-xl) var(--space-md);
@@ -246,18 +172,15 @@
     .hero h1 {
       font-size: clamp(2rem, 5vw, 4rem);
       margin-bottom: var(--space-md);
-      background: var(--gradient-primary);
+      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: fadeInUp 1s ease-out;
     }
     
     .hero p {
       font-size: clamp(1rem, 2vw, 1.5rem);
       color: var(--text-secondary);
       margin-bottom: var(--space-lg);
-      animation: fadeInUp 1s ease-out 0.2s backwards;
     }
     
     .hero-actions {
@@ -265,23 +188,79 @@
       gap: var(--space-md);
       justify-content: center;
       flex-wrap: wrap;
-      animation: fadeInUp 1s ease-out 0.4s backwards;
     }
     
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .transparency-banner {
+      background: rgba(138, 43, 226, 0.1);
+      border: 2px solid rgba(138, 43, 226, 0.3);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin: var(--space-lg) var(--space-md);
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
     }
     
-    /* ==========================================
-       SEARCH & FILTERS
-       ========================================== */
+    .transparency-banner h3 {
+      color: var(--accent-violet);
+      margin-bottom: var(--space-xs);
+    }
+    
+    .transparency-banner p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .transparency-banner a {
+      color: var(--accent-cyan);
+      text-decoration: underline;
+    }
+    
+    .commitments {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+    }
+    
+    .commitment-item {
+      display: flex;
+      align-items: start;
+      gap: var(--space-xs);
+      font-size: 0.9rem;
+    }
+    
+    .stats-section {
+      max-width: 1400px;
+      margin: var(--space-xl) auto;
+      padding: 0 var(--space-md);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--space-lg);
+    }
+    
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 3rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      margin-top: var(--space-xs);
+    }
+    
     .search-section {
       max-width: 1400px;
       margin: var(--space-xl) auto;
@@ -304,7 +283,6 @@
       border-radius: var(--radius-md);
       color: var(--text-primary);
       font-size: 1rem;
-      transition: all 0.3s;
     }
     
     .search-input:focus {
@@ -317,7 +295,6 @@
       display: flex;
       gap: var(--space-sm);
       flex-wrap: wrap;
-      align-items: center;
     }
     
     .filter-btn {
@@ -327,27 +304,14 @@
       border-radius: var(--radius-sm);
       color: var(--text-primary);
       cursor: pointer;
-      transition: all 0.3s;
+      font-size: 1rem;
     }
     
-    .filter-btn:hover,
-    .filter-btn.active {
-      background: var(--gradient-primary);
+    .filter-btn:hover, .filter-btn.active {
+      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
       border-color: transparent;
-      box-shadow: var(--glow-violet);
     }
     
-    select.filter-btn {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23E0E6ED' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      padding-right: 35px;
-    }
-    
-    /* ==========================================
-       WEBAPP CARDS GRID
-       ========================================== */
     .webapps-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -359,18 +323,16 @@
     
     .webapp-card {
       background: var(--bg-card);
-      backdrop-filter: blur(10px);
       border: 1px solid rgba(0, 217, 255, 0.2);
       border-radius: var(--radius-lg);
       overflow: hidden;
       transition: all 0.3s;
       cursor: pointer;
-      position: relative;
     }
     
     .webapp-card:hover {
       transform: translateY(-8px);
-      box-shadow: var(--shadow-lg), var(--glow-cyan);
+      box-shadow: var(--shadow-lg);
       border-color: var(--accent-cyan);
     }
     
@@ -385,39 +347,16 @@
       padding: var(--space-md);
     }
     
-    .webapp-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      margin-bottom: var(--space-sm);
-    }
-    
     .webapp-title {
       font-size: 1.25rem;
       font-weight: bold;
-      color: var(--text-primary);
       margin-bottom: var(--space-xs);
     }
     
     .webapp-developer {
       font-size: 0.875rem;
       color: var(--text-secondary);
-    }
-    
-    .webapp-rating {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 1.2rem;
-    }
-    
-    .star {
-      color: var(--accent-gold);
-      filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
-    }
-    
-    .star.empty {
-      color: rgba(255, 215, 0, 0.3);
+      margin-bottom: var(--space-sm);
     }
     
     .webapp-description {
@@ -446,17 +385,6 @@
       color: var(--accent-cyan);
     }
     
-    .webapp-badges {
-      display: flex;
-      gap: var(--space-xs);
-      margin-bottom: var(--space-md);
-    }
-    
-    .badge {
-      font-size: 1.5rem;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-    }
-    
     .webapp-actions {
       display: flex;
       gap: var(--space-sm);
@@ -469,236 +397,6 @@
       font-size: 0.9rem;
     }
     
-    /* ==========================================
-       MODAL
-       ========================================== */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 2000;
-      overflow-y: auto;
-      backdrop-filter: blur(5px);
-      animation: fadeIn 0.3s;
-    }
-    
-    .modal.active {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: var(--space-md);
-    }
-    
-    .modal-content {
-      background: var(--bg-secondary);
-      border: 2px solid rgba(0, 217, 255, 0.3);
-      border-radius: var(--radius-lg);
-      max-width: 900px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      position: relative;
-      animation: slideUp 0.3s;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .modal-close {
-      position: absolute;
-      top: var(--space-md);
-      right: var(--space-md);
-      background: rgba(239, 68, 68, 0.2);
-      border: none;
-      color: var(--error);
-      font-size: 2rem;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-    }
-    
-    .modal-close:hover {
-      background: var(--error);
-      color: white;
-      transform: rotate(90deg);
-    }
-    
-    .modal-header {
-      padding: var(--space-lg);
-      border-bottom: 1px solid rgba(0, 217, 255, 0.2);
-    }
-    
-    .modal-body {
-      padding: var(--space-lg);
-    }
-    
-    .iframe-preview {
-      width: 100%;
-      height: 500px;
-      border: 2px solid rgba(0, 217, 255, 0.3);
-      border-radius: var(--radius-md);
-      background: white;
-      margin-bottom: var(--space-lg);
-    }
-    
-    .reviews-section {
-      margin-top: var(--space-xl);
-    }
-    
-    .review-item {
-      background: var(--bg-card);
-      padding: var(--space-md);
-      border-radius: var(--radius-md);
-      margin-bottom: var(--space-md);
-      border-left: 3px solid var(--accent-cyan);
-    }
-    
-    .review-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: var(--space-xs);
-    }
-    
-    .review-author {
-      font-weight: bold;
-      color: var(--accent-cyan);
-    }
-    
-    .review-date {
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-    }
-    
-    .rating-form,
-    .review-form {
-      background: var(--bg-card);
-      padding: var(--space-md);
-      border-radius: var(--radius-md);
-      margin-bottom: var(--space-lg);
-    }
-    
-    .form-group {
-      margin-bottom: var(--space-md);
-    }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: var(--space-xs);
-      color: var(--text-primary);
-      font-weight: 600;
-    }
-    
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      width: 100%;
-      padding: var(--space-sm);
-      background: var(--bg-secondary);
-      border: 2px solid rgba(0, 217, 255, 0.3);
-      border-radius: var(--radius-sm);
-      color: var(--text-primary);
-      font-size: 1rem;
-      font-family: inherit;
-    }
-    
-    .form-group textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-    
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-      box-shadow: var(--glow-cyan);
-    }
-    
-    .star-rating {
-      display: flex;
-      gap: var(--space-xs);
-      font-size: 2rem;
-      cursor: pointer;
-    }
-    
-    .star-rating .star {
-      transition: all 0.2s;
-    }
-    
-    .star-rating .star:hover,
-    .star-rating .star.selected {
-      color: var(--accent-gold);
-      transform: scale(1.2);
-    }
-    
-    /* ==========================================
-       STATS SECTION
-       ========================================== */
-    .stats-section {
-      max-width: 1400px;
-      margin: var(--space-xl) auto;
-      padding: 0 var(--space-md);
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: var(--space-lg);
-    }
-    
-    .stat-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(0, 217, 255, 0.2);
-      border-radius: var(--radius-lg);
-      padding: var(--space-lg);
-      text-align: center;
-      transition: all 0.3s;
-    }
-    
-    .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-md);
-      border-color: var(--accent-cyan);
-    }
-    
-    .stat-number {
-      font-size: 3rem;
-      font-weight: bold;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .stat-label {
-      color: var(--text-secondary);
-      margin-top: var(--space-xs);
-    }
-    
-    /* ==========================================
-       LOADING & EMPTY STATES
-       ========================================== */
     .loading {
       text-align: center;
       padding: var(--space-xl);
@@ -727,15 +425,91 @@
       color: var(--text-secondary);
     }
     
-    .empty-state-icon {
-      font-size: 4rem;
-      margin-bottom: var(--space-md);
-      opacity: 0.5;
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 2000;
+      overflow-y: auto;
+      padding: var(--space-md);
     }
     
-    /* ==========================================
-       FOOTER
-       ========================================== */
+    .modal.active {
+      display: flex;
+      justify-content: center;
+      align-items: start;
+      padding-top: 50px;
+    }
+    
+    .modal-content {
+      background: var(--bg-secondary);
+      border: 2px solid rgba(0, 217, 255, 0.3);
+      border-radius: var(--radius-lg);
+      max-width: 900px;
+      width: 100%;
+      position: relative;
+      padding: var(--space-lg);
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      background: rgba(239, 68, 68, 0.2);
+      border: none;
+      color: var(--error);
+      font-size: 2rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      line-height: 1;
+    }
+    
+    .form-group {
+      margin-bottom: var(--space-md);
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: var(--space-xs);
+      font-weight: 600;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: var(--space-sm);
+      background: var(--bg-card);
+      border: 2px solid rgba(0, 217, 255, 0.3);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: var(--glow-cyan);
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+    
     footer {
       background: var(--bg-secondary);
       border-top: 1px solid rgba(0, 217, 255, 0.2);
@@ -746,78 +520,42 @@
     
     footer p {
       color: var(--text-secondary);
+      margin-bottom: var(--space-xs);
     }
     
     footer a {
       color: var(--accent-cyan);
       text-decoration: none;
-      transition: all 0.3s;
     }
     
-    footer a:hover {
-      text-shadow: var(--glow-cyan);
-    }
-    
-    /* ==========================================
-       RESPONSIVE
-       ========================================== */
     @media (max-width: 768px) {
       .nav-links {
         width: 100%;
         justify-content: center;
       }
       
-      .hero h1 {
-        font-size: 2rem;
-      }
-      
       .webapps-grid {
         grid-template-columns: 1fr;
       }
-      
-      .stats-section {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    /* ==========================================
-       UTILITY CLASSES
-       ========================================== */
-    .hidden {
-      display: none !important;
-    }
-    
-    .text-center {
-      text-align: center;
-    }
-    
-    .mt-lg {
-      margin-top: var(--space-lg);
-    }
-    
-    .mb-lg {
-      margin-bottom: var(--space-lg);
     }
   </style>
 </head>
 <body>
-  <!-- HEADER -->
   <header>
     <nav>
-      <a href="#" class="logo">
+      <a href="#" class="logo" onclick="scrollToTop(); return false;">
         <span>🌌</span>
         <span>NEXUS WEB HUB</span>
       </a>
       <div class="nav-links">
-        <a href="#home">Home</a>
-        <a href="#explore">Explore</a>
-        <a href="#stats">Stats</a>
+        <button onclick="scrollToTop()">Home</button>
+        <button onclick="scrollToExplore()">Explore</button>
+        <button onclick="scrollToStats()">Stats</button>
         <button class="btn btn-primary" onclick="openSubmitModal()">Submit WebApp</button>
       </div>
     </nav>
   </header>
 
-  <!-- HERO SECTION -->
   <section class="hero" id="home">
     <h1>🚀 Universal WebApps Catalog</h1>
     <p>Discover, explore and share the best open web applications from around the world</p>
@@ -827,39 +565,36 @@
     </div>
   </section>
 
-  <!-- TRANSPARENCY BANNER -->
-  <section class="transparency-banner" style="margin: 0 var(--space-md) var(--space-xl);">
+  <section class="transparency-banner">
     <h3>💎 Our Commitment to Transparency</h3>
     <p>
       Nexus Web Hub will introduce <strong>optional premium features</strong> in the future to ensure sustainability. 
       However, <strong>the core catalog will always remain free</strong> and accessible to everyone.
     </p>
-    <p style="margin-top: var(--space-sm);">
+    <p>
       <strong>What we will NEVER do:</strong> Paid placement, advertising, or biased rankings. 
-      Your experience is never for sale. 
-      <a href="https://github.com/Tryboy869/nexus-web-hub#-sustainability--monetization" target="_blank">Learn more →</a>
+      Your experience is never for sale.
     </p>
     <div class="commitments">
       <div class="commitment-item">
-        <span class="icon">✅</span>
+        <span style="color: var(--success);">✅</span>
         <span>Free catalog access forever</span>
       </div>
       <div class="commitment-item">
-        <span class="icon">✅</span>
+        <span style="color: var(--success);">✅</span>
         <span>No paid placements</span>
       </div>
       <div class="commitment-item">
-        <span class="icon">✅</span>
+        <span style="color: var(--success);">✅</span>
         <span>No advertising</span>
       </div>
       <div class="commitment-item">
-        <span class="icon">✅</span>
+        <span style="color: var(--success);">✅</span>
         <span>Community-driven rankings</span>
       </div>
     </div>
   </section>
 
-  <!-- STATS SECTION -->
   <section class="stats-section" id="stats">
     <div class="stat-card">
       <div class="stat-number" id="stat-apps">0</div>
@@ -879,15 +614,13 @@
     </div>
   </section>
 
-  <!-- SEARCH & FILTERS -->
   <section class="search-section" id="explore">
     <div class="search-bar">
       <input 
         type="text" 
         class="search-input" 
         id="searchInput"
-        placeholder="🔍 Search WebApps by name or description..."
-        oninput="handleSearch()"
+        placeholder="🔍 Search WebApps..."
       >
       <button class="btn btn-primary" onclick="handleSearch()">Search</button>
     </div>
@@ -910,14 +643,9 @@
         <option value="popular">🔥 Popular</option>
         <option value="name">🔤 Name</option>
       </select>
-      
-      <button class="filter-btn" id="hasGithubFilter" onclick="toggleGithubFilter()">
-        💻 Open Source Only
-      </button>
     </div>
   </section>
 
-  <!-- WEBAPPS GRID -->
   <div class="loading" id="loading">
     <div class="spinner"></div>
     <p>Loading WebApps...</p>
@@ -926,191 +654,123 @@
   <div class="webapps-grid" id="webappsGrid"></div>
   
   <div class="empty-state hidden" id="emptyState">
-    <div class="empty-state-icon">🔍</div>
+    <div style="font-size: 4rem; margin-bottom: var(--space-md); opacity: 0.5;">🔍</div>
     <h2>No WebApps Found</h2>
-    <p>Try adjusting your search or filters</p>
-  </div>
-
-  <!-- DETAIL MODAL -->
-  <div class="modal" id="detailModal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
-      <div class="modal-header">
-        <h2 id="modalTitle"></h2>
-        <p id="modalDeveloper"></p>
-      </div>
-      <div class="modal-body">
-        <div id="modalIframe"></div>
-        <div id="modalDescription"></div>
-        <div id="modalTags"></div>
-        <div id="modalBadges"></div>
-        <div id="modalLinks"></div>
-        
-        <!-- Rating Form -->
-        <div class="rating-form mt-lg">
-          <h3>Rate this WebApp</h3>
-          <div class="star-rating" id="starRating">
-            <span class="star" data-value="1" onclick="selectRating(1)">⭐</span>
-            <span class="star" data-value="2" onclick="selectRating(2)">⭐</span>
-            <span class="star" data-value="3" onclick="selectRating(3)">⭐</span>
-            <span class="star" data-value="4" onclick="selectRating(4)">⭐</span>
-            <span class="star" data-value="5" onclick="selectRating(5)">⭐</span>
-          </div>
-          <button class="btn btn-primary mt-lg" onclick="submitRating()">Submit Rating</button>
-        </div>
-        
-        <!-- Review Form -->
-        <div class="review-form mt-lg">
-          <h3>Leave a Review</h3>
-          <div class="form-group">
-            <label>Your Name</label>
-            <input type="text" id="reviewName" placeholder="Enter your name">
-          </div>
-          <div class="form-group">
-            <label>Your Review</label>
-            <textarea id="reviewComment" placeholder="Share your thoughts..."></textarea>
-          </div>
-          <button class="btn btn-primary" onclick="submitReview()">Submit Review</button>
-        </div>
-        
-        <!-- Reviews Section -->
-        <div class="reviews-section" id="reviewsSection">
-          <h3>Recent Reviews</h3>
-          <div id="reviewsList"></div>
-        </div>
-      </div>
-    </div>
+    <p>Try adjusting your search or filters, or be the first to submit one!</p>
   </div>
 
   <!-- SUBMIT MODAL -->
   <div class="modal" id="submitModal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal('submitModal')">&times;</button>
-      <div class="modal-header">
-        <h2>Submit Your WebApp</h2>
-        <p>Share your amazing web application with the community</p>
-      </div>
-      <div class="modal-body">
-        <form id="submitForm" onsubmit="handleSubmit(event)">
-          <div class="form-group">
-            <label>WebApp Name *</label>
-            <input type="text" id="submitName" required minlength="3" maxlength="100" 
-                   placeholder="My Awesome WebApp">
-          </div>
-          
-          <div class="form-group">
-            <label>Developer/Team Name *</label>
-            <input type="text" id="submitDeveloper" required minlength="2" maxlength="100" 
-                   placeholder="Your name or team name">
-          </div>
-          
-          <div class="form-group">
-            <label>WebApp URL * (must be HTTPS)</label>
-            <input type="url" id="submitUrl" required 
-                   placeholder="https://your-webapp.com" pattern="https://.*">
-          </div>
-          
-          <div class="form-group">
-            <label>Short Description * (20-200 characters)</label>
-            <textarea id="submitDescShort" required minlength="20" maxlength="200" 
-                      placeholder="A brief description of your WebApp..."></textarea>
-          </div>
-          
-          <div class="form-group">
-            <label>Long Description (50-2000 characters)</label>
-            <textarea id="submitDescLong" minlength="50" maxlength="2000" 
-                      placeholder="Detailed description with features, benefits, etc..."></textarea>
-          </div>
-          
-          <div class="form-group">
-            <label>Type *</label>
-            <select id="submitType" required>
-              <option value="">Select a type</option>
-              <option value="game">🎮 Game</option>
-              <option value="tool">🛠️ Tool</option>
-              <option value="api">🔌 API</option>
-              <option value="design">🎨 Design</option>
-              <option value="productivity">📊 Productivity</option>
-              <option value="education">📚 Education</option>
-              <option value="social">💬 Social</option>
-              <option value="other">🌟 Other</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label>Tags * (comma separated, 1-10 tags)</label>
-            <input type="text" id="submitTags" required 
-                   placeholder="web, tool, productivity, open-source">
-          </div>
-          
-          <div class="form-group">
-            <label>Video URL (YouTube, Vimeo, etc.)</label>
-            <input type="url" id="submitVideo" placeholder="https://youtube.com/watch?v=...">
-          </div>
-          
-          <div class="form-group">
-            <label>GitHub Repository (if open-source)</label>
-            <input type="url" id="submitGithub" placeholder="https://github.com/username/repo">
-          </div>
-          
-          <button type="submit" class="btn btn-primary" style="width: 100%;">
-            🚀 Submit WebApp
-          </button>
-        </form>
+      <h2 style="margin-bottom: var(--space-md);">Submit Your WebApp</h2>
+      
+      <form id="submitForm" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label>WebApp Name *</label>
+          <input type="text" id="submitName" required minlength="3" maxlength="100" 
+                 placeholder="My Awesome WebApp">
+        </div>
         
-        <div id="submitStatus" class="mt-lg text-center hidden"></div>
-      </div>
+        <div class="form-group">
+          <label>Developer/Team Name *</label>
+          <input type="text" id="submitDeveloper" required minlength="2" maxlength="100" 
+                 placeholder="Your name or team name">
+        </div>
+        
+        <div class="form-group">
+          <label>WebApp URL * (must be HTTPS)</label>
+          <input type="url" id="submitUrl" required 
+                 placeholder="https://your-webapp.com" pattern="https://.*">
+        </div>
+        
+        <div class="form-group">
+          <label>Short Description * (20-200 characters)</label>
+          <textarea id="submitDescShort" required minlength="20" maxlength="200" 
+                    placeholder="A brief description..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Type *</label>
+          <select id="submitType" required>
+            <option value="">Select a type</option>
+            <option value="game">🎮 Game</option>
+            <option value="tool">🛠️ Tool</option>
+            <option value="api">🔌 API</option>
+            <option value="design">🎨 Design</option>
+            <option value="productivity">📊 Productivity</option>
+            <option value="education">📚 Education</option>
+            <option value="social">💬 Social</option>
+            <option value="other">🌟 Other</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Tags * (comma separated)</label>
+          <input type="text" id="submitTags" required 
+                 placeholder="web, tool, productivity">
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          🚀 Submit WebApp
+        </button>
+      </form>
+      
+      <div id="submitStatus" style="margin-top: var(--space-md); text-align: center;"></div>
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer>
-    <p>
-      🌌 <strong>Nexus Web Hub</strong> - Universal WebApps Catalog
-    </p>
-    <p>
-      Built with ❤️ by <a href="https://github.com/Tryboy869" target="_blank">Nexus Studio</a>
-    </p>
-    <p style="margin-top: var(--space-xs);">
-      <strong>DAOUDA Abdoul Anzize</strong> - CEO
-    </p>
+    <p>🌌 <strong>Nexus Web Hub</strong> - Universal WebApps Catalog</p>
+    <p>Built with ❤️ by <a href="https://github.com/Tryboy869" target="_blank">Nexus Studio</a></p>
+    <p><strong>DAOUDA Abdoul Anzize</strong> - CEO</p>
     <p style="margin-top: var(--space-sm);">
       <a href="https://github.com/Tryboy869/nexus-web-hub" target="_blank">GitHub</a> • 
-      <a href="mailto:nexusstudio100@gmail.com">Contact</a> • 
-      <a href="#" onclick="alert('Coming soon!')">Documentation</a> • 
-      <a href="#" onclick="alert('Coming soon!')">API</a>
+      <a href="mailto:nexusstudio100@gmail.com">Contact</a>
     </p>
   </footer>
 
-  <!-- JAVASCRIPT -->
   <script>
-    // ==========================================
-    // CONFIGURATION
-    // ==========================================
     const API_BASE = window.location.origin;
-    
-    // State
     let allWebapps = [];
-    let currentFilters = {
-      search: '',
-      type: '',
-      sort: 'recent',
-      githubOnly: false
-    };
-    let currentWebapp = null;
-    let selectedRating = 0;
+    let currentFilters = { search: '', type: '', sort: 'recent' };
     
-    // Badge mapping
-    const BADGES = {
-      pioneer: { icon: '🏆', label: 'Pioneer' },
-      highly_rated: { icon: '⭐', label: 'Highly Rated' },
-      popular: { icon: '🔥', label: 'Popular' },
-      open_source: { icon: '💻', label: 'Open Source' }
-    };
+    // Navigation functions
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     
-    // ==========================================
-    // API FUNCTIONS
-    // ==========================================
+    function scrollToExplore() {
+      document.getElementById('explore').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function scrollToStats() {
+      document.getElementById('stats').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function surpriseMe() {
+      if (allWebapps.length > 0) {
+        const random = allWebapps[Math.floor(Math.random() * allWebapps.length)];
+        window.open(random.url, '_blank');
+      } else {
+        alert('Loading WebApps... Please try again in a moment.');
+      }
+    }
+    
+    // Modal functions
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+    
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+    
+    function openSubmitModal() {
+      openModal('submitModal');
+    }
+    
+    // API functions
     async function fetchWebapps() {
       try {
         const params = new URLSearchParams({
@@ -1127,32 +787,11 @@
         
         if (data.success) {
           allWebapps = data.data;
-          
-          // Filter for GitHub if needed
-          if (currentFilters.githubOnly) {
-            allWebapps = allWebapps.filter(app => app.github_url);
-          }
-          
           renderWebapps(allWebapps);
         }
       } catch (error) {
-        console.error('Error fetching webapps:', error);
-        showError('Failed to load WebApps. Please refresh the page.');
-      }
-    }
-    
-    async function fetchWebappDetails(id) {
-      try {
-        const response = await fetch(`${API_BASE}/api/webapps/${id}`);
-        const data = await response.json();
-        
-        if (data.success) {
-          currentWebapp = data.data;
-          showWebappModal(data.data);
-        }
-      } catch (error) {
-        console.error('Error fetching webapp details:', error);
-        showError('Failed to load WebApp details.');
+        console.error('Error:', error);
+        document.getElementById('loading').innerHTML = '<p style="color: var(--error);">Failed to load WebApps. Please refresh.</p>';
       }
     }
     
@@ -1168,63 +807,10 @@
           document.getElementById('stat-views').textContent = data.data.total_views;
         }
       } catch (error) {
-        console.error('Error fetching stats:', error);
+        console.error('Stats error:', error);
       }
     }
     
-    async function submitWebapp(formData) {
-      try {
-        const response = await fetch(`${API_BASE}/api/webapps/submit`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
-        
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        console.error('Error submitting webapp:', error);
-        return { success: false, error: 'Network error. Please try again.' };
-      }
-    }
-    
-    async function submitRatingAPI(webappId, rating) {
-      try {
-        const response = await fetch(`${API_BASE}/api/ratings`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ webapp_id: webappId, rating })
-        });
-        
-        return await response.json();
-      } catch (error) {
-        console.error('Error submitting rating:', error);
-        return { success: false, error: 'Failed to submit rating' };
-      }
-    }
-    
-    async function submitReviewAPI(webappId, userName, comment) {
-      try {
-        const response = await fetch(`${API_BASE}/api/reviews`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            webapp_id: webappId, 
-            user_name: userName, 
-            comment 
-          })
-        });
-        
-        return await response.json();
-      } catch (error) {
-        console.error('Error submitting review:', error);
-        return { success: false, error: 'Failed to submit review' };
-      }
-    }
-    
-    // ==========================================
-    // RENDER FUNCTIONS
-    // ==========================================
     function renderWebapps(webapps) {
       const grid = document.getElementById('webappsGrid');
       const loading = document.getElementById('loading');
@@ -1241,47 +827,28 @@
       emptyState.classList.add('hidden');
       
       grid.innerHTML = webapps.map(app => `
-        <div class="webapp-card" onclick="fetchWebappDetails('${app.id}')">
+        <div class="webapp-card">
           <img 
-            src="${app.screenshot_url || 'assets/placeholder.svg'}" 
+            src="${app.screenshot_url || '/assets/placeholder.svg'}" 
             alt="${app.name}"
             class="webapp-thumbnail"
-            onerror="this.src='assets/placeholder.svg'"
+            onerror="this.src='/assets/placeholder.svg'"
           >
           <div class="webapp-content">
-            <div class="webapp-header">
-              <div>
-                <div class="webapp-title">${app.name}</div>
-                <div class="webapp-developer">by ${app.developer}</div>
-              </div>
-              <div class="webapp-rating">
-                ${renderStars(app.rating)}
-              </div>
-            </div>
-            
+            <div class="webapp-title">${app.name}</div>
+            <div class="webapp-developer">by ${app.developer}</div>
             <div class="webapp-description">${app.description_short}</div>
             
             <div class="webapp-tags">
               ${app.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')}
             </div>
             
-            ${app.badges.length > 0 ? `
-              <div class="webapp-badges">
-                ${app.badges.map(badge => `
-                  <span class="badge" title="${BADGES[badge]?.label || badge}">
-                    ${BADGES[badge]?.icon || '🏅'}
-                  </span>
-                `).join('')}
-              </div>
-            ` : ''}
-            
             <div class="webapp-actions">
-              <a href="${app.url}" target="_blank" class="btn btn-primary" 
-                 onclick="event.stopPropagation()">
+              <a href="${app.url}" target="_blank" class="btn btn-primary" onclick="event.stopPropagation()">
                 Open App
               </a>
-              <button class="btn btn-secondary" onclick="event.stopPropagation(); fetchWebappDetails('${app.id}')">
-                Details
+              <button class="btn btn-secondary" onclick="event.stopPropagation(); window.open('${app.url}', '_blank')">
+                Visit
               </button>
             </div>
           </div>
@@ -1289,116 +856,6 @@
       `).join('');
     }
     
-    function renderStars(rating) {
-      const fullStars = Math.floor(rating);
-      const emptyStars = 5 - fullStars;
-      
-      let html = '';
-      for (let i = 0; i < fullStars; i++) {
-        html += '<span class="star">⭐</span>';
-      }
-      for (let i = 0; i < emptyStars; i++) {
-        html += '<span class="star empty">⭐</span>';
-      }
-      
-      return html;
-    }
-    
-    function showWebappModal(app) {
-      document.getElementById('modalTitle').textContent = app.name;
-      document.getElementById('modalDeveloper').textContent = `by ${app.developer}`;
-      
-      // Iframe preview
-      document.getElementById('modalIframe').innerHTML = `
-        <iframe 
-          src="${app.url}" 
-          class="iframe-preview"
-          sandbox="allow-scripts allow-same-origin allow-forms"
-          loading="lazy"
-        ></iframe>
-      `;
-      
-      // Description
-      document.getElementById('modalDescription').innerHTML = `
-        <h3>About</h3>
-        <p>${app.description_long || app.description_short}</p>
-      `;
-      
-      // Tags
-      document.getElementById('modalTags').innerHTML = `
-        <h3>Tags</h3>
-        <div class="webapp-tags">
-          ${app.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-        </div>
-      `;
-      
-      // Badges
-      if (app.badges.length > 0) {
-        document.getElementById('modalBadges').innerHTML = `
-          <h3>Badges</h3>
-          <div class="webapp-badges">
-            ${app.badges.map(badge => `
-              <span class="badge" style="font-size: 2rem">
-                ${BADGES[badge]?.icon || '🏅'}
-                <span style="font-size: 1rem; margin-left: 8px;">
-                  ${BADGES[badge]?.label || badge}
-                </span>
-              </span>
-            `).join('')}
-          </div>
-        `;
-      }
-      
-      // Links
-      document.getElementById('modalLinks').innerHTML = `
-        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-          <a href="${app.url}" target="_blank" class="btn btn-primary">
-            🌐 Visit WebApp
-          </a>
-          ${app.video_url ? `
-            <a href="${app.video_url}" target="_blank" class="btn btn-secondary">
-              📹 Watch Video
-            </a>
-          ` : ''}
-          ${app.github_url ? `
-            <a href="${app.github_url}" target="_blank" class="btn btn-secondary">
-              💻 View Source
-            </a>
-          ` : ''}
-        </div>
-      `;
-      
-      // Reviews
-      renderReviews(app.reviews);
-      
-      // Show modal
-      document.getElementById('detailModal').classList.add('active');
-      selectedRating = 0;
-      updateStarRating();
-    }
-    
-    function renderReviews(reviews) {
-      const reviewsList = document.getElementById('reviewsList');
-      
-      if (reviews.length === 0) {
-        reviewsList.innerHTML = '<p>No reviews yet. Be the first to review!</p>';
-        return;
-      }
-      
-      reviewsList.innerHTML = reviews.map(review => `
-        <div class="review-item">
-          <div class="review-header">
-            <span class="review-author">${review.user_name}</span>
-            <span class="review-date">${formatDate(review.created_at)}</span>
-          </div>
-          <p>${review.comment}</p>
-        </div>
-      `).join('');
-    }
-    
-    // ==========================================
-    // EVENT HANDLERS
-    // ==========================================
     function handleSearch() {
       currentFilters.search = document.getElementById('searchInput').value;
       fetchWebapps();
@@ -1410,165 +867,73 @@
       fetchWebapps();
     }
     
-    function toggleGithubFilter() {
-      const btn = document.getElementById('hasGithubFilter');
-      currentFilters.githubOnly = !currentFilters.githubOnly;
-      btn.classList.toggle('active');
-      fetchWebapps();
-    }
-    
     async function handleSubmit(event) {
       event.preventDefault();
       
       const statusDiv = document.getElementById('submitStatus');
-      statusDiv.innerHTML = '<div class="spinner"></div><p>Submitting...</p>';
-      statusDiv.classList.remove('hidden');
+      statusDiv.innerHTML = '<div class="spinner" style="margin: 0 auto;"></div><p>Submitting...</p>';
       
       const formData = {
         name: document.getElementById('submitName').value,
         developer: document.getElementById('submitDeveloper').value,
         url: document.getElementById('submitUrl').value,
         description_short: document.getElementById('submitDescShort').value,
-        description_long: document.getElementById('submitDescLong').value || null,
         type: document.getElementById('submitType').value,
-        tags: document.getElementById('submitTags').value.split(',').map(t => t.trim()),
-        video_url: document.getElementById('submitVideo').value || null,
-        github_url: document.getElementById('submitGithub').value || null
+        tags: document.getElementById('submitTags').value.split(',').map(t => t.trim())
       };
       
-      const result = await submitWebapp(formData);
-      
-      if (result.success) {
-        statusDiv.innerHTML = `
-          <div style="color: var(--success); font-size: 1.2rem;">
-            ✅ ${result.message}
-          </div>
-        `;
-        document.getElementById('submitForm').reset();
-        setTimeout(() => {
-          closeModal('submitModal');
-          fetchWebapps();
-        }, 3000);
-      } else {
+      try {
+        const response = await fetch(`${API_BASE}/api/webapps/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          statusDiv.innerHTML = `
+            <div style="color: var(--success); font-size: 1.2rem;">
+              ✅ ${result.message}
+            </div>
+          `;
+          document.getElementById('submitForm').reset();
+          setTimeout(() => {
+            closeModal('submitModal');
+            fetchWebapps();
+            fetchStats();
+          }, 3000);
+        } else {
+          statusDiv.innerHTML = `
+            <div style="color: var(--error); font-size: 1.2rem;">
+              ❌ ${result.error}
+            </div>
+          `;
+        }
+      } catch (error) {
         statusDiv.innerHTML = `
           <div style="color: var(--error); font-size: 1.2rem;">
-            ❌ ${result.error}
+            ❌ Network error. Please try again.
           </div>
         `;
       }
     }
     
-    function selectRating(rating) {
-      selectedRating = rating;
-      updateStarRating();
-    }
-    
-    function updateStarRating() {
-      const stars = document.querySelectorAll('#starRating .star');
-      stars.forEach((star, index) => {
-        if (index < selectedRating) {
-          star.classList.add('selected');
-        } else {
-          star.classList.remove('selected');
-        }
-      });
-    }
-    
-    async function submitRating() {
-      if (!selectedRating) {
-        alert('Please select a rating');
-        return;
+    // Close modal on outside click
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        closeModal(e.target.id);
       }
-      
-      const result = await submitRatingAPI(currentWebapp.id, selectedRating);
-      
-      if (result.success) {
-        alert('✅ Rating submitted successfully!');
-        fetchWebappDetails(currentWebapp.id);
-      } else {
-        alert('❌ ' + result.error);
-      }
-    }
-    
-    async function submitReview() {
-      const userName = document.getElementById('reviewName').value;
-      const comment = document.getElementById('reviewComment').value;
-      
-      if (!userName || !comment) {
-        alert('Please fill in all fields');
-        return;
-      }
-      
-      if (comment.length < 10) {
-        alert('Review must be at least 10 characters');
-        return;
-      }
-      
-      const result = await submitReviewAPI(currentWebapp.id, userName, comment);
-      
-      if (result.success) {
-        alert('✅ Review submitted successfully!');
-        document.getElementById('reviewName').value = '';
-        document.getElementById('reviewComment').value = '';
-        fetchWebappDetails(currentWebapp.id);
-      } else {
-        alert('❌ ' + result.error);
-      }
-    }
-    
-    // ==========================================
-    // UTILITY FUNCTIONS
-    // ==========================================
-    function openModal(modalId) {
-      document.getElementById(modalId).classList.add('active');
-    }
-    
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.remove('active');
-    }
-    
-    function openSubmitModal() {
-      openModal('submitModal');
-    }
-    
-    function scrollToExplore() {
-      document.getElementById('explore').scrollIntoView({ behavior: 'smooth' });
-    }
-    
-    function surpriseMe() {
-      if (allWebapps.length > 0) {
-        const randomApp = allWebapps[Math.floor(Math.random() * allWebapps.length)];
-        fetchWebappDetails(randomApp.id);
-      } else {
-        alert('Loading WebApps... Please try again in a moment.');
-      }
-    }
-    
-    function formatDate(timestamp) {
-      const date = new Date(timestamp * 1000);
-      return date.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-      });
-    }
-    
-    function showError(message) {
-      alert(message);
-    }
-    
-    // Close modals on outside click
-    document.querySelectorAll('.modal').forEach(modal => {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          closeModal(modal.id);
-        }
-      });
     });
     
-    // ==========================================
-    // INITIALIZATION
-    // ==========================================
+    // Search on Enter key
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        handleSearch();
+      }
+    });
+    
+    // Initialize
     async function init() {
       console.log('🌌 Nexus Web Hub initializing...');
       await fetchStats();
@@ -1576,7 +941,6 @@
       console.log('✅ Ready!');
     }
     
-    // Start app when DOM is ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
