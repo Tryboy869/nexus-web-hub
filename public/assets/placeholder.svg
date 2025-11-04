@@ -1,0 +1,107 @@
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0e27;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1f3a;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4169E1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8A2BE2;stop-opacity:1" />
+    </linearGradient>
+    
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#bgGradient)"/>
+  
+  <!-- Stars -->
+  <circle cx="100" cy="100" r="2" fill="white" opacity="0.6"/>
+  <circle cx="300" cy="150" r="1" fill="white" opacity="0.4"/>
+  <circle cx="500" cy="80" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="700" cy="200" r="2" fill="white" opacity="0.6"/>
+  <circle cx="900" cy="120" r="1" fill="white" opacity="0.4"/>
+  <circle cx="1100" cy="180" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="200" cy="400" r="1" fill="white" opacity="0.4"/>
+  <circle cx="400" cy="450" r="2" fill="white" opacity="0.6"/>
+  <circle cx="600" cy="380" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="800" cy="500" r="1" fill="white" opacity="0.4"/>
+  <circle cx="1000" cy="420" r="2" fill="white" opacity="0.6"/>
+  <circle cx="150" cy="650" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="350" cy="700" r="1" fill="white" opacity="0.4"/>
+  <circle cx="550" cy="620" r="2" fill="white" opacity="0.6"/>
+  <circle cx="750" cy="680" r="1" fill="white" opacity="0.4"/>
+  <circle cx="950" cy="720" r="1.5" fill="white" opacity="0.5"/>
+  
+  <!-- Central Hub -->
+  <g filter="url(#glow)">
+    <!-- Hexagon -->
+    <polygon points="600,280 660,310 660,370 600,400 540,370 540,310" 
+             fill="url(#nodeGradient)" 
+             stroke="#00D9FF" 
+             stroke-width="3"
+             opacity="0.9"/>
+    
+    <!-- Inner symbol (stylized N) -->
+    <path d="M 570 320 L 570 360 L 575 360 L 605 330 L 605 360 L 610 360 L 610 320 L 605 320 L 575 350 L 575 320 Z" 
+          fill="#E0E6ED" 
+          opacity="0.9"/>
+    <path d="M 620 320 L 620 360 L 625 360 L 625 345 L 640 345 L 640 360 L 645 360 L 645 320 L 640 320 L 640 340 L 625 340 L 625 320 Z" 
+          fill="#E0E6ED" 
+          opacity="0.9"/>
+  </g>
+  
+  <!-- Satellite Nodes -->
+  <g opacity="0.8">
+    <!-- Top node -->
+    <circle cx="600" cy="180" r="15" fill="#00D9FF" filter="url(#glow)"/>
+    <line x1="600" y1="280" x2="600" y2="195" stroke="#00D9FF" stroke-width="2" opacity="0.5" stroke-dasharray="5,5"/>
+    
+    <!-- Top Right node -->
+    <circle cx="750" cy="250" r="12" fill="#8A2BE2" filter="url(#glow)"/>
+    <line x1="660" y1="310" x2="738" y2="255" stroke="#8A2BE2" stroke-width="2" opacity="0.5" stroke-dasharray="5,5"/>
+    
+    <!-- Bottom Right node -->
+    <circle cx="720" cy="480" r="10" fill="#FFD700" filter="url(#glow)"/>
+    <line x1="660" y1="370" x2="710" y2="475" stroke="#FFD700" stroke-width="2" opacity="0.5" stroke-dasharray="5,5"/>
+    
+    <!-- Bottom node -->
+    <circle cx="600" cy="550" r="12" fill="#00D9FF" filter="url(#glow)"/>
+    <line x1="600" y1="400" x2="600" y2="538" stroke="#00D9FF" stroke-width="2" opacity="0.5" stroke-dasharray="5,5"/>
+    
+    <!-- Bottom Left node -->
+    <circle cx="450" cy="480" r="10" fill="#8A2BE2" filter="url(#glow)"/>
+    <line x1="540" y1="370" x2="460" y2="475" stroke="#8A2BE2" stroke-width="2" opacity="0.5" stroke-dasharray="5,5"/>
+    
+    <!-- Top Left node -->
+    <circle cx="450" cy="250" r="12" fill="#FFD700" filter="url(#glow)"/>
+    <line x1="540" y1="310" x2="462" y2="255" stroke="#FFD700" stroke-width="2" opacity="0.5" stroke-dasharray="5,5"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="600" y="600" font-family="Arial, sans-serif" font-size="32" font-weight="bold" 
+        fill="#E0E6ED" text-anchor="middle" opacity="0.8">
+    NEXUS WEB HUB
+  </text>
+  
+  <text x="600" y="640" font-family="Arial, sans-serif" font-size="18" 
+        fill="#9CA3AF" text-anchor="middle" opacity="0.7">
+    Universal WebApps Catalog
+  </text>
+  
+  <!-- Corner decoration -->
+  <g opacity="0.3">
+    <circle cx="50" cy="50" r="3" fill="#00D9FF"/>
+    <circle cx="1150" cy="50" r="3" fill="#8A2BE2"/>
+    <circle cx="50" cy="750" r="3" fill="#FFD700"/>
+    <circle cx="1150" cy="750" r="3" fill="#00D9FF"/>
+  </g>
+</svg>
