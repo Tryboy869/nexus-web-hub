@@ -2,6 +2,52 @@
 
 First off, **thank you** for considering contributing to Nexus Web Hub! It's people like you that make this project a reality.
 
+> ⚠️ **Important**: Please read our [Sustainability & Monetization Policy](#-sustainability--monetization-policy) below before contributing.
+
+---
+
+## 💰 Sustainability & Monetization Policy
+
+### Understanding the Project Model
+
+Nexus Web Hub is building a **sustainable open-source platform**. This means:
+
+1. **The core catalog will always be free and open-source**
+2. **Premium features may be introduced in the future** to fund development
+3. **No advertising, no paid placement, no biased rankings**
+
+### What This Means for Contributors
+
+By contributing to Nexus Web Hub, you acknowledge and agree that:
+
+✅ **Your contributions to the core platform** are licensed under MIT  
+✅ **The project may introduce premium features** alongside the free core  
+✅ **You do not expect financial compensation** for your contributions unless explicitly agreed in writing  
+✅ **You support the sustainability model** that allows the project to continue long-term  
+✅ **Premium features will not compromise** the core mission and values
+
+### What Won't Change
+
+- ❌ The catalog will never be paywalled
+- ❌ WebApp rankings will never be based on payment
+- ❌ The core codebase will remain open-source
+- ❌ Community contributions will always be welcome
+- ❌ No ads or sponsored placements
+
+### Transparency Commitment
+
+Any major monetization decision will be:
+- 📢 Announced publicly with advance notice
+- 💬 Open to community feedback
+- 📝 Clearly documented
+- 🎯 Aligned with our core values
+
+### Questions?
+
+If you have concerns about this policy, please reach out:
+- 📧 nexusstudio100@gmail.com
+- 💬 Open a GitHub Discussion
+
 ---
 
 ## 🌟 Ways to Contribute
