@@ -23,6 +23,9 @@ const PORT = process.env.PORT || 3000;
 // MIDDLEWARE CONFIGURATION
 // ==========================================
 
+// CRITICAL: Trust proxy for Render/Railway/Fly.io deployments
+app.set('trust proxy', 1);
+
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
