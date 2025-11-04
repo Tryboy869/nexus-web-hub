@@ -4,9 +4,11 @@
 
 ![Nexus Web Hub Banner](public/assets/logo.png)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT + Commercial](https://img.shields.io/badge/License-Dual-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+> ⚠️ **Important Notice**: This project will include premium features in the future to ensure sustainability. Core catalog access will always remain free. See [Sustainability & Monetization](#-sustainability--monetization) section below.
 
 ---
 
@@ -18,6 +20,23 @@ Nexus Web Hub is an open-source platform that aims to become the **universal cat
 - **🔓 Freedom**: No gatekeeping, no approval delays
 - **💎 Quality**: Community-driven ratings and reviews
 - **🚀 Innovation**: Showcase the best of the open web
+- **🤝 Sustainability**: Building a financially sustainable platform without compromising our values
+
+### Our Core Commitment
+
+**What will ALWAYS be free:**
+- ✅ Full access to the entire WebApp catalog
+- ✅ Submitting your WebApps
+- ✅ Rating and reviewing WebApps
+- ✅ Using the public API (with fair rate limits)
+- ✅ Contributing to the codebase
+
+**What we will NEVER do:**
+- ❌ Paid placement or featured listings
+- ❌ Advertising-based monetization
+- ❌ Selling user data
+- ❌ Biasing search results based on payment
+- ❌ Paywall on core catalog access
 
 ---
 
@@ -311,9 +330,74 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
+## 💰 Sustainability & Monetization
+
+### Our Philosophy
+
+Nexus Web Hub is committed to remaining a **fair and accessible platform** for all. To ensure long-term sustainability and continuous development, we plan to introduce **optional premium features** in the future.
+
+### Transparency Promise
+
+**Current Status**: 100% Free  
+**Future Plan**: Hybrid model (Free Core + Optional Premium)
+
+**Our Commitments:**
+1. 📖 **Full Transparency**: Any monetization will be clearly communicated
+2. 🆓 **Free Core**: Catalog access and basic features will always be free
+3. 🚫 **No Pay-to-Win**: Rankings and visibility based solely on quality and engagement
+4. 💎 **Value-Driven**: Premium features will provide genuine value, not artificial limitations
+5. 👥 **Community First**: Major decisions will involve community feedback
+
+### What Premium Might Include (Future)
+
+While details are not finalized, premium features may include:
+- 📊 Advanced analytics for WebApp creators
+- 🎨 Enhanced customization options
+- 🔌 Extended API access limits
+- 🛠️ Professional tools and services
+- ⚡ Priority support
+
+**None of these will affect the core experience of discovering and using WebApps.**
+
+### Why This Approach?
+
+Building and maintaining a quality platform requires:
+- 💻 Infrastructure costs (servers, databases, CDN)
+- 🔧 Ongoing development and maintenance
+- 🛡️ Security and moderation
+- 📈 Scaling as the community grows
+- 👨‍💻 Compensating maintainers and contributors
+
+By monetizing optional premium features (not the core catalog), we can:
+- ✅ Keep the platform accessible to everyone
+- ✅ Sustain long-term development
+- ✅ Remain independent from advertisers
+- ✅ Reward maintainers fairly
+- ✅ Invest in better features for all users
+
+### Inspired By
+
+We follow the model of successful open-source projects like:
+- **GitLab**: Open core + Enterprise features
+- **Ghost**: Self-hosted free + Managed hosting premium
+- **Discourse**: Free software + Paid hosting/support
+
+---
+
 ## 📜 License
 
-This project is licensed under the **MIT License** - see [LICENSE](LICENSE) for details.
+This project uses a **dual licensing model**:
+
+- **Core Platform**: MIT License (see [LICENSE](LICENSE))
+- **Future Premium Features**: May use commercial licensing
+
+By contributing to this project, you agree that:
+- Your contributions to the core platform are licensed under MIT
+- The project may include premium features in the future
+- You do not expect compensation for contributions unless explicitly agreed
+- You support the sustainability model described above
+
+See [LICENSE](LICENSE) and [CONTRIBUTING.md](CONTRIBUTING.md) for full details.
 
 ---
 
