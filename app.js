@@ -1,52 +1,25 @@
 // ==========================================
-// NEXUS WEB HUB - BACKEND COMPLET
-// Architecture: Node.js + Express + Turso + Vanilla JS
-// Version: 1.0.0 - WORKING VERSION
-// Author: DAOUDA Abdoul Anzize - CEO Nexus Studio
+// NEXUS WEB HUB - MONO-FILE ARCHITECTURE
+// Version: 1.0.0 (NEXUS AXION 2.5)
+// Author: DAOUDA Abdoul Anzize - Nexus Studio
 // ==========================================
 
 import express from 'express';
-import helmet from 'helmet';
-import cors from 'cors';
-import rateLimit from 'express-rate-limit';
 import { createClient } from '@libsql/client';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { z } from 'zod';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ==========================================
-// MIDDLEWARE CONFIGURATION
-// ==========================================
-
+// Trust proxy (pour Render/Railway)
 app.set('trust proxy', 1);
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      frameSrc: ["'self'", "https://*"],
-      imgSrc: ["'self'", "data:", "https:"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"]
-    }
-  }
-}));
-
-app.use(cors());
+// Middleware
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static('public'));
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
-});
-app.use('/api/', limiter);
+app.use(express.urlencoded({ extended: true }));
 
 // ==========================================
-// TURSO DATABASE CONNECTION
+// DATABASE CONNECTION
 // ==========================================
 
 const db = createClient({
@@ -62,7 +35,6 @@ async function initDatabase() {
   console.log('🗄️  Initializing database...');
   
   try {
-    // Create table with backward compatibility
     await db.execute(`
       CREATE TABLE IF NOT EXISTS webapps (
         id TEXT PRIMARY KEY,
@@ -70,11 +42,10 @@ async function initDatabase() {
         developer TEXT NOT NULL,
         url TEXT NOT NULL UNIQUE,
         description_short TEXT NOT NULL,
-        description_long TEXT,
+        description_long TEXT CHECK(length(description_long) <= 3000),
         video_url TEXT,
         github_url TEXT,
-        screenshot_url TEXT,
-        type TEXT,
+        types TEXT NOT NULL,
         tags TEXT NOT NULL,
         status TEXT DEFAULT 'approved',
         views INTEGER DEFAULT 0,
@@ -82,26 +53,6 @@ async function initDatabase() {
         updated_at INTEGER DEFAULT (unixepoch())
       )
     `);
-    
-    // Add types column if it doesn't exist (migration)
-    try {
-      await db.execute(`ALTER TABLE webapps ADD COLUMN types TEXT`);
-      console.log('✅ Added types column');
-    } catch (e) {
-      console.log('ℹ️  types column already exists');
-    }
-    
-    // Migrate existing data from type to types if needed
-    try {
-      await db.execute(`
-        UPDATE webapps 
-        SET types = json_array(type) 
-        WHERE types IS NULL AND type IS NOT NULL
-      `);
-      console.log('✅ Migrated type to types');
-    } catch (e) {
-      console.log('ℹ️  Migration skipped');
-    }
     
     await db.execute(`
       CREATE TABLE IF NOT EXISTS ratings (
@@ -142,12 +93,39 @@ async function initDatabase() {
     await db.execute(`CREATE INDEX IF NOT EXISTS idx_ratings_webapp ON ratings(webapp_id)`);
     await db.execute(`CREATE INDEX IF NOT EXISTS idx_reviews_webapp ON reviews(webapp_id)`);
     
-    console.log('✅ Database initialized successfully');
+    console.log('✅ Database initialized');
   } catch (error) {
     console.error('❌ Database initialization failed:', error);
     process.exit(1);
   }
 }
+
+// ==========================================
+// VALIDATION SCHEMAS
+// ==========================================
+
+const WebAppSchema = z.object({
+  name: z.string().min(3).max(100),
+  developer: z.string().min(2).max(100),
+  url: z.string().url().startsWith('https://'),
+  description_short: z.string().min(20).max(200),
+  description_long: z.string().max(3000).optional(),
+  video_url: z.string().url().optional(),
+  github_url: z.string().url().optional(),
+  types: z.array(z.enum(['game', 'tool', 'api', 'design', 'productivity', 'education', 'social', 'other'])).min(1).max(3),
+  tags: z.array(z.string()).min(1).max(10)
+});
+
+const RatingSchema = z.object({
+  webapp_id: z.string(),
+  rating: z.number().int().min(1).max(5)
+});
+
+const ReviewSchema = z.object({
+  webapp_id: z.string(),
+  user_name: z.string().min(2).max(50),
+  comment: z.string().min(10).max(1000)
+});
 
 // ==========================================
 // UTILITY FUNCTIONS
@@ -161,6 +139,26 @@ function getClientIp(req) {
   return req.headers['x-forwarded-for']?.split(',')[0] || 
          req.connection.remoteAddress || 
          'unknown';
+}
+
+async function checkUrlAccessibility(url) {
+  try {
+    const response = await fetch(url, { 
+      method: 'HEAD', 
+      signal: AbortSignal.timeout(5000)
+    });
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function checkDuplicate(url) {
+  const result = await db.execute({
+    sql: 'SELECT id FROM webapps WHERE url = ?',
+    args: [url]
+  });
+  return result.rows.length > 0;
 }
 
 async function calculateRating(webappId) {
@@ -225,39 +223,19 @@ async function awardBadges(webappId) {
 }
 
 // ==========================================
-// HTML TEMPLATE GENERATOR
+// HTML GENERATION
 // ==========================================
 
-const TOOL_TYPES = {
-  game: '🎮 Game',
-  tool: '🛠️ Tool',
-  api: '🔌 API',
-  design: '🎨 Design',
-  productivity: '📊 Productivity',
-  education: '📚 Education',
-  social: '💬 Social',
-  entertainment: '🎬 Entertainment',
-  finance: '💰 Finance',
-  developer: '👨‍💻 Developer',
-  ai: '🤖 AI/ML',
-  other: '🌟 Other'
-};
-
-const BADGE_ICONS = {
-  pioneer: '🏆',
-  highly_rated: '⭐',
-  popular: '🔥',
-  open_source: '💻'
-};
-
-function generateHTML(content, title = 'Nexus Web Hub') {
+function generateHTML() {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Nexus Web Hub - Universal WebApps Catalog">
-  <title>${title}</title>
+  <meta name="author" content="DAOUDA Abdoul Anzize - Nexus Studio">
+  <title>Nexus Web Hub - Universal WebApps Catalog</title>
+  
   <style>
     * {
       margin: 0;
@@ -276,6 +254,7 @@ function generateHTML(content, title = 'Nexus Web Hub') {
       --accent-gold: #FFD700;
       --success: #10b981;
       --error: #ef4444;
+      --gradient-primary: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
     }
     
     body {
@@ -283,7 +262,6 @@ function generateHTML(content, title = 'Nexus Web Hub') {
       background: var(--bg-primary);
       color: var(--text-primary);
       line-height: 1.6;
-      overflow-x: hidden;
     }
     
     body::before {
@@ -293,9 +271,11 @@ function generateHTML(content, title = 'Nexus Web Hub') {
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: radial-gradient(2px 2px at 20px 30px, white, transparent),
-                        radial-gradient(2px 2px at 60px 70px, white, transparent),
-                        radial-gradient(1px 1px at 50px 50px, white, transparent);
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, white, transparent),
+        radial-gradient(2px 2px at 60px 70px, white, transparent),
+        radial-gradient(1px 1px at 50px 50px, white, transparent),
+        radial-gradient(1px 1px at 130px 80px, white, transparent);
       background-size: 200px 200px;
       opacity: 0.3;
       z-index: -1;
@@ -310,13 +290,13 @@ function generateHTML(content, title = 'Nexus Web Hub') {
     .container {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 1rem;
+      padding: 2rem;
     }
     
     header {
       background: rgba(26, 31, 58, 0.95);
       backdrop-filter: blur(10px);
-      padding: 1rem;
+      padding: 1.5rem;
       position: sticky;
       top: 0;
       z-index: 1000;
@@ -324,7 +304,9 @@ function generateHTML(content, title = 'Nexus Web Hub') {
       border-bottom: 1px solid rgba(0, 217, 255, 0.2);
     }
     
-    header .container {
+    nav {
+      max-width: 1400px;
+      margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -333,40 +315,12 @@ function generateHTML(content, title = 'Nexus Web Hub') {
     }
     
     .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
       font-size: 1.5rem;
       font-weight: bold;
-      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
+      background: var(--gradient-primary);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    
-    nav {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    
-    nav a, nav button {
-      color: var(--text-primary);
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.3s;
-      text-decoration: none;
-    }
-    
-    nav a:hover, nav button:hover {
-      background: rgba(0, 217, 255, 0.1);
-      color: var(--accent-cyan);
+      background-clip: text;
     }
     
     .btn {
@@ -382,40 +336,30 @@ function generateHTML(content, title = 'Nexus Web Hub') {
     }
     
     .btn-primary {
-      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
+      background: var(--gradient-primary);
       color: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-    }
-    
-    .btn-secondary {
-      background: transparent;
-      color: var(--accent-cyan);
-      border: 2px solid var(--accent-cyan);
-    }
-    
-    .btn-secondary:hover {
-      background: var(--accent-cyan);
-      color: var(--bg-primary);
+      box-shadow: 0 4px 12px rgba(138, 43, 226, 0.5);
     }
     
     .hero {
       text-align: center;
-      padding: 3rem 1rem;
+      padding: 3rem 2rem;
       max-width: 1000px;
       margin: 0 auto;
     }
     
     .hero h1 {
       font-size: clamp(2rem, 5vw, 4rem);
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
+      margin-bottom: 1.5rem;
+      background: var(--gradient-primary);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeInUp 1s ease-out;
     }
     
     .hero p {
@@ -426,9 +370,20 @@ function generateHTML(content, title = 'Nexus Web Hub') {
     
     .hero-actions {
       display: flex;
-      gap: 1rem;
+      gap: 1.5rem;
       justify-content: center;
       flex-wrap: wrap;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     
     .transparency-banner {
@@ -440,65 +395,42 @@ function generateHTML(content, title = 'Nexus Web Hub') {
       max-width: 1400px;
     }
     
-    .transparency-banner h3 {
-      color: var(--accent-violet);
-      margin-bottom: 0.5rem;
-    }
-    
-    .transparency-banner p {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
-    }
-    
-    .commitments {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-    
-    .commitment-item {
-      display: flex;
-      align-items: start;
-      gap: 0.5rem;
-      font-size: 0.9rem;
-    }
-    
-    .stats-section {
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
+      gap: 1.5rem;
       max-width: 1400px;
       margin: 3rem auto;
-      padding: 0 1rem;
     }
     
     .stat-card {
       background: var(--bg-card);
+      backdrop-filter: blur(10px);
       border: 1px solid rgba(0, 217, 255, 0.2);
       border-radius: 16px;
       padding: 2rem;
       text-align: center;
+      transition: all 0.3s;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent-cyan);
     }
     
     .stat-number {
       font-size: 3rem;
       font-weight: bold;
-      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
+      background: var(--gradient-primary);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-    }
-    
-    .stat-label {
-      color: var(--text-secondary);
-      margin-top: 0.5rem;
+      background-clip: text;
     }
     
     .search-section {
       max-width: 1400px;
       margin: 3rem auto;
-      padding: 0 1rem;
+      padding: 0 2rem;
     }
     
     .search-bar {
@@ -511,7 +443,7 @@ function generateHTML(content, title = 'Nexus Web Hub') {
     .search-input {
       flex: 1;
       min-width: 250px;
-      padding: 1rem;
+      padding: 1rem 1.5rem;
       background: var(--bg-card);
       border: 2px solid rgba(0, 217, 255, 0.3);
       border-radius: 12px;
@@ -529,6 +461,7 @@ function generateHTML(content, title = 'Nexus Web Hub') {
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
+      align-items: center;
     }
     
     .filter-btn {
@@ -538,7 +471,13 @@ function generateHTML(content, title = 'Nexus Web Hub') {
       border-radius: 8px;
       color: var(--text-primary);
       cursor: pointer;
-      font-size: 1rem;
+      transition: all 0.3s;
+    }
+    
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--gradient-primary);
+      border-color: transparent;
     }
     
     .webapps-grid {
@@ -546,65 +485,50 @@ function generateHTML(content, title = 'Nexus Web Hub') {
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 2rem;
       max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 1rem 3rem;
+      margin: 0 auto 3rem;
+      padding: 0 2rem;
     }
     
     .webapp-card {
       background: var(--bg-card);
+      backdrop-filter: blur(10px);
       border: 1px solid rgba(0, 217, 255, 0.2);
       border-radius: 16px;
       overflow: hidden;
       transition: all 0.3s;
       cursor: pointer;
+      position: relative;
     }
     
-    .webapp-card:hover {
+    .webapp-card.expanded {
+      grid-column: 1 / -1;
+      cursor: default;
+    }
+    
+    .webapp-card:not(.expanded):hover {
       transform: translateY(-8px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 217, 255, 0.5);
       border-color: var(--accent-cyan);
     }
     
     .webapp-preview {
-      position: relative;
       width: 100%;
       height: 200px;
-      overflow: hidden;
-      background: var(--bg-primary);
-    }
-    
-    .webapp-preview iframe {
-      width: 125%;
-      height: 125%;
-      border: none;
-      pointer-events: none;
-      transform: scale(0.8);
-      transform-origin: top left;
-    }
-    
-    .preview-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: transparent;
+      background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0;
-      transition: opacity 0.3s;
+      color: var(--text-secondary);
     }
     
-    .preview-overlay:hover {
-      opacity: 1;
-      background: rgba(0, 0, 0, 0.7);
+    .webapp-card.expanded .webapp-preview {
+      height: 500px;
     }
     
-    .preview-hint {
-      color: white;
-      font-size: 1.2rem;
-      font-weight: bold;
+    .webapp-preview iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
     
     .webapp-content {
@@ -615,51 +539,67 @@ function generateHTML(content, title = 'Nexus Web Hub') {
       display: flex;
       justify-content: space-between;
       align-items: start;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
     }
     
     .webapp-title {
       font-size: 1.25rem;
       font-weight: bold;
+      margin-bottom: 0.5rem;
     }
     
     .webapp-rating {
-      font-size: 0.9rem;
-      color: var(--accent-gold);
+      display: flex;
+      gap: 4px;
+      font-size: 1.2rem;
     }
     
-    .webapp-developer {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      margin-bottom: 1rem;
+    .star {
+      color: var(--accent-gold);
+      filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+    }
+    
+    .star.empty {
+      color: rgba(255, 215, 0, 0.3);
     }
     
     .webapp-description {
       color: var(--text-secondary);
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
     
-    .webapp-types, .webapp-tags {
+    .webapp-card.expanded .webapp-description {
+      display: block;
+      -webkit-line-clamp: unset;
+    }
+    
+    .description-long {
+      margin-top: 1rem;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      display: none;
+    }
+    
+    .webapp-card.expanded .description-long {
+      display: block;
+    }
+    
+    .webapp-types,
+    .webapp-tags {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
     
-    .type-badge {
-      padding: 4px 10px;
-      background: rgba(65, 105, 225, 0.2);
-      border: 1px solid rgba(65, 105, 225, 0.4);
-      border-radius: 8px;
-      font-size: 0.75rem;
-      color: var(--accent-cyan);
-    }
-    
+    .type-badge,
     .tag {
       padding: 4px 12px;
       background: rgba(0, 217, 255, 0.1);
@@ -672,7 +612,7 @@ function generateHTML(content, title = 'Nexus Web Hub') {
     .webapp-badges {
       display: flex;
       gap: 0.5rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
       font-size: 1.5rem;
     }
     
@@ -685,58 +625,16 @@ function generateHTML(content, title = 'Nexus Web Hub') {
       flex: 1;
       text-align: center;
       padding: 0.5rem;
-      font-size: 0.9rem;
     }
     
-    .empty-state {
-      text-align: center;
-      padding: 3rem;
-      color: var(--text-secondary);
-    }
-    
-    .modal {
+    .expanded-content {
       display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 2000;
-      overflow-y: auto;
-      padding: 1rem;
+      padding: 1.5rem;
+      border-top: 1px solid rgba(0, 217, 255, 0.2);
     }
     
-    .modal.active {
-      display: flex;
-      justify-content: center;
-      align-items: start;
-      padding-top: 50px;
-    }
-    
-    .modal-content {
-      background: var(--bg-secondary);
-      border: 2px solid rgba(0, 217, 255, 0.3);
-      border-radius: 16px;
-      max-width: 900px;
-      width: 100%;
-      position: relative;
-      padding: 2rem;
-    }
-    
-    .modal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: rgba(239, 68, 68, 0.2);
-      border: none;
-      color: var(--error);
-      font-size: 2rem;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      line-height: 1;
+    .webapp-card.expanded .expanded-content {
+      display: block;
     }
     
     .form-group {
@@ -754,7 +652,7 @@ function generateHTML(content, title = 'Nexus Web Hub') {
     .form-group select {
       width: 100%;
       padding: 1rem;
-      background: var(--bg-card);
+      background: var(--bg-secondary);
       border: 2px solid rgba(0, 217, 255, 0.3);
       border-radius: 8px;
       color: var(--text-primary);
@@ -767,337 +665,650 @@ function generateHTML(content, title = 'Nexus Web Hub') {
       resize: vertical;
     }
     
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
-    }
-    
-    .types-checkboxes {
+    .type-checkboxes {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 0.5rem;
     }
     
-    .checkbox-item {
+    .checkbox-label {
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      padding: 0.5rem;
+      background: var(--bg-secondary);
+      border: 2px solid rgba(0, 217, 255, 0.3);
+      border-radius: 8px;
+      cursor: pointer;
     }
     
-    .checkbox-item input[type="checkbox"] {
-      width: auto;
+    .checkbox-label:hover {
+      border-color: var(--accent-cyan);
+    }
+    
+    .submit-form {
+      max-width: 1400px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+      display: none;
+    }
+    
+    .submit-form.active {
+      display: block;
     }
     
     footer {
       background: var(--bg-secondary);
       border-top: 1px solid rgba(0, 217, 255, 0.2);
-      padding: 3rem 1rem;
+      padding: 3rem 2rem;
       margin-top: 3rem;
-    }
-    
-    .footer-content {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-    
-    .footer-section h3 {
-      color: var(--accent-cyan);
-      margin-bottom: 1rem;
-    }
-    
-    .footer-section h4 {
-      color: var(--text-primary);
-      margin-bottom: 1rem;
-    }
-    
-    .footer-section p {
-      margin: 0.5rem 0;
-      font-size: 0.9rem;
-    }
-    
-    .footer-section ul {
-      list-style: none;
-      padding: 0;
-    }
-    
-    .footer-section ul li {
-      margin: 0.5rem 0;
-    }
-    
-    .footer-section a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    
-    .footer-section a:hover {
-      color: var(--accent-cyan);
-    }
-    
-    .footer-bottom {
       text-align: center;
-      padding-top: 2rem;
-      border-top: 1px solid rgba(0, 217, 255, 0.2);
     }
     
-    .footer-bottom p {
-      margin: 0.5rem 0;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-    
-    .footer-bottom strong {
-      color: var(--accent-cyan);
+    .hidden {
+      display: none !important;
     }
     
     @media (max-width: 768px) {
       .webapps-grid {
         grid-template-columns: 1fr;
       }
+      
+      .webapp-card.expanded {
+        grid-column: 1;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  ${content}
-  
-  <script>
-    const API_BASE = window.location.origin;
-    let allApps = [];
+  <header>
+    <nav>
+      <div class="logo">🌌 NEXUS WEB HUB</div>
+      <button class="btn btn-primary" onclick="toggleSubmitForm()">Submit WebApp</button>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>🚀 Universal WebApps Catalog</h1>
+    <p>Discover, explore and share the best open web applications</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="scrollToExplore()">Explore Catalog</button>
+      <button class="btn btn-primary" onclick="surpriseMe()">🎲 Surprise Me</button>
+    </div>
+  </section>
+
+  <div class="container transparency-banner">
+    <h3 style="color: var(--accent-violet); margin-bottom: 1rem;">💎 Our Commitment to Transparency</h3>
+    <p style="margin-bottom: 1rem;">
+      Nexus Web Hub will introduce <strong>optional premium features</strong> in the future. 
+      However, <strong>the core catalog will always remain free</strong>.
+    </p>
+    <p><strong>What we will NEVER do:</strong> Paid placement, advertising, or biased rankings.</p>
+  </div>
+
+  <section class="stats-grid container">
+    <div class="stat-card">
+      <div class="stat-number" id="stat-apps">0</div>
+      <div style="color: var(--text-secondary);">WebApps</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="stat-ratings">0</div>
+      <div style="color: var(--text-secondary);">Ratings</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="stat-reviews">0</div>
+      <div style="color: var(--text-secondary);">Reviews</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="stat-views">0</div>
+      <div style="color: var(--text-secondary);">Total Views</div>
+    </div>
+  </section>
+
+  <section class="search-section" id="explore">
+    <div class="search-bar">
+      <input 
+        type="text" 
+        class="search-input" 
+        id="searchInput"
+        placeholder="🔍 Search WebApps..."
+        oninput="handleSearch()"
+      >
+    </div>
     
-    // Smooth scroll
-    function scrollToElement(id) {
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-    
-    // Modal management
-    function openModal(id) {
-      const modal = document.getElementById(id);
-      if (modal) {
-        modal.classList.add('active');
-      }
-    }
-    
-    function closeModal(id) {
-      const modal = document.getElementById(id);
-      if (modal) {
-        modal.classList.remove('active');
-      }
-    }
-    
-    // Close modal on outside click
-    document.addEventListener('click', (e) => {
-      if (e.target.classList.contains('modal')) {
-        closeModal(e.target.id);
-      }
-    });
-    
-    // Surprise Me
-    async function surpriseMe() {
-      try {
-        const response = await fetch(API_BASE + '/api/webapps?status=approved&limit=100');
-        const data = await response.json();
+    <div class="filters">
+      <select class="filter-btn" id="sortFilter" onchange="handleFilter()">
+        <option value="recent">🆕 Recent</option>
+        <option value="popular">🔥 Popular</option>
+        <option value="name">🔤 Name</option>
+      </select>
+      
+      <button class="filter-btn" id="githubFilter" onclick="toggleGithubFilter()">
+        💻 Open Source Only
+      </button>
+    </div>
+  </section>
+
+  <div class="webapps-grid" id="webappsGrid"></div>
+
+  <section class="submit-form" id="submitForm">
+    <div class="container">
+      <h2 style="margin-bottom: 2rem;">Submit Your WebApp</h2>
+      <form onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label>WebApp Name *</label>
+          <input type="text" id="name" required minlength="3" maxlength="100">
+        </div>
         
-        if (data.success && data.data.length > 0) {
-          const random = data.data[Math.floor(Math.random() * data.data.length)];
-          window.open(random.url, '_blank');
-        } else {
-          alert('No WebApps available yet. Be the first to submit one!');
-        }
-      } catch (error) {
-        console.error('Surprise error:', error);
-        alert('Error loading WebApps');
-      }
-    }
+        <div class="form-group">
+          <label>Developer/Team Name *</label>
+          <input type="text" id="developer" required minlength="2" maxlength="100">
+        </div>
+        
+        <div class="form-group">
+          <label>WebApp URL * (HTTPS only)</label>
+          <input type="url" id="url" required pattern="https://.*">
+        </div>
+        
+        <div class="form-group">
+          <label>Short Description * (20-200 characters)</label>
+          <textarea id="description_short" required minlength="20" maxlength="200"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Long Description (0-3000 characters)</label>
+          <textarea id="description_long" maxlength="3000" rows="6"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Types * (Select 1-3)</label>
+          <div class="type-checkboxes" id="typesCheckboxes">
+            <label class="checkbox-label">
+              <input type="checkbox" value="game"> 🎮 Game
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" value="tool"> 🛠️ Tool
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" value="api"> 🔌 API
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" value="design"> 🎨 Design
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" value="productivity"> 📊 Productivity
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" value="education"> 📚 Education
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" value="social"> 💬 Social
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" value="other"> 🌟 Other
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Tags * (comma separated, 1-10 tags)</label>
+          <input type="text" id="tags" required placeholder="web, tool, productivity">
+        </div>
+        
+        <div class="form-group">
+          <label>Video URL (YouTube, Vimeo, etc.)</label>
+          <input type="url" id="video_url">
+        </div>
+        
+        <div class="form-group">
+          <label>GitHub Repository</label>
+          <input type="url" id="github_url">
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          🚀 Submit WebApp
+        </button>
+        
+        <div id="submitStatus" style="margin-top: 1rem; text-align: center;"></div>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <p style="margin-bottom: 0.5rem;">
+      🌌 <strong>Nexus Web Hub</strong> - Universal WebApps Catalog
+    </p>
+    <p style="margin-bottom: 1rem;">
+      Built with ❤️ by <strong>Nexus Studio</strong> - DAOUDA Abdoul Anzize, CEO
+    </p>
+    <p>
+      <a href="https://github.com/Tryboy869/nexus-web-hub" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">GitHub</a> • 
+      <a href="mailto:nexusstudio100@gmail.com" style="color: var(--accent-cyan); text-decoration: none;">Contact</a>
+    </p>
+  </footer>
+
+  <script>
+    // ==========================================
+    // CLIENT-SIDE LOGIC
+    // ==========================================
     
-    // Search functionality
-    async function handleSearch() {
-      const search = document.getElementById('searchInput')?.value || '';
-      const type = document.getElementById('typeFilter')?.value || '';
-      const sort = document.getElementById('sortFilter')?.value || 'recent';
-      
-      const params = new URLSearchParams({
-        status: 'approved',
-        sort: sort,
-        limit: 100
-      });
-      
-      if (type) params.append('types', type);
-      if (search) params.append('search', search);
-      
+    const API_BASE = window.location.origin;
+    let allWebapps = [];
+    let currentFilters = {
+      search: '',
+      sort: 'recent',
+      githubOnly: false
+    };
+    
+    const BADGES = {
+      pioneer: { icon: '🏆', label: 'Pioneer' },
+      highly_rated: { icon: '⭐', label: 'Highly Rated' },
+      popular: { icon: '🔥', label: 'Popular' },
+      open_source: { icon: '💻', label: 'Open Source' }
+    };
+    
+    const TYPE_ICONS = {
+      game: '🎮',
+      tool: '🛠️',
+      api: '🔌',
+      design: '🎨',
+      productivity: '📊',
+      education: '📚',
+      social: '💬',
+      other: '🌟'
+    };
+    
+    // ==========================================
+    // API FUNCTIONS
+    // ==========================================
+    
+    async function fetchWebapps() {
       try {
-        const response = await fetch(API_BASE + '/api/webapps?' + params);
+        const params = new URLSearchParams({
+          status: 'approved',
+          sort: currentFilters.sort,
+          limit: 100
+        });
+        
+        if (currentFilters.search) params.append('search', currentFilters.search);
+        
+        const response = await fetch(`${API_BASE}/api/webapps?${params}`);
         const data = await response.json();
         
         if (data.success) {
-          allApps = data.data;
-          renderWebApps(data.data);
+          allWebapps = data.data;
+          
+          if (currentFilters.githubOnly) {
+            allWebapps = allWebapps.filter(app => app.github_url);
+          }
+          
+          renderWebapps(allWebapps);
         }
       } catch (error) {
-        console.error('Search error:', error);
+        console.error('Error fetching webapps:', error);
       }
     }
     
-    function renderWebApps(apps) {
-      const grid = document.querySelector('.webapps-grid');
-      if (!grid) return;
+    async function fetchStats() {
+      try {
+        const response = await fetch(`${API_BASE}/api/stats`);
+        const data = await response.json();
+        
+        if (data.success) {
+          document.getElementById('stat-apps').textContent = data.data.total_apps;
+          document.getElementById('stat-ratings').textContent = data.data.total_ratings;
+          document.getElementById('stat-reviews').textContent = data.data.total_reviews;
+          document.getElementById('stat-views').textContent = data.data.total_views;
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    }
+    
+    async function submitWebapp(formData) {
+      try {
+        const response = await fetch(`${API_BASE}/api/webapps/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        
+        return await response.json();
+      } catch (error) {
+        console.error('Error submitting webapp:', error);
+        return { success: false, error: 'Network error' };
+      }
+    }
+    
+    async function submitRating(webappId, rating) {
+      try {
+        const response = await fetch(`${API_BASE}/api/ratings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ webapp_id: webappId, rating })
+        });
+        
+        return await response.json();
+      } catch (error) {
+        return { success: false, error: 'Failed to submit rating' };
+      }
+    }
+    
+    async function submitReview(webappId, userName, comment) {
+      try {
+        const response = await fetch(`${API_BASE}/api/reviews`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            webapp_id: webappId, 
+            user_name: userName, 
+            comment 
+          })
+        });
+        
+        return await response.json();
+      } catch (error) {
+        return { success: false, error: 'Failed to submit review' };
+      }
+    }
+    
+    // ==========================================
+    // RENDER FUNCTIONS
+    // ==========================================
+    
+    function renderWebapps(webapps) {
+      const grid = document.getElementById('webappsGrid');
       
-      if (apps.length === 0) {
-        grid.innerHTML = '<div class="empty-state"><div style="font-size:4rem;margin-bottom:1rem;opacity:0.5">🔍</div><h2>No WebApps Found</h2><p>Try adjusting your search or filters</p></div>';
+      if (webapps.length === 0) {
+        grid.innerHTML = '<div style="text-align: center; padding: 4rem; grid-column: 1/-1;"><div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div><h2>No WebApps Found</h2><p style="color: var(--text-secondary);">Try adjusting your search or filters</p></div>';
         return;
       }
       
-      grid.innerHTML = apps.map(app => {
-        const types = JSON.parse(app.types || '[]');
-        const tags = JSON.parse(app.tags || '[]');
-        const badges = app.badges || [];
-        
-        return `
-          <div class="webapp-card" data-id="${app.id}">
-            <div class="webapp-preview">
-              <iframe src="${app.url}" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>
-              <div class="preview-overlay" onclick="window.open('${app.url}', '_blank')">
-                <div class="preview-hint">👁️ Click to open</div>
+      grid.innerHTML = webapps.map(app => `
+        <div class="webapp-card" id="card-${app.id}" onclick="toggleExpand('${app.id}')">
+          <div class="webapp-preview">
+            <iframe 
+              src="${app.url}" 
+              sandbox="allow-scripts allow-same-origin"
+              loading="lazy"
+              onerror="this.style.display='none'"
+            ></iframe>
+          </div>
+          
+          <div class="webapp-content">
+            <div class="webapp-header">
+              <div>
+                <div class="webapp-title">${app.name}</div>
+                <div style="color: var(--text-secondary); font-size: 0.9rem;">by ${app.developer}</div>
+              </div>
+              <div class="webapp-rating">
+                ${renderStars(app.rating)}
               </div>
             </div>
-            <div class="webapp-content">
-              <div class="webapp-header">
-                <h3 class="webapp-title">${app.name}</h3>
-                <div class="webapp-rating">⭐ ${app.rating_avg > 0 ? app.rating_avg.toFixed(1) : 'N/A'}</div>
+            
+            <div class="webapp-description">${app.description_short}</div>
+            
+            ${app.description_long ? `
+              <div class="description-long">
+                <h4 style="margin-bottom: 0.5rem;">Full Description:</h4>
+                <p>${app.description_long}</p>
               </div>
-              <div class="webapp-developer">by ${app.developer}</div>
-              <p class="webapp-description">${app.description_short}</p>
-              <div class="webapp-types">
-                ${types.slice(0, 3).map(t => `<span class="type-badge">${TOOL_TYPES[t] || t}</span>`).join('')}
-              </div>
-              <div class="webapp-tags">
-                ${tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('')}
-              </div>
+            ` : ''}
+            
+            <div class="webapp-types">
+              ${app.types.map(type => `<span class="type-badge">${TYPE_ICONS[type] || ''} ${type}</span>`).join('')}
+            </div>
+            
+            <div class="webapp-tags">
+              ${app.tags.slice(0, 5).map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+            
+            ${app.badges.length > 0 ? `
               <div class="webapp-badges">
-                ${badges.map(b => `<span class="badge">${BADGE_ICONS[b] || '🏅'}</span>`).join('')}
+                ${app.badges.map(badge => `
+                  <span title="${BADGES[badge]?.label || badge}">
+                    ${BADGES[badge]?.icon || '🏅'}
+                  </span>
+                `).join('')}
               </div>
-              <div class="webapp-actions">
-                <button class="btn btn-primary" onclick="window.open('${app.url}', '_blank')">Open App</button>
-              </div>
+            ` : ''}
+            
+            <div class="webapp-actions">
+              <a href="${app.url}" target="_blank" class="btn btn-primary" onclick="event.stopPropagation()">
+                🌐 Open App
+              </a>
+              ${app.video_url ? `
+                <a href="${app.video_url}" target="_blank" class="btn btn-primary" onclick="event.stopPropagation()">
+                  📹 Video
+                </a>
+              ` : ''}
+              ${app.github_url ? `
+                <a href="${app.github_url}" target="_blank" class="btn btn-primary" onclick="event.stopPropagation()">
+                  💻 GitHub
+                </a>
+              ` : ''}
             </div>
           </div>
-        `;
-      }).join('');
+          
+          <div class="expanded-content">
+            <h3 style="margin-bottom: 1rem;">⭐ Rate this WebApp</h3>
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; font-size: 2rem;">
+              ${[1,2,3,4,5].map(rating => `
+                <span class="star" style="cursor: pointer;" onclick="event.stopPropagation(); submitRatingForApp('${app.id}', ${rating})">⭐</span>
+              `).join('')}
+            </div>
+            
+            <h3 style="margin: 2rem 0 1rem;">💬 Leave a Review</h3>
+            <div class="form-group">
+              <input type="text" id="review-name-${app.id}" placeholder="Your name" onclick="event.stopPropagation()">
+            </div>
+            <div class="form-group">
+              <textarea id="review-comment-${app.id}" placeholder="Your review (min 10 characters)" onclick="event.stopPropagation()"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="event.stopPropagation(); submitReviewForApp('${app.id}')">
+              Submit Review
+            </button>
+            
+            <div style="margin-top: 2rem;">
+              <h3 style="margin-bottom: 1rem;">Recent Reviews</h3>
+              ${app.reviews && app.reviews.length > 0 ? app.reviews.map(review => `
+                <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <strong style="color: var(--accent-cyan);">${review.user_name}</strong>
+                    <span style="color: var(--text-secondary); font-size: 0.85rem;">${formatDate(review.created_at)}</span>
+                  </div>
+                  <p>${review.comment}</p>
+                </div>
+              `).join('') : '<p style="color: var(--text-secondary);">No reviews yet. Be the first!</p>'}
+            </div>
+            
+            <button class="btn btn-primary" style="margin-top: 2rem; width: 100%;" onclick="toggleExpand('${app.id}')">
+              Close Details
+            </button>
+          </div>
+        </div>
+      `).join('');
     }
     
-    // Badge icons mapping
-    const BADGE_ICONS = {
-      pioneer: '🏆',
-      highly_rated: '⭐',
-      popular: '🔥',
-      open_source: '💻'
-    };
+    function renderStars(rating) {
+      const fullStars = Math.floor(rating);
+      const emptyStars = 5 - fullStars;
+      
+      let html = '';
+      for (let i = 0; i < fullStars; i++) {
+        html += '<span class="star">⭐</span>';
+      }
+      for (let i = 0; i < emptyStars; i++) {
+        html += '<span class="star empty">⭐</span>';
+      }
+      
+      return html;
+    }
     
-    const TOOL_TYPES = {
-      game: '🎮 Game',
-      tool: '🛠️ Tool',
-      api: '🔌 API',
-      design: '🎨 Design',
-      productivity: '📊 Productivity',
-      education: '📚 Education',
-      social: '💬 Social',
-      entertainment: '🎬 Entertainment',
-      finance: '💰 Finance',
-      developer: '👨‍💻 Developer',
-      ai: '🤖 AI/ML',
-      other: '🌟 Other'
-    };
-    
-    // Search on Enter
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-      searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          handleSearch();
-        }
+    function formatDate(timestamp) {
+      const date = new Date(timestamp * 1000);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
       });
     }
     
-    // Filter handlers
-    const typeFilter = document.getElementById('typeFilter');
-    const sortFilter = document.getElementById('sortFilter');
+    // ==========================================
+    // EVENT HANDLERS
+    // ==========================================
     
-    if (typeFilter) {
-      typeFilter.addEventListener('change', handleSearch);
+    function handleSearch() {
+      currentFilters.search = document.getElementById('searchInput').value;
+      fetchWebapps();
     }
     
-    if (sortFilter) {
-      sortFilter.addEventListener('change', handleSearch);
+    function handleFilter() {
+      currentFilters.sort = document.getElementById('sortFilter').value;
+      fetchWebapps();
     }
     
-    // Submit form handler
+    function toggleGithubFilter() {
+      const btn = document.getElementById('githubFilter');
+      currentFilters.githubOnly = !currentFilters.githubOnly;
+      btn.classList.toggle('active');
+      fetchWebapps();
+    }
+    
+    function toggleExpand(appId) {
+      const card = document.getElementById(`card-${appId}`);
+      const wasExpanded = card.classList.contains('expanded');
+      
+      // Close all cards
+      document.querySelectorAll('.webapp-card').forEach(c => {
+        c.classList.remove('expanded');
+      });
+      
+      // Toggle current card
+      if (!wasExpanded) {
+        card.classList.add('expanded');
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    
     async function handleSubmit(event) {
       event.preventDefault();
       
-      const form = event.target;
-      const formData = new FormData(form);
+      const statusDiv = document.getElementById('submitStatus');
+      statusDiv.innerHTML = '<div style="color: var(--accent-cyan);">⏳ Submitting...</div>';
       
       // Get selected types
-      const types = [];
-      form.querySelectorAll('input[name="types"]:checked').forEach(checkbox => {
-        types.push(checkbox.value);
-      });
+      const typeCheckboxes = document.querySelectorAll('#typesCheckboxes input[type="checkbox"]:checked');
+      const types = Array.from(typeCheckboxes).map(cb => cb.value);
       
-      if (types.length < 1 || types.length > 3) {
-        alert('Please select 1-3 types');
+      if (types.length === 0 || types.length > 3) {
+        statusDiv.innerHTML = '<div style="color: var(--error);">❌ Please select 1-3 types</div>';
         return;
       }
       
-      const data = {
-        name: formData.get('name'),
-        developer: formData.get('developer'),
-        url: formData.get('url'),
-        description_short: formData.get('description_short'),
-        description_long: formData.get('description_long'),
-        video_url: formData.get('video_url'),
-        github_url: formData.get('github_url'),
+      const formData = {
+        name: document.getElementById('name').value,
+        developer: document.getElementById('developer').value,
+        url: document.getElementById('url').value,
+        description_short: document.getElementById('description_short').value,
+        description_long: document.getElementById('description_long').value || undefined,
         types: types,
-        tags: formData.get('tags').split(',').map(t => t.trim()).filter(t => t)
+        tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t),
+        video_url: document.getElementById('video_url').value || undefined,
+        github_url: document.getElementById('github_url').value || undefined
       };
       
-      const statusDiv = document.getElementById('submitStatus');
-      statusDiv.innerHTML = '<p style="color: var(--accent-cyan);">Submitting...</p>';
+      const result = await submitWebapp(formData);
       
-      try {
-        const response = await fetch('/api/webapps/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-          statusDiv.innerHTML = '<p style="color: var(--success);">✅ WebApp submitted successfully!</p>';
-          form.reset();
-          setTimeout(() => {
-            closeModal('submitModal');
-            location.reload();
-          }, 2000);
-        } else {
-          statusDiv.innerHTML = '<p style="color: var(--error);">❌ ' + result.error + '</p>';
-        }
-      } catch (error) {
-        console.error('Submit error:', error);
-        statusDiv.innerHTML = '<p style="color: var(--error);">❌ Network error</p>';
+      if (result.success) {
+        statusDiv.innerHTML = '<div style="color: var(--success);">✅ ' + result.message + '</div>';
+        event.target.reset();
+        setTimeout(() => {
+          toggleSubmitForm();
+          fetchWebapps();
+          fetchStats();
+        }, 2000);
+      } else {
+        statusDiv.innerHTML = '<div style="color: var(--error);">❌ ' + (result.error || 'Submission failed') + '</div>';
       }
     }
     
-    // Initialize
-    if (document.querySelector('.webapps-grid')) {
-      handleSearch();
+    async function submitRatingForApp(appId, rating) {
+      const result = await submitRating(appId, rating);
+      
+      if (result.success) {
+        alert('✅ Rating submitted successfully!');
+        fetchWebapps();
+      } else {
+        alert('❌ ' + result.error);
+      }
+    }
+    
+    async function submitReviewForApp(appId) {
+      const userName = document.getElementById(`review-name-${appId}`).value;
+      const comment = document.getElementById(`review-comment-${appId}`).value;
+      
+      if (!userName || !comment) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      if (comment.length < 10) {
+        alert('Review must be at least 10 characters');
+        return;
+      }
+      
+      const result = await submitReview(appId, userName, comment);
+      
+      if (result.success) {
+        alert('✅ Review submitted successfully!');
+        document.getElementById(`review-name-${appId}`).value = '';
+        document.getElementById(`review-comment-${appId}`).value = '';
+        fetchWebapps();
+      } else {
+        alert('❌ ' + result.error);
+      }
+    }
+    
+    function toggleSubmitForm() {
+      const form = document.getElementById('submitForm');
+      form.classList.toggle('active');
+      
+      if (form.classList.contains('active')) {
+        form.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    
+    function scrollToExplore() {
+      document.getElementById('explore').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function surpriseMe() {
+      if (allWebapps.length > 0) {
+        const randomApp = allWebapps[Math.floor(Math.random() * allWebapps.length)];
+        toggleExpand(randomApp.id);
+      }
+    }
+    
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    
+    async function init() {
+      console.log('🌌 Nexus Web Hub initializing...');
+      await fetchStats();
+      await fetchWebapps();
+      console.log('✅ Ready!');
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
     }
   </script>
 </body>
@@ -1108,9 +1319,13 @@ function generateHTML(content, title = 'Nexus Web Hub') {
 // API ROUTES
 // ==========================================
 
+app.get('/', (req, res) => {
+  res.send(generateHTML());
+});
+
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'healthy', 
+  res.json({
+    status: 'healthy',
     version: '1.0.0',
     timestamp: Date.now()
   });
@@ -1120,7 +1335,7 @@ app.get('/api/webapps', async (req, res) => {
   try {
     const { 
       status = 'approved', 
-      types, 
+      types,
       tag, 
       search, 
       sort = 'recent',
@@ -1165,16 +1380,24 @@ app.get('/api/webapps', async (req, res) => {
     
     const enriched = await Promise.all(result.rows.map(async (app) => {
       const rating = await calculateRating(app.id);
-      const badgesResult = await db.execute({
+      const badges = await db.execute({
         sql: 'SELECT badge_type FROM badges WHERE webapp_id = ?',
+        args: [app.id]
+      });
+      
+      const reviews = await db.execute({
+        sql: 'SELECT user_name, comment, created_at FROM reviews WHERE webapp_id = ? ORDER BY created_at DESC LIMIT 5',
         args: [app.id]
       });
       
       return {
         ...app,
-        rating_avg: rating.average,
+        types: JSON.parse(app.types),
+        tags: JSON.parse(app.tags),
+        rating: rating.average,
         rating_count: rating.total,
-        badges: badgesResult.rows.map(b => b.badge_type)
+        badges: badges.rows.map(b => b.badge_type),
+        reviews: reviews.rows
       };
     }));
     
@@ -1225,7 +1448,9 @@ app.get('/api/webapps/:id', async (req, res) => {
       success: true,
       data: {
         ...app,
-        rating_avg: rating.average,
+        types: JSON.parse(app.types),
+        tags: JSON.parse(app.tags),
+        rating: rating.average,
         rating_count: rating.total,
         reviews: reviews.rows,
         badges: badges.rows.map(b => b.badge_type)
@@ -1240,57 +1465,21 @@ app.get('/api/webapps/:id', async (req, res) => {
 
 app.post('/api/webapps/submit', async (req, res) => {
   try {
-    const { 
-      name, 
-      developer, 
-      url, 
-      description_short, 
-      description_long,
-      video_url,
-      github_url,
-      types, 
-      tags 
-    } = req.body;
+    const validated = WebAppSchema.parse(req.body);
     
-    // Validation
-    if (!name || name.length < 3 || name.length > 100) {
-      return res.status(400).json({ success: false, error: 'Invalid name (3-100 chars)' });
+    const isAccessible = await checkUrlAccessibility(validated.url);
+    if (!isAccessible) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'URL is not accessible. Please check and try again.' 
+      });
     }
     
-    if (!developer || developer.length < 2 || developer.length > 100) {
-      return res.status(400).json({ success: false, error: 'Invalid developer (2-100 chars)' });
-    }
-    
-    if (!url || !url.startsWith('https://')) {
-      return res.status(400).json({ success: false, error: 'URL must start with https://' });
-    }
-    
-    if (!description_short || description_short.length < 20 || description_short.length > 300) {
-      return res.status(400).json({ success: false, error: 'Short description must be 20-300 chars' });
-    }
-    
-    if (description_long && description_long.length > 3000) {
-      return res.status(400).json({ success: false, error: 'Long description max 3000 chars' });
-    }
-    
-    if (!Array.isArray(types) || types.length < 1 || types.length > 3) {
-      return res.status(400).json({ success: false, error: 'Must select 1-3 types' });
-    }
-    
-    if (!Array.isArray(tags) || tags.length < 1 || tags.length > 10) {
-      return res.status(400).json({ success: false, error: 'Must provide 1-10 tags' });
-    }
-    
-    // Check duplicate
-    const existing = await db.execute({
-      sql: 'SELECT id FROM webapps WHERE url = ?',
-      args: [url]
-    });
-    
-    if (existing.rows.length > 0) {
+    const isDuplicate = await checkDuplicate(validated.url);
+    if (isDuplicate) {
       return res.status(409).json({ 
         success: false, 
-        error: 'This WebApp URL is already in our catalog' 
+        error: 'This WebApp is already in our catalog.' 
       });
     }
     
@@ -1303,20 +1492,18 @@ app.post('/api/webapps/submit', async (req, res) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         id,
-        name,
-        developer,
-        url,
-        description_short,
-        description_long || null,
-        video_url || null,
-        github_url || null,
-        JSON.stringify(types),
-        JSON.stringify(tags),
+        validated.name,
+        validated.developer,
+        validated.url,
+        validated.description_short,
+        validated.description_long || null,
+        validated.video_url || null,
+        validated.github_url || null,
+        JSON.stringify(validated.types),
+        JSON.stringify(validated.tags),
         'approved'
       ]
     });
-    
-    await awardBadges(id);
     
     res.json({
       success: true,
@@ -1325,6 +1512,14 @@ app.post('/api/webapps/submit', async (req, res) => {
     });
     
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Validation failed', 
+        details: error.errors 
+      });
+    }
+    
     console.error('Error submitting webapp:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
@@ -1332,16 +1527,12 @@ app.post('/api/webapps/submit', async (req, res) => {
 
 app.post('/api/ratings', async (req, res) => {
   try {
-    const { webapp_id, rating } = req.body;
+    const validated = RatingSchema.parse(req.body);
     const userIp = getClientIp(req);
-    
-    if (!webapp_id || !rating || rating < 1 || rating > 5) {
-      return res.status(400).json({ success: false, error: 'Invalid rating (1-5)' });
-    }
     
     const webapp = await db.execute({
       sql: 'SELECT id FROM webapps WHERE id = ? AND status = "approved"',
-      args: [webapp_id]
+      args: [validated.webapp_id]
     });
     
     if (webapp.rows.length === 0) {
@@ -1353,20 +1544,28 @@ app.post('/api/ratings', async (req, res) => {
             VALUES (?, ?, ?)
             ON CONFLICT(webapp_id, user_ip) 
             DO UPDATE SET rating = ?, created_at = unixepoch()`,
-      args: [webapp_id, userIp, rating, rating]
+      args: [validated.webapp_id, userIp, validated.rating, validated.rating]
     });
     
-    await awardBadges(webapp_id);
+    await awardBadges(validated.webapp_id);
     
-    const newRating = await calculateRating(webapp_id);
+    const rating = await calculateRating(validated.webapp_id);
     
     res.json({
       success: true,
       message: 'Rating submitted successfully',
-      data: newRating
+      data: rating
     });
     
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Validation failed', 
+        details: error.errors 
+      });
+    }
+    
     console.error('Error submitting rating:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
@@ -1374,24 +1573,12 @@ app.post('/api/ratings', async (req, res) => {
 
 app.post('/api/reviews', async (req, res) => {
   try {
-    const { webapp_id, user_name, comment } = req.body;
+    const validated = ReviewSchema.parse(req.body);
     const userIp = getClientIp(req);
-    
-    if (!webapp_id || !user_name || !comment) {
-      return res.status(400).json({ success: false, error: 'All fields required' });
-    }
-    
-    if (user_name.length < 2 || user_name.length > 50) {
-      return res.status(400).json({ success: false, error: 'Name must be 2-50 chars' });
-    }
-    
-    if (comment.length < 10 || comment.length > 1000) {
-      return res.status(400).json({ success: false, error: 'Comment must be 10-1000 chars' });
-    }
     
     const webapp = await db.execute({
       sql: 'SELECT id FROM webapps WHERE id = ? AND status = "approved"',
-      args: [webapp_id]
+      args: [validated.webapp_id]
     });
     
     if (webapp.rows.length === 0) {
@@ -1400,7 +1587,7 @@ app.post('/api/reviews', async (req, res) => {
     
     await db.execute({
       sql: 'INSERT INTO reviews (webapp_id, user_name, user_ip, comment) VALUES (?, ?, ?, ?)',
-      args: [webapp_id, user_name, userIp, comment]
+      args: [validated.webapp_id, validated.user_name, userIp, validated.comment]
     });
     
     res.json({
@@ -1409,6 +1596,14 @@ app.post('/api/reviews', async (req, res) => {
     });
     
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Validation failed', 
+        details: error.errors 
+      });
+    }
+    
     console.error('Error submitting review:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
@@ -1421,242 +1616,29 @@ app.get('/api/stats', async (req, res) => {
     const totalReviews = await db.execute('SELECT COUNT(*) as count FROM reviews');
     const totalViews = await db.execute('SELECT SUM(views) as total FROM webapps');
     
+    const topApps = await db.execute(`
+      SELECT w.id, w.name, w.views, 
+             (SELECT AVG(rating) FROM ratings WHERE webapp_id = w.id) as avg_rating
+      FROM webapps w
+      WHERE w.status = 'approved'
+      ORDER BY w.views DESC
+      LIMIT 10
+    `);
+    
     res.json({
       success: true,
       data: {
         total_apps: totalApps.rows[0].count,
         total_ratings: totalRatings.rows[0].count,
         total_reviews: totalReviews.rows[0].count,
-        total_views: totalViews.rows[0].total || 0
+        total_views: totalViews.rows[0].total || 0,
+        top_apps: topApps.rows
       }
     });
     
   } catch (error) {
     console.error('Error fetching stats:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
-
-// ==========================================
-// HTML PAGES
-// ==========================================
-
-app.get('/', async (req, res) => {
-  try {
-    const statsResult = await db.execute('SELECT COUNT(*) as total_apps FROM webapps WHERE status = "approved"');
-    const ratingsResult = await db.execute('SELECT COUNT(*) as total_ratings FROM ratings');
-    const reviewsResult = await db.execute('SELECT COUNT(*) as total_reviews FROM reviews');
-    const viewsResult = await db.execute('SELECT SUM(views) as total_views FROM webapps');
-    
-    const stats = {
-      total_apps: statsResult.rows[0].total_apps,
-      total_ratings: ratingsResult.rows[0].total_ratings,
-      total_reviews: reviewsResult.rows[0].total_reviews,
-      total_views: viewsResult.rows[0].total_views || 0
-    };
-    
-    const content = `
-      <header>
-        <div class="container">
-          <a href="/" class="logo">
-            <span>🌌</span>
-            <span>NEXUS WEB HUB</span>
-          </a>
-          <nav>
-            <a href="#home" onclick="scrollToElement('home'); return false;">Home</a>
-            <a href="#explore" onclick="scrollToElement('explore'); return false;">Explore</a>
-            <a href="#stats" onclick="scrollToElement('stats'); return false;">Stats</a>
-            <button class="btn btn-primary" onclick="openModal('submitModal')">Submit WebApp</button>
-          </nav>
-        </div>
-      </header>
-      
-      <section class="hero" id="home">
-        <h1>🚀 Universal WebApps Catalog</h1>
-        <p>Discover, explore and share the best open web applications from around the world</p>
-        <div class="hero-actions">
-          <button class="btn btn-primary" onclick="scrollToElement('explore')">Explore Catalog</button>
-          <button class="btn btn-secondary" onclick="surpriseMe()">🎲 Surprise Me</button>
-        </div>
-      </section>
-      
-      <section class="transparency-banner">
-        <h3>💎 Our Commitment to Transparency</h3>
-        <p>
-          Nexus Web Hub will introduce <strong>optional premium features</strong> in the future to ensure sustainability.  
-          However, <strong>the core catalog will always remain free</strong> and accessible to everyone.
-        </p>
-        <p>
-          <strong>What we will NEVER do:</strong> Paid placement, advertising, or biased rankings.  
-          Your experience is never for sale.
-        </p>
-        <div class="commitments">
-          <div class="commitment-item">
-            <span style="color: var(--success);">✅</span>
-            <span>Free catalog access forever</span>
-          </div>
-          <div class="commitment-item">
-            <span style="color: var(--success);">✅</span>
-            <span>No paid placements</span>
-          </div>
-          <div class="commitment-item">
-            <span style="color: var(--success);">✅</span>
-            <span>No advertising</span>
-          </div>
-          <div class="commitment-item">
-            <span style="color: var(--success);">✅</span>
-            <span>Community-driven rankings</span>
-          </div>
-        </div>
-      </section>
-      
-      <section class="stats-section" id="stats">
-        <div class="stat-card">
-          <div class="stat-number">${stats.total_apps}</div>
-          <div class="stat-label">WebApps</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">${stats.total_ratings}</div>
-          <div class="stat-label">Ratings</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">${stats.total_reviews}</div>
-          <div class="stat-label">Reviews</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">${stats.total_views}</div>
-          <div class="stat-label">Total Views</div>
-        </div>
-      </section>
-      
-      <section class="search-section" id="explore">
-        <div class="search-bar">
-          <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search WebApps...">
-          <button class="btn btn-primary" onclick="handleSearch()">Search</button>
-        </div>
-        
-        <div class="filters">
-          <select class="filter-btn" id="typeFilter">
-            <option value="">All Types</option>
-            ${Object.entries(TOOL_TYPES).map(([value, label]) => 
-              `<option value="${value}">${label}</option>`
-            ).join('')}
-          </select>
-          
-          <select class="filter-btn" id="sortFilter">
-            <option value="recent">🆕 Recent</option>
-            <option value="popular">🔥 Popular</option>
-            <option value="name">🔤 Name</option>
-          </select>
-        </div>
-      </section>
-      
-      <div class="webapps-grid"></div>
-      
-      <div class="modal" id="submitModal">
-        <div class="modal-content">
-          <button class="modal-close" onclick="closeModal('submitModal')">&times;</button>
-          <h2 style="margin-bottom: 1.5rem;">🚀 Submit Your WebApp</h2>
-          
-          <form id="submitForm" onsubmit="handleSubmit(event)">
-            <div class="form-group">
-              <label>WebApp Name *</label>
-              <input type="text" name="name" required minlength="3" maxlength="100" placeholder="My Awesome WebApp">
-            </div>
-            
-            <div class="form-group">
-              <label>Developer/Team Name *</label>
-              <input type="text" name="developer" required minlength="2" maxlength="100" placeholder="Your name or team">
-            </div>
-            
-            <div class="form-group">
-              <label>WebApp URL * (must be HTTPS)</label>
-              <input type="url" name="url" required placeholder="https://your-webapp.com" pattern="https://.*">
-            </div>
-            
-            <div class="form-group">
-              <label>Short Description * (20-300 characters)</label>
-              <textarea name="description_short" required minlength="20" maxlength="300" placeholder="Brief description for cards..."></textarea>
-            </div>
-            
-            <div class="form-group">
-              <label>Long Description (0-3000 characters)</label>
-              <textarea name="description_long" maxlength="3000" rows="6" placeholder="Detailed description..."></textarea>
-            </div>
-            
-            <div class="form-group">
-              <label>Types * (select 1-3)</label>
-              <div class="types-checkboxes">
-                ${Object.entries(TOOL_TYPES).map(([value, label]) => `
-                  <div class="checkbox-item">
-                    <input type="checkbox" name="types" value="${value}" id="type-${value}">
-                    <label for="type-${value}">${label}</label>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label>Tags * (comma separated, 1-10)</label>
-              <input type="text" name="tags" required placeholder="web, tool, productivity">
-            </div>
-            
-            <div class="form-group">
-              <label>Video URL (optional - YouTube, etc.)</label>
-              <input type="url" name="video_url" placeholder="https://youtube.com/watch?v=...">
-            </div>
-            
-            <div class="form-group">
-              <label>GitHub Repository (optional)</label>
-              <input type="url" name="github_url" placeholder="https://github.com/user/repo">
-            </div>
-            
-            <button type="submit" class="btn btn-primary" style="width: 100%;">
-              🚀 Submit WebApp
-            </button>
-          </form>
-          
-          <div id="submitStatus" style="margin-top: 1.5rem; text-align: center;"></div>
-        </div>
-      </div>
-      
-      <footer>
-        <div class="container">
-          <div class="footer-content">
-            <div class="footer-section">
-              <h3>🌌 Nexus Web Hub</h3>
-              <p>Universal WebApps Catalog</p>
-              <p class="tagline">Discover and share the best WebApps</p>
-            </div>
-            
-            <div class="footer-section">
-              <h4>Navigation</h4>
-              <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="#explore" onclick="scrollToElement('explore'); return false;">Explore</a></li>
-                <li><a href="#stats" onclick="scrollToElement('stats'); return false;">Stats</a></li>
-              </ul>
-            </div>
-            
-            <div class="footer-section">
-              <h4>Contact</h4>
-              <p>📧 <a href="mailto:nexusstudio100@gmail.com">nexusstudio100@gmail.com</a></p>
-            </div>
-          </div>
-          
-          <div class="footer-bottom">
-            <p>Powered by <strong>Nexus Studio</strong></p>
-            <p>© ${new Date().getFullYear()} Nexus Web Hub. All rights reserved.</p>
-            <p class="tech">DAOUDA Abdoul Anzize - CEO</p>
-          </div>
-        </div>
-      </footer>
-    `;
-    
-    res.send(generateHTML(content, 'Nexus Web Hub - Universal WebApps Catalog'));
-  } catch (error) {
-    console.error('Error rendering home:', error);
-    res.status(500).send('Internal Server Error');
   }
 });
 
@@ -1670,14 +1652,14 @@ async function startServer() {
   app.listen(PORT, () => {
     console.log(`
 ╔════════════════════════════════════════╗
-║   🌌 NEXUS WEB HUB - Server Ready     ║
+║   🌌 NEXUS WEB HUB - Ready            ║
 ║                                        ║
-║   🚀 URL: http://localhost:${PORT}      ║
+║   🚀 Server: http://localhost:${PORT}   ║
 ║   📊 Status: Production Ready          ║
 ║   🗄️  Database: Turso (Connected)      ║
-║   ⚡ Stack: Node + Express + Vanilla JS║
 ║                                        ║
-║   Built with ❤️ by Anzize Daouda      ║
+║   Built with ❤️ by Nexus Studio       ║
+║   DAOUDA Abdoul Anzize - CEO          ║
 ╚════════════════════════════════════════╝
     `);
   });
