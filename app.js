@@ -1,7 +1,7 @@
 // ==========================================
-// NEXUS WEB HUB - BACKEND + FRONTEND REACT SSR
-// Architecture: Node.js + Express + Turso + React SSR
-// Version: 1.0.0
+// NEXUS WEB HUB - BACKEND COMPLET
+// Architecture: Node.js + Express + Turso + Vanilla JS
+// Version: 1.0.0 - WORKING VERSION
 // Author: DAOUDA Abdoul Anzize - CEO Nexus Studio
 // ==========================================
 
@@ -10,8 +10,6 @@ import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { createClient } from '@libsql/client';
-import React from 'react';
-import { renderToString } from 'react-dom/server';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -76,7 +74,7 @@ async function initDatabase() {
         video_url TEXT,
         github_url TEXT,
         screenshot_url TEXT,
-        type TEXT NOT NULL,
+        type TEXT,
         tags TEXT NOT NULL,
         status TEXT DEFAULT 'approved',
         views INTEGER DEFAULT 0,
@@ -90,8 +88,7 @@ async function initDatabase() {
       await db.execute(`ALTER TABLE webapps ADD COLUMN types TEXT`);
       console.log('✅ Added types column');
     } catch (e) {
-      // Column already exists or other error - ignore
-      console.log('ℹ️  types column already exists or migration not needed');
+      console.log('ℹ️  types column already exists');
     }
     
     // Migrate existing data from type to types if needed
@@ -103,7 +100,7 @@ async function initDatabase() {
       `);
       console.log('✅ Migrated type to types');
     } catch (e) {
-      console.log('ℹ️  Migration skipped or already done');
+      console.log('ℹ️  Migration skipped');
     }
     
     await db.execute(`
@@ -228,7 +225,7 @@ async function awardBadges(webappId) {
 }
 
 // ==========================================
-// REACT COMPONENTS
+// HTML TEMPLATE GENERATOR
 // ==========================================
 
 const TOOL_TYPES = {
@@ -253,919 +250,859 @@ const BADGE_ICONS = {
   open_source: '💻'
 };
 
-function Layout({ children, title = 'Nexus Web Hub' }) {
-  return React.createElement('html', { lang: 'en' },
-    React.createElement('head', null,
-      React.createElement('meta', { charSet: 'UTF-8' }),
-      React.createElement('meta', { name: 'viewport', content: 'width=device-width, initial-scale=1.0' }),
-      React.createElement('title', null, title),
-      React.createElement('style', { dangerouslySetInnerHTML: { __html: CSS_STYLES } })
-    ),
-    React.createElement('body', null,
-      React.createElement('div', { id: 'root' }, children),
-      React.createElement('script', { dangerouslySetInnerHTML: { __html: CLIENT_SCRIPT } })
-    )
-  );
-}
-
-function Header() {
-  return React.createElement('header', { className: 'header' },
-    React.createElement('div', { className: 'container' },
-      React.createElement('div', { className: 'logo', onClick: () => {} },
-        React.createElement('span', null, '🌌'),
-        React.createElement('span', null, 'NEXUS WEB HUB')
-      ),
-      React.createElement('nav', { className: 'nav-links' },
-        React.createElement('button', { onClick: () => {} }, 'Home'),
-        React.createElement('button', { onClick: () => {} }, 'Explore'),
-        React.createElement('button', { onClick: () => {} }, 'Stats'),
-        React.createElement('button', { className: 'btn btn-primary', onClick: () => {} }, 'Submit WebApp')
-      )
-    )
-  );
-}
-
-function Hero({ stats }) {
-  return React.createElement('section', { className: 'hero' },
-    React.createElement('h1', null, '🚀 Universal WebApps Catalog'),
-    React.createElement('p', null, 'Discover, explore and share the best open web applications from around the world'),
-    React.createElement('div', { className: 'hero-actions' },
-      React.createElement('button', { className: 'btn btn-primary', onClick: () => {} }, 'Explore Catalog'),
-      React.createElement('button', { className: 'btn btn-secondary', onClick: () => {} }, '🎲 Surprise Me')
-    )
-  );
-}
-
-function TransparencyBanner() {
-  return React.createElement('section', { className: 'transparency-banner' },
-    React.createElement('h3', null, '💎 Our Commitment to Transparency'),
-    React.createElement('p', null, 
-      'Nexus Web Hub will introduce ',
-      React.createElement('strong', null, 'optional premium features'),
-      ' in the future to ensure sustainability. However, ',
-      React.createElement('strong', null, 'the core catalog will always remain free'),
-      ' and accessible to everyone.'
-    ),
-    React.createElement('p', null,
-      React.createElement('strong', null, 'What we will NEVER do:'),
-      ' Paid placement, advertising, or biased rankings. Your experience is never for sale.'
-    ),
-    React.createElement('div', { className: 'commitments' },
-      React.createElement('div', { className: 'commitment-item' },
-        React.createElement('span', { style: { color: 'var(--success)' } }, '✅'),
-        React.createElement('span', null, 'Free catalog access forever')
-      ),
-      React.createElement('div', { className: 'commitment-item' },
-        React.createElement('span', { style: { color: 'var(--success)' } }, '✅'),
-        React.createElement('span', null, 'No paid placements')
-      ),
-      React.createElement('div', { className: 'commitment-item' },
-        React.createElement('span', { style: { color: 'var(--success)' } }, '✅'),
-        React.createElement('span', null, 'No advertising')
-      ),
-      React.createElement('div', { className: 'commitment-item' },
-        React.createElement('span', { style: { color: 'var(--success)' } }, '✅'),
-        React.createElement('span', null, 'Community-driven rankings')
-      )
-    )
-  );
-}
-
-function StatsSection({ stats }) {
-  return React.createElement('section', { className: 'stats-section', id: 'stats' },
-    React.createElement('div', { className: 'stat-card' },
-      React.createElement('div', { className: 'stat-number' }, stats.total_apps),
-      React.createElement('div', { className: 'stat-label' }, 'WebApps')
-    ),
-    React.createElement('div', { className: 'stat-card' },
-      React.createElement('div', { className: 'stat-number' }, stats.total_ratings),
-      React.createElement('div', { className: 'stat-label' }, 'Ratings')
-    ),
-    React.createElement('div', { className: 'stat-card' },
-      React.createElement('div', { className: 'stat-number' }, stats.total_reviews),
-      React.createElement('div', { className: 'stat-label' }, 'Reviews')
-    ),
-    React.createElement('div', { className: 'stat-card' },
-      React.createElement('div', { className: 'stat-number' }, stats.total_views),
-      React.createElement('div', { className: 'stat-label' }, 'Total Views')
-    )
-  );
-}
-
-function SearchSection() {
-  return React.createElement('section', { className: 'search-section', id: 'explore' },
-    React.createElement('div', { className: 'search-bar' },
-      React.createElement('input', {
-        type: 'text',
-        className: 'search-input',
-        id: 'searchInput',
-        placeholder: '🔍 Search WebApps...'
-      }),
-      React.createElement('button', { className: 'btn btn-primary', onClick: () => {} }, 'Search')
-    ),
-    React.createElement('div', { className: 'filters' },
-      React.createElement('select', { className: 'filter-btn', id: 'typeFilter' },
-        React.createElement('option', { value: '' }, 'All Types'),
-        ...Object.entries(TOOL_TYPES).map(([value, label]) =>
-          React.createElement('option', { key: value, value }, label)
-        )
-      ),
-      React.createElement('select', { className: 'filter-btn', id: 'sortFilter' },
-        React.createElement('option', { value: 'recent' }, '🆕 Recent'),
-        React.createElement('option', { value: 'popular' }, '🔥 Popular'),
-        React.createElement('option', { value: 'name' }, '🔤 Name')
-      )
-    )
-  );
-}
-
-function WebAppCard({ app }) {
-  const types = JSON.parse(app.types || '[]');
-  const tags = JSON.parse(app.tags || '[]');
+function generateHTML(content, title = 'Nexus Web Hub') {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Nexus Web Hub - Universal WebApps Catalog">
+  <title>${title}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --bg-primary: #0a0e27;
+      --bg-secondary: #1a1f3a;
+      --bg-card: rgba(26, 31, 58, 0.8);
+      --text-primary: #E0E6ED;
+      --text-secondary: #9CA3AF;
+      --accent-cyan: #00D9FF;
+      --accent-violet: #8A2BE2;
+      --accent-gold: #FFD700;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(2px 2px at 20px 30px, white, transparent),
+                        radial-gradient(2px 2px at 60px 70px, white, transparent),
+                        radial-gradient(1px 1px at 50px 50px, white, transparent);
+      background-size: 200px 200px;
+      opacity: 0.3;
+      z-index: -1;
+      animation: twinkle 3s infinite;
+    }
+    
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.5; }
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    
+    header {
+      background: rgba(26, 31, 58, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+    }
+    
+    header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    
+    nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    nav a, nav button {
+      color: var(--text-primary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    
+    nav a:hover, nav button:hover {
+      background: rgba(0, 217, 255, 0.1);
+      color: var(--accent-cyan);
+    }
+    
+    .btn {
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      color: var(--accent-cyan);
+      border: 2px solid var(--accent-cyan);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--accent-cyan);
+      color: var(--bg-primary);
+    }
+    
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 4rem);
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .hero p {
+      font-size: clamp(1rem, 2vw, 1.5rem);
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+    
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .transparency-banner {
+      background: rgba(138, 43, 226, 0.1);
+      border: 2px solid rgba(138, 43, 226, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem auto;
+      max-width: 1400px;
+    }
+    
+    .transparency-banner h3 {
+      color: var(--accent-violet);
+      margin-bottom: 0.5rem;
+    }
+    
+    .transparency-banner p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+    
+    .commitments {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .commitment-item {
+      display: flex;
+      align-items: start;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .stats-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+    }
+    
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 3rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+    
+    .search-section {
+      max-width: 1400px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+    }
+    
+    .search-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .search-input {
+      flex: 1;
+      min-width: 250px;
+      padding: 1rem;
+      background: var(--bg-card);
+      border: 2px solid rgba(0, 217, 255, 0.3);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+    }
+    
+    .filters {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+      padding: 0.5rem 1.5rem;
+      background: var(--bg-card);
+      border: 2px solid rgba(138, 43, 226, 0.3);
+      border-radius: 8px;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    
+    .webapps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1rem 3rem;
+    }
+    
+    .webapp-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .webapp-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      border-color: var(--accent-cyan);
+    }
+    
+    .webapp-preview {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      background: var(--bg-primary);
+    }
+    
+    .webapp-preview iframe {
+      width: 125%;
+      height: 125%;
+      border: none;
+      pointer-events: none;
+      transform: scale(0.8);
+      transform-origin: top left;
+    }
+    
+    .preview-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .preview-overlay:hover {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.7);
+    }
+    
+    .preview-hint {
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    
+    .webapp-content {
+      padding: 1.5rem;
+    }
+    
+    .webapp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 0.5rem;
+    }
+    
+    .webapp-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+    
+    .webapp-rating {
+      font-size: 0.9rem;
+      color: var(--accent-gold);
+    }
+    
+    .webapp-developer {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+    
+    .webapp-description {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .webapp-types, .webapp-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    
+    .type-badge {
+      padding: 4px 10px;
+      background: rgba(65, 105, 225, 0.2);
+      border: 1px solid rgba(65, 105, 225, 0.4);
+      border-radius: 8px;
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+    }
+    
+    .tag {
+      padding: 4px 12px;
+      background: rgba(0, 217, 255, 0.1);
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: var(--accent-cyan);
+    }
+    
+    .webapp-badges {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+    
+    .webapp-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .webapp-actions .btn {
+      flex: 1;
+      text-align: center;
+      padding: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 2000;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+    
+    .modal.active {
+      display: flex;
+      justify-content: center;
+      align-items: start;
+      padding-top: 50px;
+    }
+    
+    .modal-content {
+      background: var(--bg-secondary);
+      border: 2px solid rgba(0, 217, 255, 0.3);
+      border-radius: 16px;
+      max-width: 900px;
+      width: 100%;
+      position: relative;
+      padding: 2rem;
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(239, 68, 68, 0.2);
+      border: none;
+      color: var(--error);
+      font-size: 2rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      line-height: 1;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 1rem;
+      background: var(--bg-card);
+      border: 2px solid rgba(0, 217, 255, 0.3);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+    }
+    
+    .types-checkboxes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.5rem;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+      width: auto;
+    }
+    
+    footer {
+      background: var(--bg-secondary);
+      border-top: 1px solid rgba(0, 217, 255, 0.2);
+      padding: 3rem 1rem;
+      margin-top: 3rem;
+    }
+    
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .footer-section h3 {
+      color: var(--accent-cyan);
+      margin-bottom: 1rem;
+    }
+    
+    .footer-section h4 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    
+    .footer-section p {
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+    }
+    
+    .footer-section ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .footer-section ul li {
+      margin: 0.5rem 0;
+    }
+    
+    .footer-section a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    .footer-section a:hover {
+      color: var(--accent-cyan);
+    }
+    
+    .footer-bottom {
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(0, 217, 255, 0.2);
+    }
+    
+    .footer-bottom p {
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    
+    .footer-bottom strong {
+      color: var(--accent-cyan);
+    }
+    
+    @media (max-width: 768px) {
+      .webapps-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  ${content}
   
-  return React.createElement('div', { className: 'webapp-card', 'data-id': app.id },
-    React.createElement('div', { className: 'webapp-preview' },
-      React.createElement('iframe', {
-        src: app.url,
-        sandbox: 'allow-scripts allow-same-origin',
-        loading: 'lazy',
-        title: app.name
-      }),
-      React.createElement('div', { className: 'preview-overlay' },
-        React.createElement('div', { className: 'preview-hint' }, '👁️ Click for details')
-      )
-    ),
-    React.createElement('div', { className: 'webapp-content' },
-      React.createElement('div', { className: 'webapp-header' },
-        React.createElement('h3', { className: 'webapp-title' }, app.name),
-        React.createElement('div', { className: 'webapp-rating' },
-          '⭐ ',
-          app.rating_avg > 0 ? app.rating_avg.toFixed(1) : 'N/A'
-        )
-      ),
-      React.createElement('div', { className: 'webapp-developer' }, 'by ', app.developer),
-      React.createElement('p', { className: 'webapp-description' }, app.description_short),
-      React.createElement('div', { className: 'webapp-types' },
-        types.slice(0, 3).map(type =>
-          React.createElement('span', { key: type, className: 'type-badge' }, 
-            TOOL_TYPES[type] || type
-          )
-        )
-      ),
-      React.createElement('div', { className: 'webapp-tags' },
-        tags.slice(0, 3).map(tag =>
-          React.createElement('span', { key: tag, className: 'tag' }, tag)
-        )
-      ),
-      React.createElement('div', { className: 'webapp-badges' },
-        app.badges && app.badges.map(badge =>
-          React.createElement('span', { key: badge, className: 'badge' }, 
-            BADGE_ICONS[badge] || '🏅'
-          )
-        )
-      ),
-      React.createElement('div', { className: 'webapp-actions' },
-        React.createElement('button', { 
-          className: 'btn btn-primary',
-          onClick: () => {}
-        }, 'Open App'),
-        React.createElement('button', { 
-          className: 'btn btn-secondary',
-          onClick: () => {}
-        }, 'Details')
-      )
-    )
-  );
-}
-
-function WebAppsGrid({ apps }) {
-  if (apps.length === 0) {
-    return React.createElement('div', { className: 'empty-state' },
-      React.createElement('div', { style: { fontSize: '4rem', marginBottom: '1rem', opacity: 0.5 } }, '🔍'),
-      React.createElement('h2', null, 'No WebApps Found'),
-      React.createElement('p', null, 'Try adjusting your search or filters, or be the first to submit one!')
-    );
-  }
-  
-  return React.createElement('div', { className: 'webapps-grid' },
-    apps.map(app => React.createElement(WebAppCard, { key: app.id, app }))
-  );
-}
-
-function Footer() {
-  return React.createElement('footer', { className: 'footer' },
-    React.createElement('div', { className: 'container' },
-      React.createElement('div', { className: 'footer-content' },
-        React.createElement('div', { className: 'footer-section' },
-          React.createElement('h3', null, '🌌 Nexus Web Hub'),
-          React.createElement('p', null, 'Universal WebApps Catalog'),
-          React.createElement('p', { className: 'tagline' }, 'Discover and share the best WebApps')
-        ),
-        React.createElement('div', { className: 'footer-section' },
-          React.createElement('h4', null, 'Navigation'),
-          React.createElement('ul', null,
-            React.createElement('li', null, React.createElement('a', { href: '/' }, 'Home')),
-            React.createElement('li', null, React.createElement('a', { href: '/explore' }, 'Explore')),
-            React.createElement('li', null, React.createElement('a', { href: '/submit' }, 'Submit'))
-          )
-        ),
-        React.createElement('div', { className: 'footer-section' },
-          React.createElement('h4', null, 'Contact'),
-          React.createElement('p', null, 
-            '📧 ',
-            React.createElement('a', { href: 'mailto:nexusstudio100@gmail.com' }, 'nexusstudio100@gmail.com')
-          )
-        )
-      ),
-      React.createElement('div', { className: 'footer-bottom' },
-        React.createElement('p', null, 
-          'Powered by ',
-          React.createElement('strong', null, 'Nexus Studio')
-        ),
-        React.createElement('p', null, '© ', new Date().getFullYear(), ' Nexus Web Hub. All rights reserved.'),
-        React.createElement('p', { className: 'tech' }, 'DAOUDA Abdoul Anzize - CEO')
-      )
-    )
-  );
-}
-
-function HomePage({ stats, apps }) {
-  return React.createElement(Layout, { title: 'Nexus Web Hub - Universal WebApps Catalog' },
-    React.createElement(Header),
-    React.createElement(Hero, { stats }),
-    React.createElement(TransparencyBanner),
-    React.createElement(StatsSection, { stats }),
-    React.createElement(SearchSection),
-    React.createElement(WebAppsGrid, { apps }),
-    React.createElement(Footer)
-  );
-}
-
-// ==========================================
-// CSS STYLES
-// ==========================================
-
-const CSS_STYLES = `
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  --bg-primary: #0a0e27;
-  --bg-secondary: #1a1f3a;
-  --bg-card: rgba(26, 31, 58, 0.8);
-  --text-primary: #E0E6ED;
-  --text-secondary: #9CA3AF;
-  --accent-cyan: #00D9FF;
-  --accent-violet: #8A2BE2;
-  --accent-gold: #FFD700;
-  --success: #10b981;
-  --error: #ef4444;
-  --space-xs: 0.5rem;
-  --space-sm: 1rem;
-  --space-md: 1.5rem;
-  --space-lg: 2rem;
-  --space-xl: 3rem;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --glow-cyan: 0 0 20px rgba(0, 217, 255, 0.5);
-  --glow-violet: 0 0 20px rgba(138, 43, 226, 0.5);
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: radial-gradient(2px 2px at 20px 30px, white, transparent),
-                    radial-gradient(2px 2px at 60px 70px, white, transparent),
-                    radial-gradient(1px 1px at 50px 50px, white, transparent);
-  background-size: 200px 200px;
-  opacity: 0.3;
-  z-index: -1;
-  animation: twinkle 3s infinite;
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.5; }
-}
-
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: var(--space-md);
-}
-
-.header {
-  background: rgba(26, 31, 58, 0.95);
-  backdrop-filter: blur(10px);
-  padding: var(--space-md);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-shadow: var(--shadow-md);
-  border-bottom: 1px solid rgba(0, 217, 255, 0.2);
-}
-
-.header .container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  font-size: 1.5rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  cursor: pointer;
-}
-
-.nav-links {
-  display: flex;
-  gap: var(--space-md);
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.nav-links button {
-  color: var(--text-primary);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-sm);
-  font-size: 1rem;
-  transition: all 0.3s;
-}
-
-.nav-links button:hover {
-  background: rgba(0, 217, 255, 0.1);
-  color: var(--accent-cyan);
-}
-
-.btn {
-  padding: var(--space-xs) var(--space-md);
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-decoration: none;
-  display: inline-block;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
-  color: white;
-  box-shadow: var(--shadow-sm);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn-secondary {
-  background: transparent;
-  color: var(--accent-cyan);
-  border: 2px solid var(--accent-cyan);
-}
-
-.btn-secondary:hover {
-  background: var(--accent-cyan);
-  color: var(--bg-primary);
-}
-
-.hero {
-  text-align: center;
-  padding: var(--space-xl) var(--space-md);
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.hero h1 {
-  font-size: clamp(2rem, 5vw, 4rem);
-  margin-bottom: var(--space-md);
-  background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.hero p {
-  font-size: clamp(1rem, 2vw, 1.5rem);
-  color: var(--text-secondary);
-  margin-bottom: var(--space-lg);
-}
-
-.hero-actions {
-  display: flex;
-  gap: var(--space-md);
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.transparency-banner {
-  background: rgba(138, 43, 226, 0.1);
-  border: 2px solid rgba(138, 43, 226, 0.3);
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
-  margin: var(--space-lg) auto;
-  max-width: 1400px;
-}
-
-.transparency-banner h3 {
-  color: var(--accent-violet);
-  margin-bottom: var(--space-xs);
-}
-
-.transparency-banner p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  margin-bottom: var(--space-sm);
-}
-
-.commitments {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-sm);
-  margin-top: var(--space-md);
-}
-
-.commitment-item {
-  display: flex;
-  align-items: start;
-  gap: var(--space-xs);
-  font-size: 0.9rem;
-}
-
-.stats-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--space-lg);
-  max-width: 1400px;
-  margin: var(--space-xl) auto;
-  padding: 0 var(--space-md);
-}
-
-.stat-card {
-  background: var(--bg-card);
-  border: 1px solid rgba(0, 217, 255, 0.2);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  text-align: center;
-}
-
-.stat-number {
-  font-size: 3rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.stat-label {
-  color: var(--text-secondary);
-  margin-top: var(--space-xs);
-}
-
-.search-section {
-  max-width: 1400px;
-  margin: var(--space-xl) auto;
-  padding: 0 var(--space-md);
-}
-
-.search-bar {
-  display: flex;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-lg);
-  flex-wrap: wrap;
-}
-
-.search-input {
-  flex: 1;
-  min-width: 250px;
-  padding: var(--space-sm) var(--space-md);
-  background: var(--bg-card);
-  border: 2px solid rgba(0, 217, 255, 0.3);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 1rem;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--accent-cyan);
-  box-shadow: var(--glow-cyan);
-}
-
-.filters {
-  display: flex;
-  gap: var(--space-sm);
-  flex-wrap: wrap;
-}
-
-.filter-btn {
-  padding: var(--space-xs) var(--space-md);
-  background: var(--bg-card);
-  border: 2px solid rgba(138, 43, 226, 0.3);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.webapps-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--space-lg);
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 var(--space-md) var(--space-xl);
-}
-
-.webapp-card {
-  background: var(--bg-card);
-  border: 1px solid rgba(0, 217, 255, 0.2);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  transition: all 0.3s;
-  cursor: pointer;
-}
-
-.webapp-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--accent-cyan);
-}
-
-.webapp-preview {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  overflow: hidden;
-  background: var(--bg-primary);
-}
-
-.webapp-preview iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  pointer-events: none;
-  transform: scale(0.8);
-  transform-origin: top left;
-}
-
-.preview-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.preview-overlay:hover {
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.7);
-}
-
-.preview-hint {
-  color: white;
-  font-size: 1.2rem;
-  font-weight: bold;
-  transform: translateY(10px);
-  transition: transform 0.3s;
-}
-
-.preview-overlay:hover .preview-hint {
-  transform: translateY(0);
-}
-
-.webapp-content {
-  padding: var(--space-md);
-}
-
-.webapp-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  margin-bottom: var(--space-xs);
-}
-
-.webapp-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-}
-
-.webapp-rating {
-  font-size: 0.9rem;
-  color: var(--accent-gold);
-}
-
-.webapp-developer {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-sm);
-}
-
-.webapp-description {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  margin-bottom: var(--space-md);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.webapp-types {
-  display: flex;
-  gap: var(--space-xs);
-  flex-wrap: wrap;
-  margin-bottom: var(--space-sm);
-}
-
-.type-badge {
-  padding: 4px 10px;
-  background: rgba(65, 105, 225, 0.2);
-  border: 1px solid rgba(65, 105, 225, 0.4);
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  color: var(--accent-cyan);
-}
-
-.webapp-tags {
-  display: flex;
-  gap: var(--space-xs);
-  flex-wrap: wrap;
-  margin-bottom: var(--space-md);
-}
-
-.tag {
-  padding: 4px 12px;
-  background: rgba(0, 217, 255, 0.1);
-  border: 1px solid rgba(0, 217, 255, 0.3);
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-  color: var(--accent-cyan);
-}
-
-.webapp-badges {
-  display: flex;
-  gap: var(--space-xs);
-  margin-bottom: var(--space-md);
-}
-
-.badge {
-  font-size: 1.5rem;
-}
-
-.webapp-actions {
-  display: flex;
-  gap: var(--space-sm);
-}
-
-.webapp-actions .btn {
-  flex: 1;
-  text-align: center;
-  padding: var(--space-xs);
-  font-size: 0.9rem;
-}
-
-.empty-state {
-  text-align: center;
-  padding: var(--space-xl);
-  color: var(--text-secondary);
-}
-
-.footer {
-  background: var(--bg-secondary);
-  border-top: 1px solid rgba(0, 217, 255, 0.2);
-  padding: var(--space-xl) var(--space-md);
-  margin-top: var(--space-xl);
-}
-
-.footer-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-lg);
-  margin-bottom: var(--space-lg);
-}
-
-.footer-section h3 {
-  color: var(--accent-cyan);
-  margin-bottom: var(--space-sm);
-}
-
-.footer-section h4 {
-  color: var(--text-primary);
-  margin-bottom: var(--space-sm);
-}
-
-.footer-section p {
-  margin: var(--space-xs) 0;
-  font-size: 0.9rem;
-}
-
-.footer-section .tagline {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-}
-
-.footer-section ul {
-  list-style: none;
-  padding: 0;
-}
-
-.footer-section ul li {
-  margin: var(--space-xs) 0;
-}
-
-.footer-section a {
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: color 0.3s;
-}
-
-.footer-section a:hover {
-  color: var(--accent-cyan);
-}
-
-.footer-bottom {
-  text-align: center;
-  padding-top: var(--space-lg);
-  border-top: 1px solid rgba(0, 217, 255, 0.2);
-}
-
-.footer-bottom p {
-  margin: var(--space-xs) 0;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
-
-.footer-bottom strong {
-  color: var(--accent-cyan);
-}
-
-.footer-bottom .tech {
-  color: var(--text-secondary);
-  font-size: 0.8rem;
-  margin-top: var(--space-sm);
-}
-
-@media (max-width: 768px) {
-  .header .container {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .nav-links {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .webapps-grid {
-    grid-template-columns: 1fr;
-  }
-}
-`;
-
-// ==========================================
-// CLIENT-SIDE JAVASCRIPT
-// ==========================================
-
-const CLIENT_SCRIPT = `
-const API_BASE = window.location.origin;
-
-// Search functionality
-const searchInput = document.getElementById('searchInput');
-if (searchInput) {
-  searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
+  <script>
+    const API_BASE = window.location.origin;
+    let allApps = [];
+    
+    // Smooth scroll
+    function scrollToElement(id) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    
+    // Modal management
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.classList.add('active');
+      }
+    }
+    
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.classList.remove('active');
+      }
+    }
+    
+    // Close modal on outside click
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        closeModal(e.target.id);
+      }
+    });
+    
+    // Surprise Me
+    async function surpriseMe() {
+      try {
+        const response = await fetch(API_BASE + '/api/webapps?status=approved&limit=100');
+        const data = await response.json();
+        
+        if (data.success && data.data.length > 0) {
+          const random = data.data[Math.floor(Math.random() * data.data.length)];
+          window.open(random.url, '_blank');
+        } else {
+          alert('No WebApps available yet. Be the first to submit one!');
+        }
+      } catch (error) {
+        console.error('Surprise error:', error);
+        alert('Error loading WebApps');
+      }
+    }
+    
+    // Search functionality
+    async function handleSearch() {
+      const search = document.getElementById('searchInput')?.value || '';
+      const type = document.getElementById('typeFilter')?.value || '';
+      const sort = document.getElementById('sortFilter')?.value || 'recent';
+      
+      const params = new URLSearchParams({
+        status: 'approved',
+        sort: sort,
+        limit: 100
+      });
+      
+      if (type) params.append('types', type);
+      if (search) params.append('search', search);
+      
+      try {
+        const response = await fetch(API_BASE + '/api/webapps?' + params);
+        const data = await response.json();
+        
+        if (data.success) {
+          allApps = data.data;
+          renderWebApps(data.data);
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+      }
+    }
+    
+    function renderWebApps(apps) {
+      const grid = document.querySelector('.webapps-grid');
+      if (!grid) return;
+      
+      if (apps.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><div style="font-size:4rem;margin-bottom:1rem;opacity:0.5">🔍</div><h2>No WebApps Found</h2><p>Try adjusting your search or filters</p></div>';
+        return;
+      }
+      
+      grid.innerHTML = apps.map(app => {
+        const types = JSON.parse(app.types || '[]');
+        const tags = JSON.parse(app.tags || '[]');
+        const badges = app.badges || [];
+        
+        return `
+          <div class="webapp-card" data-id="${app.id}">
+            <div class="webapp-preview">
+              <iframe src="${app.url}" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>
+              <div class="preview-overlay" onclick="window.open('${app.url}', '_blank')">
+                <div class="preview-hint">👁️ Click to open</div>
+              </div>
+            </div>
+            <div class="webapp-content">
+              <div class="webapp-header">
+                <h3 class="webapp-title">${app.name}</h3>
+                <div class="webapp-rating">⭐ ${app.rating_avg > 0 ? app.rating_avg.toFixed(1) : 'N/A'}</div>
+              </div>
+              <div class="webapp-developer">by ${app.developer}</div>
+              <p class="webapp-description">${app.description_short}</p>
+              <div class="webapp-types">
+                ${types.slice(0, 3).map(t => `<span class="type-badge">${TOOL_TYPES[t] || t}</span>`).join('')}
+              </div>
+              <div class="webapp-tags">
+                ${tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('')}
+              </div>
+              <div class="webapp-badges">
+                ${badges.map(b => `<span class="badge">${BADGE_ICONS[b] || '🏅'}</span>`).join('')}
+              </div>
+              <div class="webapp-actions">
+                <button class="btn btn-primary" onclick="window.open('${app.url}', '_blank')">Open App</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Badge icons mapping
+    const BADGE_ICONS = {
+      pioneer: '🏆',
+      highly_rated: '⭐',
+      popular: '🔥',
+      open_source: '💻'
+    };
+    
+    const TOOL_TYPES = {
+      game: '🎮 Game',
+      tool: '🛠️ Tool',
+      api: '🔌 API',
+      design: '🎨 Design',
+      productivity: '📊 Productivity',
+      education: '📚 Education',
+      social: '💬 Social',
+      entertainment: '🎬 Entertainment',
+      finance: '💰 Finance',
+      developer: '👨‍💻 Developer',
+      ai: '🤖 AI/ML',
+      other: '🌟 Other'
+    };
+    
+    // Search on Enter
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          handleSearch();
+        }
+      });
+    }
+    
+    // Filter handlers
+    const typeFilter = document.getElementById('typeFilter');
+    const sortFilter = document.getElementById('sortFilter');
+    
+    if (typeFilter) {
+      typeFilter.addEventListener('change', handleSearch);
+    }
+    
+    if (sortFilter) {
+      sortFilter.addEventListener('change', handleSearch);
+    }
+    
+    // Submit form handler
+    async function handleSubmit(event) {
+      event.preventDefault();
+      
+      const form = event.target;
+      const formData = new FormData(form);
+      
+      // Get selected types
+      const types = [];
+      form.querySelectorAll('input[name="types"]:checked').forEach(checkbox => {
+        types.push(checkbox.value);
+      });
+      
+      if (types.length < 1 || types.length > 3) {
+        alert('Please select 1-3 types');
+        return;
+      }
+      
+      const data = {
+        name: formData.get('name'),
+        developer: formData.get('developer'),
+        url: formData.get('url'),
+        description_short: formData.get('description_short'),
+        description_long: formData.get('description_long'),
+        video_url: formData.get('video_url'),
+        github_url: formData.get('github_url'),
+        types: types,
+        tags: formData.get('tags').split(',').map(t => t.trim()).filter(t => t)
+      };
+      
+      const statusDiv = document.getElementById('submitStatus');
+      statusDiv.innerHTML = '<p style="color: var(--accent-cyan);">Submitting...</p>';
+      
+      try {
+        const response = await fetch('/api/webapps/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          statusDiv.innerHTML = '<p style="color: var(--success);">✅ WebApp submitted successfully!</p>';
+          form.reset();
+          setTimeout(() => {
+            closeModal('submitModal');
+            location.reload();
+          }, 2000);
+        } else {
+          statusDiv.innerHTML = '<p style="color: var(--error);">❌ ' + result.error + '</p>';
+        }
+      } catch (error) {
+        console.error('Submit error:', error);
+        statusDiv.innerHTML = '<p style="color: var(--error);">❌ Network error</p>';
+      }
+    }
+    
+    // Initialize
+    if (document.querySelector('.webapps-grid')) {
       handleSearch();
     }
-  });
+  </script>
+</body>
+</html>`;
 }
-
-async function handleSearch() {
-  const search = document.getElementById('searchInput').value;
-  const type = document.getElementById('typeFilter').value;
-  const sort = document.getElementById('sortFilter').value;
-  
-  const params = new URLSearchParams({
-    status: 'approved',
-    sort: sort || 'recent',
-    limit: 100
-  });
-  
-  if (type) params.append('types', type);
-  if (search) params.append('search', search);
-  
-  try {
-    const response = await fetch(API_BASE + '/api/webapps?' + params);
-    const data = await response.json();
-    
-    if (data.success) {
-      renderWebApps(data.data);
-    }
-  } catch (error) {
-    console.error('Search error:', error);
-  }
-}
-
-function renderWebApps(apps) {
-  const grid = document.querySelector('.webapps-grid');
-  if (!grid) return;
-  
-  if (apps.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div style="font-size:4rem;margin-bottom:1rem;opacity:0.5">🔍</div><h2>No WebApps Found</h2><p>Try adjusting your search or filters</p></div>';
-    return;
-  }
-  
-  grid.innerHTML = apps.map(app => {
-    const types = JSON.parse(app.types || '[]');
-    const tags = JSON.parse(app.tags || '[]');
-    const badges = app.badges || [];
-    
-    return '<div class="webapp-card" data-id="' + app.id + '"><div class="webapp-preview"><iframe src="' + app.url + '" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe><div class="preview-overlay"><div class="preview-hint">👁️ Click for details</div></div></div><div class="webapp-content"><div class="webapp-header"><h3 class="webapp-title">' + app.name + '</h3><div class="webapp-rating">⭐ ' + (app.rating_avg > 0 ? app.rating_avg.toFixed(1) : 'N/A') + '</div></div><div class="webapp-developer">by ' + app.developer + '</div><p class="webapp-description">' + app.description_short + '</p><div class="webapp-types">' + types.slice(0, 3).map(t => '<span class="type-badge">' + t + '</span>').join('') + '</div><div class="webapp-tags">' + tags.slice(0, 3).map(t => '<span class="tag">' + t + '</span>').join('') + '</div><div class="webapp-badges">' + badges.map(b => '<span class="badge">' + getBadgeIcon(b) + '</span>').join('') + '</div><div class="webapp-actions"><button class="btn btn-primary" onclick="window.open(\\'' + app.url + '\\', \\'_blank\\')">Open App</button><button class="btn btn-secondary" onclick="showDetails(\\'' + app.id + '\\')">Details</button></div></div></div>';
-  }).join('');
-}
-
-function getBadgeIcon(badge) {
-  const icons = {
-    pioneer: '🏆',
-    highly_rated: '⭐',
-    popular: '🔥',
-    open_source: '💻'
-  };
-  return icons[badge] || '🏅';
-}
-
-function showDetails(appId) {
-  window.location.href = '/app/' + appId;
-}
-
-// Filter handlers
-const typeFilter = document.getElementById('typeFilter');
-const sortFilter = document.getElementById('sortFilter');
-
-if (typeFilter) {
-  typeFilter.addEventListener('change', handleSearch);
-}
-
-if (sortFilter) {
-  sortFilter.addEventListener('change', handleSearch);
-}
-
-// Surprise Me
-const surpriseBtn = document.querySelector('.hero-actions .btn-secondary');
-if (surpriseBtn) {
-  surpriseBtn.addEventListener('click', async () => {
-    try {
-      const response = await fetch(API_BASE + '/api/webapps?status=approved&limit=100');
-      const data = await response.json();
-      
-      if (data.success && data.data.length > 0) {
-        const random = data.data[Math.floor(Math.random() * data.data.length)];
-        window.open(random.url, '_blank');
-      }
-    } catch (error) {
-      console.error('Surprise error:', error);
-    }
-  });
-}
-`;
 
 // ==========================================
 // API ROUTES
@@ -1484,22 +1421,13 @@ app.get('/api/stats', async (req, res) => {
     const totalReviews = await db.execute('SELECT COUNT(*) as count FROM reviews');
     const totalViews = await db.execute('SELECT SUM(views) as total FROM webapps');
     
-    const topApps = await db.execute(`
-      SELECT w.id, w.name, w.views
-      FROM webapps w
-      WHERE w.status = 'approved'
-      ORDER BY w.views DESC
-      LIMIT 10
-    `);
-    
     res.json({
       success: true,
       data: {
         total_apps: totalApps.rows[0].count,
         total_ratings: totalRatings.rows[0].count,
         total_reviews: totalReviews.rows[0].count,
-        total_views: totalViews.rows[0].total || 0,
-        top_apps: topApps.rows
+        total_views: totalViews.rows[0].total || 0
       }
     });
     
@@ -1510,48 +1438,222 @@ app.get('/api/stats', async (req, res) => {
 });
 
 // ==========================================
-// SSR ROUTES
+// HTML PAGES
 // ==========================================
 
 app.get('/', async (req, res) => {
   try {
-    const statsResponse = await db.execute('SELECT COUNT(*) as total_apps FROM webapps WHERE status = "approved"');
-    const ratingsResponse = await db.execute('SELECT COUNT(*) as total_ratings FROM ratings');
-    const reviewsResponse = await db.execute('SELECT COUNT(*) as total_reviews FROM reviews');
-    const viewsResponse = await db.execute('SELECT SUM(views) as total_views FROM webapps');
+    const statsResult = await db.execute('SELECT COUNT(*) as total_apps FROM webapps WHERE status = "approved"');
+    const ratingsResult = await db.execute('SELECT COUNT(*) as total_ratings FROM ratings');
+    const reviewsResult = await db.execute('SELECT COUNT(*) as total_reviews FROM reviews');
+    const viewsResult = await db.execute('SELECT SUM(views) as total_views FROM webapps');
     
     const stats = {
-      total_apps: statsResponse.rows[0].total_apps,
-      total_ratings: ratingsResponse.rows[0].total_ratings,
-      total_reviews: reviewsResponse.rows[0].total_reviews,
-      total_views: viewsResponse.rows[0].total_views || 0
+      total_apps: statsResult.rows[0].total_apps,
+      total_ratings: ratingsResult.rows[0].total_ratings,
+      total_reviews: reviewsResult.rows[0].total_reviews,
+      total_views: viewsResult.rows[0].total_views || 0
     };
     
-    const appsResult = await db.execute({
-      sql: 'SELECT * FROM webapps WHERE status = ? ORDER BY created_at DESC LIMIT 12',
-      args: ['approved']
-    });
-    
-    const apps = await Promise.all(appsResult.rows.map(async (app) => {
-      const rating = await calculateRating(app.id);
-      const badgesResult = await db.execute({
-        sql: 'SELECT badge_type FROM badges WHERE webapp_id = ?',
-        args: [app.id]
-      });
+    const content = `
+      <header>
+        <div class="container">
+          <a href="/" class="logo">
+            <span>🌌</span>
+            <span>NEXUS WEB HUB</span>
+          </a>
+          <nav>
+            <a href="#home" onclick="scrollToElement('home'); return false;">Home</a>
+            <a href="#explore" onclick="scrollToElement('explore'); return false;">Explore</a>
+            <a href="#stats" onclick="scrollToElement('stats'); return false;">Stats</a>
+            <button class="btn btn-primary" onclick="openModal('submitModal')">Submit WebApp</button>
+          </nav>
+        </div>
+      </header>
       
-      return {
-        ...app,
-        rating_avg: rating.average,
-        rating_count: rating.total,
-        badges: badgesResult.rows.map(b => b.badge_type)
-      };
-    }));
+      <section class="hero" id="home">
+        <h1>🚀 Universal WebApps Catalog</h1>
+        <p>Discover, explore and share the best open web applications from around the world</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="scrollToElement('explore')">Explore Catalog</button>
+          <button class="btn btn-secondary" onclick="surpriseMe()">🎲 Surprise Me</button>
+        </div>
+      </section>
+      
+      <section class="transparency-banner">
+        <h3>💎 Our Commitment to Transparency</h3>
+        <p>
+          Nexus Web Hub will introduce <strong>optional premium features</strong> in the future to ensure sustainability.  
+          However, <strong>the core catalog will always remain free</strong> and accessible to everyone.
+        </p>
+        <p>
+          <strong>What we will NEVER do:</strong> Paid placement, advertising, or biased rankings.  
+          Your experience is never for sale.
+        </p>
+        <div class="commitments">
+          <div class="commitment-item">
+            <span style="color: var(--success);">✅</span>
+            <span>Free catalog access forever</span>
+          </div>
+          <div class="commitment-item">
+            <span style="color: var(--success);">✅</span>
+            <span>No paid placements</span>
+          </div>
+          <div class="commitment-item">
+            <span style="color: var(--success);">✅</span>
+            <span>No advertising</span>
+          </div>
+          <div class="commitment-item">
+            <span style="color: var(--success);">✅</span>
+            <span>Community-driven rankings</span>
+          </div>
+        </div>
+      </section>
+      
+      <section class="stats-section" id="stats">
+        <div class="stat-card">
+          <div class="stat-number">${stats.total_apps}</div>
+          <div class="stat-label">WebApps</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${stats.total_ratings}</div>
+          <div class="stat-label">Ratings</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${stats.total_reviews}</div>
+          <div class="stat-label">Reviews</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${stats.total_views}</div>
+          <div class="stat-label">Total Views</div>
+        </div>
+      </section>
+      
+      <section class="search-section" id="explore">
+        <div class="search-bar">
+          <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search WebApps...">
+          <button class="btn btn-primary" onclick="handleSearch()">Search</button>
+        </div>
+        
+        <div class="filters">
+          <select class="filter-btn" id="typeFilter">
+            <option value="">All Types</option>
+            ${Object.entries(TOOL_TYPES).map(([value, label]) => 
+              `<option value="${value}">${label}</option>`
+            ).join('')}
+          </select>
+          
+          <select class="filter-btn" id="sortFilter">
+            <option value="recent">🆕 Recent</option>
+            <option value="popular">🔥 Popular</option>
+            <option value="name">🔤 Name</option>
+          </select>
+        </div>
+      </section>
+      
+      <div class="webapps-grid"></div>
+      
+      <div class="modal" id="submitModal">
+        <div class="modal-content">
+          <button class="modal-close" onclick="closeModal('submitModal')">&times;</button>
+          <h2 style="margin-bottom: 1.5rem;">🚀 Submit Your WebApp</h2>
+          
+          <form id="submitForm" onsubmit="handleSubmit(event)">
+            <div class="form-group">
+              <label>WebApp Name *</label>
+              <input type="text" name="name" required minlength="3" maxlength="100" placeholder="My Awesome WebApp">
+            </div>
+            
+            <div class="form-group">
+              <label>Developer/Team Name *</label>
+              <input type="text" name="developer" required minlength="2" maxlength="100" placeholder="Your name or team">
+            </div>
+            
+            <div class="form-group">
+              <label>WebApp URL * (must be HTTPS)</label>
+              <input type="url" name="url" required placeholder="https://your-webapp.com" pattern="https://.*">
+            </div>
+            
+            <div class="form-group">
+              <label>Short Description * (20-300 characters)</label>
+              <textarea name="description_short" required minlength="20" maxlength="300" placeholder="Brief description for cards..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>Long Description (0-3000 characters)</label>
+              <textarea name="description_long" maxlength="3000" rows="6" placeholder="Detailed description..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>Types * (select 1-3)</label>
+              <div class="types-checkboxes">
+                ${Object.entries(TOOL_TYPES).map(([value, label]) => `
+                  <div class="checkbox-item">
+                    <input type="checkbox" name="types" value="${value}" id="type-${value}">
+                    <label for="type-${value}">${label}</label>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Tags * (comma separated, 1-10)</label>
+              <input type="text" name="tags" required placeholder="web, tool, productivity">
+            </div>
+            
+            <div class="form-group">
+              <label>Video URL (optional - YouTube, etc.)</label>
+              <input type="url" name="video_url" placeholder="https://youtube.com/watch?v=...">
+            </div>
+            
+            <div class="form-group">
+              <label>GitHub Repository (optional)</label>
+              <input type="url" name="github_url" placeholder="https://github.com/user/repo">
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+              🚀 Submit WebApp
+            </button>
+          </form>
+          
+          <div id="submitStatus" style="margin-top: 1.5rem; text-align: center;"></div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="container">
+          <div class="footer-content">
+            <div class="footer-section">
+              <h3>🌌 Nexus Web Hub</h3>
+              <p>Universal WebApps Catalog</p>
+              <p class="tagline">Discover and share the best WebApps</p>
+            </div>
+            
+            <div class="footer-section">
+              <h4>Navigation</h4>
+              <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="#explore" onclick="scrollToElement('explore'); return false;">Explore</a></li>
+                <li><a href="#stats" onclick="scrollToElement('stats'); return false;">Stats</a></li>
+              </ul>
+            </div>
+            
+            <div class="footer-section">
+              <h4>Contact</h4>
+              <p>📧 <a href="mailto:nexusstudio100@gmail.com">nexusstudio100@gmail.com</a></p>
+            </div>
+          </div>
+          
+          <div class="footer-bottom">
+            <p>Powered by <strong>Nexus Studio</strong></p>
+            <p>© ${new Date().getFullYear()} Nexus Web Hub. All rights reserved.</p>
+            <p class="tech">DAOUDA Abdoul Anzize - CEO</p>
+          </div>
+        </div>
+      </footer>
+    `;
     
-    const html = '<!DOCTYPE html>' + renderToString(
-      React.createElement(HomePage, { stats, apps })
-    );
-    
-    res.send(html);
+    res.send(generateHTML(content, 'Nexus Web Hub - Universal WebApps Catalog'));
   } catch (error) {
     console.error('Error rendering home:', error);
     res.status(500).send('Internal Server Error');
@@ -1573,7 +1675,7 @@ async function startServer() {
 ║   🚀 URL: http://localhost:${PORT}      ║
 ║   📊 Status: Production Ready          ║
 ║   🗄️  Database: Turso (Connected)      ║
-║   ⚡ Stack: Node + Express + React SSR ║
+║   ⚡ Stack: Node + Express + Vanilla JS║
 ║                                        ║
 ║   Built with ❤️ by Anzize Daouda      ║
 ╚════════════════════════════════════════╝
