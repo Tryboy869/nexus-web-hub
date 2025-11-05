@@ -64,6 +64,7 @@ async function initDatabase() {
   console.log('🗄️  Initializing database...');
   
   try {
+    // Create table with backward compatibility
     await db.execute(`
       CREATE TABLE IF NOT EXISTS webapps (
         id TEXT PRIMARY KEY,
@@ -74,7 +75,8 @@ async function initDatabase() {
         description_long TEXT,
         video_url TEXT,
         github_url TEXT,
-        types TEXT NOT NULL,
+        screenshot_url TEXT,
+        type TEXT NOT NULL,
         tags TEXT NOT NULL,
         status TEXT DEFAULT 'approved',
         views INTEGER DEFAULT 0,
@@ -82,6 +84,27 @@ async function initDatabase() {
         updated_at INTEGER DEFAULT (unixepoch())
       )
     `);
+    
+    // Add types column if it doesn't exist (migration)
+    try {
+      await db.execute(`ALTER TABLE webapps ADD COLUMN types TEXT`);
+      console.log('✅ Added types column');
+    } catch (e) {
+      // Column already exists or other error - ignore
+      console.log('ℹ️  types column already exists or migration not needed');
+    }
+    
+    // Migrate existing data from type to types if needed
+    try {
+      await db.execute(`
+        UPDATE webapps 
+        SET types = json_array(type) 
+        WHERE types IS NULL AND type IS NOT NULL
+      `);
+      console.log('✅ Migrated type to types');
+    } catch (e) {
+      console.log('ℹ️  Migration skipped or already done');
+    }
     
     await db.execute(`
       CREATE TABLE IF NOT EXISTS ratings (
