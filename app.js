@@ -688,13 +688,11 @@ async function startServer() {
   await initDatabase();
   
   app.listen(PORT, () => {
-    console.log(\`
-╔════════════════════════════════════════╗
-║   🌌 NEXUS WEB HUB                     ║
-║   🚀 Server: http://localhost:\${PORT}    ║
-║   ✅ CLEAN VERSION - Ça marche !       ║
-╚════════════════════════════════════════╝
-    \`);
+    console.log('╔════════════════════════════════════════╗');
+    console.log('║   🌌 NEXUS WEB HUB                     ║');
+    console.log('║   🚀 Server: http://localhost:' + PORT + '    ║');
+    console.log('║   ✅ CLEAN VERSION - Ready!            ║');
+    console.log('╚════════════════════════════════════════╝');
   });
 }
 
