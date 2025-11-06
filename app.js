@@ -508,12 +508,50 @@ app.get('/', async (req, res) => {
         <div class="form-group">
           <label>Types * (select 1-3)</label>
           <div class="checkboxes">
-            <div class="checkbox-item"><input type="checkbox" name="types" value="game"><label>🎮 Game</label></div>
-            <div class="checkbox-item"><input type="checkbox" name="types" value="tool"><label>🛠️ Tool</label></div>
-            <div class="checkbox-item"><input type="checkbox" name="types" value="api"><label>🔌 API</label></div>
-            <div class="checkbox-item"><input type="checkbox" name="types" value="design"><label>🎨 Design</label></div>
-            <div class="checkbox-item"><input type="checkbox" name="types" value="productivity"><label>📊 Productivity</label></div>
-            <div class="checkbox-item"><input type="checkbox" name="types" value="education"><label>📚 Education</label></div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="types" value="game" id="type-game">
+              <label for="type-game">🎮 Game</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="types" value="tool" id="type-tool">
+              <label for="type-tool">🛠️ Tool</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="types" value="api" id="type-api">
+              <label for="type-api">🔌 API</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="types" value="design" id="type-design">
+              <label for="type-design">🎨 Design</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="types" value="productivity" id="type-productivity">
+              <label for="type-productivity">📊 Productivity</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="types" value="education" id="type-education">
+              <label for="type-education">📚 Education</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="types" value="social" id="type-social">
+              <label for="type-social">💬 Social</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="types" value="entertainment" id="type-entertainment">
+              <label for="type-entertainment">🎬 Entertainment</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="types" value="developer" id="type-developer">
+              <label for="type-developer">👨‍💻 Developer</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="types" value="ai" id="type-ai">
+              <label for="type-ai">🤖 AI/ML</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="types" value="other" id="type-other">
+              <label for="type-other">🌟 Other</label>
+            </div>
           </div>
         </div>
         
