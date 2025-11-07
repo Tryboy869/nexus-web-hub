@@ -115,6 +115,20 @@ class DatabaseModule {
   }
 
   async createTables() {
+    // FORCE RESET: Drop all tables if flag is set
+    if (process.env.FORCE_RESET_DB === 'true') {
+      console.log('🔄 FORCE_RESET_DB detected - Dropping all tables...');
+      try {
+        await this.client.execute('DROP TABLE IF EXISTS badges');
+        await this.client.execute('DROP TABLE IF EXISTS reviews');
+        await this.client.execute('DROP TABLE IF EXISTS ratings');
+        await this.client.execute('DROP TABLE IF EXISTS webapps');
+        console.log('✅ All tables dropped successfully');
+      } catch (error) {
+        console.log('⚠️ Error dropping tables (might not exist):', error.message);
+      }
+    }
+
     // Table: webapps (with correct 'types' column)
     await this.client.execute(`
       CREATE TABLE IF NOT EXISTS webapps (
