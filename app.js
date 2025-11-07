@@ -107,7 +107,7 @@ class DatabaseModule {
 
     this.client = createClient({ url, authToken });
 
-    // Create tables
+    // Create tables (will skip if already exist)
     await this.createTables();
     
     this.isInitialized = true;
@@ -115,7 +115,7 @@ class DatabaseModule {
   }
 
   async createTables() {
-    // Table: webapps
+    // Table: webapps (with correct 'types' column)
     await this.client.execute(`
       CREATE TABLE IF NOT EXISTS webapps (
         id TEXT PRIMARY KEY,
