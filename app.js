@@ -1,53 +1,142 @@
 // ==========================================
 // NEXUS WEB HUB - MONO-FILE ARCHITECTURE
-// Version: 1.0.0 - CLEAN
-// Author: DAOUDA Abdoul Anzize - Nexus Studio
+// Architecture Modulaire Production-Ready
+// Version: 1.0.0
 // ==========================================
 
 import express from 'express';
 import { createClient } from '@libsql/client';
-import { z } from 'zod';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy for Render/Railway
 app.set('trust proxy', 1);
+
+// Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // ==========================================
-// DATABASE
+// MODULE 1: SECURITY GATEWAY (Critical)
 // ==========================================
 
-const db = createClient({
-  url: process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN
-});
+class SecurityGateway {
+  constructor() {
+    this.rateLimits = new Map();
+    this.auditLog = [];
+    
+    this.dangerousPatterns = {
+      sql: [/DROP\s+TABLE/i, /DELETE.*WHERE.*1=1/i, /UNION.*SELECT/i],
+      xss: [/<script>/i, /javascript:/i, /onerror=/i],
+      path: [/\.\.\//g, /\.\./g]
+    };
+  }
 
-async function initDatabase() {
-  console.log('🗄️  Initializing database...');
-  
-  try {
-    await db.execute(`
+  validateInput(data, dataType = 'generic') {
+    if (typeof data === 'string') {
+      const patterns = this.dangerousPatterns[dataType] || [];
+      
+      for (const pattern of patterns) {
+        if (pattern.test(data)) {
+          this.audit('SECURITY_VIOLATION', { pattern: pattern.toString(), data });
+          return { valid: false, reason: `Dangerous pattern detected: ${pattern}` };
+        }
+      }
+    }
+    
+    return { valid: true, data };
+  }
+
+  checkRateLimit(clientId, maxRequests = 100) {
+    const now = Date.now();
+    
+    if (!this.rateLimits.has(clientId)) {
+      this.rateLimits.set(clientId, { count: 0, resetTime: now + 60000 });
+    }
+    
+    const client = this.rateLimits.get(clientId);
+    
+    if (now > client.resetTime) {
+      client.count = 0;
+      client.resetTime = now + 60000;
+    }
+    
+    client.count++;
+    
+    return client.count <= maxRequests;
+  }
+
+  audit(action, data) {
+    this.auditLog.push({
+      timestamp: new Date().toISOString(),
+      action,
+      data: typeof data === 'object' ? JSON.stringify(data) : data
+    });
+    
+    // Keep only last 1000 entries
+    if (this.auditLog.length > 1000) {
+      this.auditLog.shift();
+    }
+  }
+
+  getAuditLog(limit = 100) {
+    return this.auditLog.slice(-limit);
+  }
+}
+
+// ==========================================
+// MODULE 2: DATABASE MODULE (Turso)
+// ==========================================
+
+class DatabaseModule {
+  constructor() {
+    this.client = null;
+    this.isInitialized = false;
+  }
+
+  async initialize() {
+    if (this.isInitialized) return;
+
+    const url = process.env.TURSO_DATABASE_URL;
+    const authToken = process.env.TURSO_AUTH_TOKEN;
+
+    if (!url || !authToken) {
+      throw new Error('Missing Turso credentials');
+    }
+
+    this.client = createClient({ url, authToken });
+
+    // Create tables
+    await this.createTables();
+    
+    this.isInitialized = true;
+    console.log('✅ Database initialized');
+  }
+
+  async createTables() {
+    // Table: webapps
+    await this.client.execute(`
       CREATE TABLE IF NOT EXISTS webapps (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         developer TEXT NOT NULL,
         url TEXT NOT NULL UNIQUE,
         description_short TEXT NOT NULL,
-        description_long TEXT CHECK(length(description_long) <= 3000),
+        description_long TEXT,
         video_url TEXT,
         github_url TEXT,
         types TEXT NOT NULL,
         tags TEXT NOT NULL,
-        status TEXT DEFAULT 'approved',
+        status TEXT DEFAULT 'pending',
         views INTEGER DEFAULT 0,
         created_at INTEGER DEFAULT (unixepoch()),
         updated_at INTEGER DEFAULT (unixepoch())
       )
     `);
-    
-    await db.execute(`
+
+    // Table: ratings
+    await this.client.execute(`
       CREATE TABLE IF NOT EXISTS ratings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         webapp_id TEXT NOT NULL,
@@ -58,8 +147,9 @@ async function initDatabase() {
         UNIQUE(webapp_id, user_ip)
       )
     `);
-    
-    await db.execute(`
+
+    // Table: reviews
+    await this.client.execute(`
       CREATE TABLE IF NOT EXISTS reviews (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         webapp_id TEXT NOT NULL,
@@ -70,8 +160,9 @@ async function initDatabase() {
         FOREIGN KEY (webapp_id) REFERENCES webapps(id)
       )
     `);
-    
-    await db.execute(`
+
+    // Table: badges
+    await this.client.execute(`
       CREATE TABLE IF NOT EXISTS badges (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         webapp_id TEXT NOT NULL,
@@ -80,754 +171,1125 @@ async function initDatabase() {
         FOREIGN KEY (webapp_id) REFERENCES webapps(id)
       )
     `);
+
+    // Indexes
+    await this.client.execute(`CREATE INDEX IF NOT EXISTS idx_webapps_status ON webapps(status)`);
+    await this.client.execute(`CREATE INDEX IF NOT EXISTS idx_webapps_types ON webapps(types)`);
+    await this.client.execute(`CREATE INDEX IF NOT EXISTS idx_ratings_webapp ON ratings(webapp_id)`);
+    await this.client.execute(`CREATE INDEX IF NOT EXISTS idx_reviews_webapp ON reviews(webapp_id)`);
+  }
+
+  async query(operation, params) {
+    if (!this.isInitialized) {
+      throw new Error('Database not initialized');
+    }
+
+    const operations = {
+      'CREATE': (p) => this._create(p),
+      'READ': (p) => this._read(p),
+      'UPDATE': (p) => this._update(p),
+      'DELETE': (p) => this._delete(p),
+      'LIST': (p) => this._list(p),
+      'SEARCH': (p) => this._search(p),
+      'CUSTOM': (p) => this._custom(p)
+    };
+
+    const handler = operations[operation];
+    if (!handler) {
+      throw new Error(`Unknown operation: ${operation}`);
+    }
+
+    return await handler(params);
+  }
+
+  async _create(params) {
+    const { table, data } = params;
+    const keys = Object.keys(data);
+    const values = Object.values(data);
+    const placeholders = keys.map(() => '?').join(', ');
+
+    const sql = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders})`;
     
-    await db.execute(`CREATE INDEX IF NOT EXISTS idx_webapps_status ON webapps(status)`);
-    await db.execute(`CREATE INDEX IF NOT EXISTS idx_ratings_webapp ON ratings(webapp_id)`);
+    await this.client.execute({ sql, args: values });
     
-    console.log('✅ Database initialized');
-  } catch (error) {
-    console.error('❌ Database init failed:', error);
-    process.exit(1);
+    return { success: true, id: data.id };
+  }
+
+  async _read(params) {
+    const { table, id } = params;
+    
+    const result = await this.client.execute({
+      sql: `SELECT * FROM ${table} WHERE id = ?`,
+      args: [id]
+    });
+
+    if (result.rows.length === 0) {
+      return { success: false, error: 'Not found' };
+    }
+
+    return { success: true, data: result.rows[0] };
+  }
+
+  async _update(params) {
+    const { table, id, data } = params;
+    const sets = Object.keys(data).map(k => `${k} = ?`).join(', ');
+    const values = [...Object.values(data), id];
+
+    await this.client.execute({
+      sql: `UPDATE ${table} SET ${sets}, updated_at = unixepoch() WHERE id = ?`,
+      args: values
+    });
+
+    return { success: true };
+  }
+
+  async _delete(params) {
+    const { table, id } = params;
+    
+    await this.client.execute({
+      sql: `DELETE FROM ${table} WHERE id = ?`,
+      args: [id]
+    });
+
+    return { success: true };
+  }
+
+  async _list(params) {
+    const { table, limit = 50, offset = 0, where = '', args = [] } = params;
+    
+    const whereCl = where ? `WHERE ${where}` : '';
+    const sql = `SELECT * FROM ${table} ${whereCl} LIMIT ? OFFSET ?`;
+    
+    const result = await this.client.execute({
+      sql,
+      args: [...args, limit, offset]
+    });
+
+    return {
+      success: true,
+      data: result.rows,
+      total: result.rows.length
+    };
+  }
+
+  async _search(params) {
+    const { table, field, query } = params;
+    
+    const result = await this.client.execute({
+      sql: `SELECT * FROM ${table} WHERE ${field} LIKE ?`,
+      args: [`%${query}%`]
+    });
+
+    return {
+      success: true,
+      data: result.rows,
+      count: result.rows.length
+    };
+  }
+
+  async _custom(params) {
+    const { sql, args = [] } = params;
+    const result = await this.client.execute({ sql, args });
+    return { success: true, data: result.rows };
   }
 }
 
 // ==========================================
-// VALIDATION
+// MODULE 3: BUSINESS LOGIC
 // ==========================================
 
-const WebAppSchema = z.object({
-  name: z.string().min(3).max(100),
-  developer: z.string().min(2).max(100),
-  url: z.string().url().startsWith('https://'),
-  description_short: z.string().min(20).max(200),
-  description_long: z.string().max(3000).optional(),
-  video_url: z.string().url().optional(),
-  github_url: z.string().url().optional(),
-  types: z.array(z.enum(['game', 'tool', 'api', 'design', 'productivity', 'education', 'social', 'other'])).min(1).max(3),
-  tags: z.array(z.string()).min(1).max(10)
-});
+class BusinessLogic {
+  constructor(database) {
+    this.db = database;
+  }
 
-const RatingSchema = z.object({
-  webapp_id: z.string(),
-  rating: z.number().int().min(1).max(5)
-});
+  generateId() {
+    return `app-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
 
-const ReviewSchema = z.object({
-  webapp_id: z.string(),
-  user_name: z.string().min(2).max(50),
-  comment: z.string().min(10).max(1000)
-});
+  async checkDuplicate(url) {
+    const result = await this.db.query('CUSTOM', {
+      sql: 'SELECT id FROM webapps WHERE url = ?',
+      args: [url]
+    });
+    return result.data.length > 0;
+  }
 
-// ==========================================
-// UTILITIES
-// ==========================================
+  async calculateRating(webappId) {
+    const result = await this.db.query('CUSTOM', {
+      sql: 'SELECT AVG(rating) as avg_rating, COUNT(*) as total FROM ratings WHERE webapp_id = ?',
+      args: [webappId]
+    });
 
-function generateId() {
-  return 'app-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-}
+    if (result.data.length === 0 || result.data[0].total === 0) {
+      return { average: 0, total: 0 };
+    }
 
-function getClientIp(req) {
-  return req.headers['x-forwarded-for']?.split(',')[0] || req.connection.remoteAddress || 'unknown';
-}
+    return {
+      average: Math.round(result.data[0].avg_rating * 10) / 10,
+      total: result.data[0].total
+    };
+  }
 
-async function checkUrlAccessibility(url) {
-  try {
-    const response = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(5000) });
-    return response.ok;
-  } catch (error) {
-    return false;
+  async awardBadges(webappId) {
+    const badges = [];
+
+    // Badge: Pioneer (first app)
+    const totalApps = await this.db.query('CUSTOM', {
+      sql: 'SELECT COUNT(*) as count FROM webapps WHERE status = "approved"',
+      args: []
+    });
+
+    if (totalApps.data[0].count === 1) {
+      badges.push('pioneer');
+    }
+
+    // Badge: Highly Rated
+    const rating = await this.calculateRating(webappId);
+    if (rating.average >= 4.5 && rating.total >= 10) {
+      badges.push('highly_rated');
+    }
+
+    // Badge: Popular
+    const webapp = await this.db.query('READ', { table: 'webapps', id: webappId });
+    if (webapp.success && webapp.data.views >= 100) {
+      badges.push('popular');
+    }
+
+    // Badge: Open Source
+    if (webapp.success && webapp.data.github_url) {
+      badges.push('open_source');
+    }
+
+    // Insert badges
+    for (const badge of badges) {
+      try {
+        await this.db.query('CUSTOM', {
+          sql: 'INSERT OR IGNORE INTO badges (webapp_id, badge_type) VALUES (?, ?)',
+          args: [webappId, badge]
+        });
+      } catch (e) {
+        // Ignore duplicates
+      }
+    }
+
+    return badges;
+  }
+
+  async getStats() {
+    const totalApps = await this.db.query('CUSTOM', {
+      sql: 'SELECT COUNT(*) as count FROM webapps WHERE status = "approved"',
+      args: []
+    });
+
+    const totalRatings = await this.db.query('CUSTOM', {
+      sql: 'SELECT COUNT(*) as count FROM ratings',
+      args: []
+    });
+
+    const totalReviews = await this.db.query('CUSTOM', {
+      sql: 'SELECT COUNT(*) as count FROM reviews',
+      args: []
+    });
+
+    const totalViews = await this.db.query('CUSTOM', {
+      sql: 'SELECT SUM(views) as total FROM webapps',
+      args: []
+    });
+
+    return {
+      total_apps: totalApps.data[0].count,
+      total_ratings: totalRatings.data[0].count,
+      total_reviews: totalReviews.data[0].count,
+      total_views: totalViews.data[0].total || 0
+    };
   }
 }
 
-async function checkDuplicate(url) {
-  const result = await db.execute({ sql: 'SELECT id FROM webapps WHERE url = ?', args: [url] });
-  return result.rows.length > 0;
-}
-
-async function calculateRating(webappId) {
-  const result = await db.execute({
-    sql: 'SELECT AVG(rating) as avg_rating, COUNT(*) as total FROM ratings WHERE webapp_id = ?',
-    args: [webappId]
-  });
-  
-  if (result.rows.length === 0 || result.rows[0].total === 0) {
-    return { average: 0, total: 0 };
-  }
-  
-  return {
-    average: Math.round(result.rows[0].avg_rating * 10) / 10,
-    total: result.rows[0].total
-  };
-}
-
-async function awardBadges(webappId) {
-  const badges = [];
-  
-  const isFirst = await db.execute({ sql: 'SELECT COUNT(*) as count FROM webapps WHERE status = "approved"', args: [] });
-  if (isFirst.rows[0].count === 1) badges.push('pioneer');
-  
-  const rating = await calculateRating(webappId);
-  if (rating.average >= 4.5 && rating.total >= 10) badges.push('highly_rated');
-  
-  const webapp = await db.execute({ sql: 'SELECT views FROM webapps WHERE id = ?', args: [webappId] });
-  if (webapp.rows[0]?.views >= 100) badges.push('popular');
-  
-  const hasGithub = await db.execute({ sql: 'SELECT github_url FROM webapps WHERE id = ? AND github_url IS NOT NULL', args: [webappId] });
-  if (hasGithub.rows.length > 0) badges.push('open_source');
-  
-  for (const badge of badges) {
-    await db.execute({ sql: 'INSERT OR IGNORE INTO badges (webapp_id, badge_type) VALUES (?, ?)', args: [webappId, badge] });
-  }
-  
-  return badges;
-}
-
 // ==========================================
-// HTML GENERATION
+// MODULE 4: UI MODULE (Frontend HTML)
 // ==========================================
 
-function generateHTML() {
-  const html = `<!DOCTYPE html>
+class UIModule {
+  static getHTML() {
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nexus Web Hub - Universal WebApps Catalog</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0a0e27;--card:#1a1f3a;--text:#E0E6ED;--text-sec:#9CA3AF;--cyan:#00D9FF;--violet:#8A2BE2;--gold:#FFD700;--success:#10b981;--error:#ef4444}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
-body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:radial-gradient(2px 2px at 20px 30px,white,transparent),radial-gradient(2px 2px at 60px 70px,white,transparent);background-size:200px 200px;opacity:0.3;z-index:-1;animation:twinkle 3s infinite}
-@keyframes twinkle{0%,100%{opacity:0.3}50%{opacity:0.5}}
-.container{max-width:1400px;margin:0 auto;padding:2rem}
-header{background:rgba(26,31,58,0.95);backdrop-filter:blur(10px);padding:1.5rem;position:sticky;top:0;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,0.4);border-bottom:1px solid rgba(0,217,255,0.2)}
-nav{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
-.logo{font-size:1.5rem;font-weight:bold;background:linear-gradient(135deg,#4169E1 0%,#8A2BE2 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.btn{padding:0.5rem 1.5rem;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.3s;text-decoration:none;display:inline-block}
-.btn-primary{background:linear-gradient(135deg,#4169E1 0%,#8A2BE2 100%);color:white}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(138,43,226,0.5)}
-.hero{text-align:center;padding:3rem 2rem;max-width:1000px;margin:0 auto}
-.hero h1{font-size:clamp(2rem,5vw,4rem);margin-bottom:1.5rem;background:linear-gradient(135deg,#4169E1 0%,#8A2BE2 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{font-size:clamp(1rem,2vw,1.5rem);color:var(--text-sec);margin-bottom:2rem}
-.hero-actions{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap}
-.banner{background:rgba(138,43,226,0.1);border:2px solid rgba(138,43,226,0.3);border-radius:12px;padding:1.5rem;margin:2rem auto;max-width:1400px}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;max-width:1400px;margin:3rem auto}
-.stat-card{background:rgba(26,31,58,0.8);backdrop-filter:blur(10px);border:1px solid rgba(0,217,255,0.2);border-radius:16px;padding:2rem;text-align:center;transition:all 0.3s}
-.stat-card:hover{transform:translateY(-5px);border-color:var(--cyan)}
-.stat-number{font-size:3rem;font-weight:bold;background:linear-gradient(135deg,#4169E1 0%,#8A2BE2 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.search-section{max-width:1400px;margin:3rem auto;padding:0 2rem}
-.search-bar{display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap}
-.search-input{flex:1;min-width:250px;padding:1rem 1.5rem;background:rgba(26,31,58,0.8);border:2px solid rgba(0,217,255,0.3);border-radius:12px;color:var(--text);font-size:1rem}
-.search-input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 20px rgba(0,217,255,0.5)}
-.filters{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
-.filter-btn{padding:0.5rem 1.5rem;background:rgba(26,31,58,0.8);border:2px solid rgba(138,43,226,0.3);border-radius:8px;color:var(--text);cursor:pointer;transition:all 0.3s}
-.filter-btn:hover,.filter-btn.active{background:linear-gradient(135deg,#4169E1 0%,#8A2BE2 100%);border-color:transparent}
-.webapps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:2rem;max-width:1400px;margin:0 auto 3rem;padding:0 2rem}
-.webapp-card{background:rgba(26,31,58,0.8);backdrop-filter:blur(10px);border:1px solid rgba(0,217,255,0.2);border-radius:16px;overflow:hidden;transition:all 0.3s;cursor:pointer}
-.webapp-card.expanded{grid-column:1/-1;cursor:default}
-.webapp-card:not(.expanded):hover{transform:translateY(-8px);box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 20px rgba(0,217,255,0.5);border-color:var(--cyan)}
-.webapp-preview{width:100%;height:200px;background:linear-gradient(135deg,#1a1f3a 0%,#0a0e27 100%);display:flex;align-items:center;justify-content:center;color:var(--text-sec)}
-.webapp-card.expanded .webapp-preview{height:500px}
-.webapp-preview iframe{width:100%;height:100%;border:none}
-.webapp-content{padding:1.5rem}
-.webapp-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:1rem}
-.webapp-title{font-size:1.25rem;font-weight:bold;margin-bottom:0.5rem}
-.webapp-rating{display:flex;gap:4px;font-size:1.2rem}
-.star{color:var(--gold);filter:drop-shadow(0 0 4px rgba(255,215,0,0.5))}
-.star.empty{color:rgba(255,215,0,0.3)}
-.webapp-description{color:var(--text-sec);margin-bottom:1.5rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.webapp-card.expanded .webapp-description{display:block;-webkit-line-clamp:unset}
-.description-long{margin-top:1rem;max-height:200px;overflow-y:auto;padding:1rem;background:rgba(0,0,0,0.2);border-radius:8px;display:none}
-.webapp-card.expanded .description-long{display:block}
-.webapp-types,.webapp-tags{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
-.type-badge,.tag{padding:4px 12px;background:rgba(0,217,255,0.1);border:1px solid rgba(0,217,255,0.3);border-radius:8px;font-size:0.8rem;color:var(--cyan)}
-.webapp-badges{display:flex;gap:0.5rem;margin-bottom:1.5rem;font-size:1.5rem}
-.webapp-actions{display:flex;gap:1rem;flex-wrap:wrap}
-.webapp-actions .btn{flex:1;text-align:center;padding:0.5rem}
-.expanded-content{display:none;padding:1.5rem;border-top:1px solid rgba(0,217,255,0.2)}
-.webapp-card.expanded .expanded-content{display:block}
-.form-group{margin-bottom:1.5rem}
-.form-group label{display:block;margin-bottom:0.5rem;font-weight:600}
-.form-group input,.form-group textarea,.form-group select{width:100%;padding:1rem;background:var(--card);border:2px solid rgba(0,217,255,0.3);border-radius:8px;color:var(--text);font-size:1rem;font-family:inherit}
-.form-group textarea{min-height:120px;resize:vertical}
-.type-checkboxes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.5rem}
-.checkbox-label{display:flex;align-items:center;gap:0.5rem;padding:0.5rem;background:var(--card);border:2px solid rgba(0,217,255,0.3);border-radius:8px;cursor:pointer}
-.checkbox-label:hover{border-color:var(--cyan)}
-.submit-form{max-width:1400px;margin:3rem auto;padding:0 2rem;display:none}
-.submit-form.active{display:block}
-footer{background:var(--card);border-top:1px solid rgba(0,217,255,0.2);padding:3rem 2rem;margin-top:3rem;text-align:center}
-@media(max-width:768px){.webapps-grid{grid-template-columns:1fr}.webapp-card.expanded{grid-column:1}.stats-grid{grid-template-columns:1fr}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Nexus Web Hub - Universal WebApps Catalog">
+  <meta name="author" content="DAOUDA Abdoul Anzize - Nexus Studio">
+  <title>Nexus Web Hub - Universal WebApps Catalog</title>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-primary: #0a0e27;
+      --bg-secondary: #1a1f3a;
+      --bg-card: rgba(26, 31, 58, 0.8);
+      --text-primary: #E0E6ED;
+      --text-secondary: #9CA3AF;
+      --accent-cyan: #00D9FF;
+      --accent-violet: #8A2BE2;
+      --accent-gold: #FFD700;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, white, transparent),
+        radial-gradient(2px 2px at 60px 70px, white, transparent),
+        radial-gradient(1px 1px at 50px 50px, white, transparent);
+      background-size: 200px 200px;
+      opacity: 0.3;
+      z-index: -1;
+      animation: twinkle 3s infinite;
+    }
+    
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.5; }
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      background: rgba(26, 31, 58, 0.95);
+      padding: 1.5rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
+      color: white;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(138, 43, 226, 0.5);
+    }
+    
+    .hero {
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+    
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 4rem);
+      background: linear-gradient(135deg, #4169E1 0%, #8A2BE2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+    
+    .card {
+      background: var(--bg-card);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      transition: all 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      border-color: var(--accent-cyan);
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    
+    input, textarea, select {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--bg-secondary);
+      border: 2px solid rgba(0, 217, 255, 0.3);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+    }
+    
+    .hidden { display: none !important; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+  </style>
 </head>
 <body>
-<header>
-<nav>
-<div class="logo">🌌 NEXUS WEB HUB</div>
-<button class="btn btn-primary" onclick="toggleSubmitForm()">Submit WebApp</button>
-</nav>
-</header>
+  <header>
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="logo">🌌 NEXUS WEB HUB</div>
+      <button class="btn" onclick="showSubmitForm()">Submit WebApp</button>
+    </div>
+  </header>
 
-<section class="hero">
-<h1>🚀 Universal WebApps Catalog</h1>
-<p>Discover, explore and share the best open web applications</p>
-<div class="hero-actions">
-<button class="btn btn-primary" onclick="scrollToExplore()">Explore Catalog</button>
-<button class="btn btn-primary" onclick="surpriseMe()">🎲 Surprise Me</button>
-</div>
-</section>
+  <section class="hero">
+    <h1>🚀 Universal WebApps Catalog</h1>
+    <p style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem;">
+      Discover, explore and share the best open web applications
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <button class="btn" onclick="scrollTo(0, 800)">Explore Catalog</button>
+      <button class="btn" onclick="surpriseMe()">🎲 Surprise Me</button>
+    </div>
+  </section>
 
-<div class="container banner">
-<h3 style="color:var(--violet);margin-bottom:1rem">💎 Our Commitment to Transparency</h3>
-<p style="margin-bottom:1rem">Nexus Web Hub will introduce <strong>optional premium features</strong> in the future. However, <strong>the core catalog will always remain free</strong>.</p>
-<p><strong>What we will NEVER do:</strong> Paid placement, advertising, or biased rankings.</p>
-</div>
+  <section id="submit-section" class="container hidden">
+    <div class="card">
+      <h2>🚀 Submit Your WebApp</h2>
+      <form id="submitForm" style="margin-top: 1.5rem;">
+        <div style="margin-bottom: 1rem;">
+          <label>WebApp Name *</label>
+          <input type="text" id="name" required minlength="3" maxlength="100">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label>Developer/Team *</label>
+          <input type="text" id="developer" required minlength="2" maxlength="100">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label>URL * (HTTPS only)</label>
+          <input type="url" id="url" required pattern="https://.*">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label>Short Description * (20-200 char)</label>
+          <textarea id="desc_short" required minlength="20" maxlength="200" rows="2"></textarea>
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label>Long Description (0-3000 char)</label>
+          <textarea id="desc_long" maxlength="3000" rows="5"></textarea>
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label>Types * (hold Ctrl/Cmd for multiple, max 3)</label>
+          <select id="types" multiple required size="8">
+            <option value="game">🎮 Game</option>
+            <option value="tool">🛠️ Tool</option>
+            <option value="api">🔌 API</option>
+            <option value="design">🎨 Design</option>
+            <option value="productivity">📊 Productivity</option>
+            <option value="education">📚 Education</option>
+            <option value="social">💬 Social</option>
+            <option value="other">🌟 Other</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label>Tags * (comma-separated, 1-10)</label>
+          <input type="text" id="tags" required placeholder="web, tool, productivity">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label>Video URL (optional)</label>
+          <input type="url" id="video_url">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label>GitHub URL (optional)</label>
+          <input type="url" id="github_url">
+        </div>
+        <button type="submit" class="btn" style="width: 100%;">🚀 Submit</button>
+      </form>
+      <div id="submit-status" style="margin-top: 1rem; text-align: center;"></div>
+    </div>
+  </section>
 
-<section class="stats-grid container">
-<div class="stat-card">
-<div class="stat-number" id="stat-apps">0</div>
-<div style="color:var(--text-sec)">WebApps</div>
-</div>
-<div class="stat-card">
-<div class="stat-number" id="stat-ratings">0</div>
-<div style="color:var(--text-sec)">Ratings</div>
-</div>
-<div class="stat-card">
-<div class="stat-number" id="stat-reviews">0</div>
-<div style="color:var(--text-sec)">Reviews</div>
-</div>
-<div class="stat-card">
-<div class="stat-number" id="stat-views">0</div>
-<div style="color:var(--text-sec)">Total Views</div>
-</div>
-</section>
+  <section class="container">
+    <h2>📊 Platform Stats</h2>
+    <div class="grid" id="stats-grid">
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 2rem;">📦</div>
+        <div style="font-size: 2rem; color: var(--accent-cyan); font-weight: bold;" id="stat-apps">0</div>
+        <div style="opacity: 0.8;">WebApps</div>
+      </div>
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 2rem;">⭐</div>
+        <div style="font-size: 2rem; color: var(--accent-cyan); font-weight: bold;" id="stat-ratings">0</div>
+        <div style="opacity: 0.8;">Ratings</div>
+      </div>
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 2rem;">💬</div>
+        <div style="font-size: 2rem; color: var(--accent-cyan); font-weight: bold;" id="stat-reviews">0</div>
+        <div style="opacity: 0.8;">Reviews</div>
+      </div>
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 2rem;">👁️</div>
+        <div style="font-size: 2rem; color: var(--accent-cyan); font-weight: bold;" id="stat-views">0</div>
+        <div style="opacity: 0.8;">Views</div>
+      </div>
+    </div>
+  </section>
 
-<section class="search-section" id="explore">
-<div class="search-bar">
-<input type="text" class="search-input" id="searchInput" placeholder="🔍 Search WebApps..." oninput="handleSearch()">
-</div>
-<div class="filters">
-<select class="filter-btn" id="sortFilter" onchange="handleFilter()">
-<option value="recent">🆕 Recent</option>
-<option value="popular">🔥 Popular</option>
-<option value="name">🔤 Name</option>
-</select>
-<button class="filter-btn" id="githubFilter" onclick="toggleGithubFilter()">💻 Open Source Only</button>
-</div>
-</section>
+  <section class="container">
+    <h2>🔍 Explore WebApps</h2>
+    <div id="webapps-grid" class="grid"></div>
+    <div id="loading" style="text-align: center; padding: 3rem;">
+      <div style="font-size: 3rem;">⏳</div>
+      <p>Loading WebApps...</p>
+    </div>
+    <div id="empty" class="hidden" style="text-align: center; padding: 3rem;">
+      <div style="font-size: 3rem;">🔍</div>
+      <p>No WebApps found yet. Be the first to submit!</p>
+    </div>
+  </section>
 
-<div class="webapps-grid" id="webappsGrid"></div>
+  <footer style="text-align: center; padding: 3rem 2rem; border-top: 1px solid rgba(0, 217, 255, 0.2); margin-top: 4rem;">
+    <p>🌌 <strong>Nexus Web Hub</strong> - Universal WebApps Catalog</p>
+    <p style="margin-top: 0.5rem;">Built with ❤️ by <strong>DAOUDA Abdoul Anzize</strong> - CEO Nexus Studio</p>
+    <p style="margin-top: 1rem;">
+      <a href="https://github.com/Tryboy869/nexus-web-hub" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">GitHub</a> •
+      <a href="mailto:nexusstudio100@gmail.com" style="color: var(--accent-cyan); text-decoration: none;">Contact</a>
+    </p>
+  </footer>
 
-<section class="submit-form" id="submitForm">
-<div class="container">
-<h2 style="margin-bottom:2rem">Submit Your WebApp</h2>
-<form onsubmit="handleSubmit(event)">
-<div class="form-group">
-<label>WebApp Name *</label>
-<input type="text" id="name" required minlength="3" maxlength="100">
-</div>
-<div class="form-group">
-<label>Developer/Team Name *</label>
-<input type="text" id="developer" required minlength="2" maxlength="100">
-</div>
-<div class="form-group">
-<label>WebApp URL * (HTTPS only)</label>
-<input type="url" id="url" required pattern="https://.*">
-</div>
-<div class="form-group">
-<label>Short Description * (20-200 characters)</label>
-<textarea id="description_short" required minlength="20" maxlength="200"></textarea>
-</div>
-<div class="form-group">
-<label>Long Description (0-3000 characters)</label>
-<textarea id="description_long" maxlength="3000" rows="6"></textarea>
-</div>
-<div class="form-group">
-<label>Types * (Select 1-3)</label>
-<div class="type-checkboxes" id="typesCheckboxes">
-<label class="checkbox-label"><input type="checkbox" value="game"> 🎮 Game</label>
-<label class="checkbox-label"><input type="checkbox" value="tool"> 🛠️ Tool</label>
-<label class="checkbox-label"><input type="checkbox" value="api"> 🔌 API</label>
-<label class="checkbox-label"><input type="checkbox" value="design"> 🎨 Design</label>
-<label class="checkbox-label"><input type="checkbox" value="productivity"> 📊 Productivity</label>
-<label class="checkbox-label"><input type="checkbox" value="education"> 📚 Education</label>
-<label class="checkbox-label"><input type="checkbox" value="social"> 💬 Social</label>
-<label class="checkbox-label"><input type="checkbox" value="other"> 🌟 Other</label>
-</div>
-</div>
-<div class="form-group">
-<label>Tags * (comma separated, 1-10 tags)</label>
-<input type="text" id="tags" required placeholder="web, tool, productivity">
-</div>
-<div class="form-group">
-<label>Video URL (YouTube, Vimeo, etc.)</label>
-<input type="url" id="video_url">
-</div>
-<div class="form-group">
-<label>GitHub Repository</label>
-<input type="url" id="github_url">
-</div>
-<button type="submit" class="btn btn-primary" style="width:100%">🚀 Submit WebApp</button>
-<div id="submitStatus" style="margin-top:1rem;text-align:center"></div>
-</form>
-</div>
-</section>
+  <script>
+    const API = {
+      async request(endpoint, options = {}) {
+        try {
+          const response = await fetch(endpoint, {
+            ...options,
+            headers: { 'Content-Type': 'application/json', ...options.headers }
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('API Error:', error);
+          return { success: false, error: error.message };
+        }
+      }
+    };
 
-<footer>
-<p style="margin-bottom:0.5rem">🌌 <strong>Nexus Web Hub</strong> - Universal WebApps Catalog</p>
-<p style="margin-bottom:1rem">Built with ❤️ by <strong>Nexus Studio</strong> - DAOUDA Abdoul Anzize, CEO</p>
-<p><a href="https://github.com/Tryboy869/nexus-web-hub" target="_blank" style="color:var(--cyan);text-decoration:none">GitHub</a> • <a href="mailto:nexusstudio100@gmail.com" style="color:var(--cyan);text-decoration:none">Contact</a></p>
-</footer>
+    async function loadStats() {
+      const data = await API.request('/api/stats');
+      if (data.success) {
+        document.getElementById('stat-apps').textContent = data.data.total_apps;
+        document.getElementById('stat-ratings').textContent = data.data.total_ratings;
+        document.getElementById('stat-reviews').textContent = data.data.total_reviews;
+        document.getElementById('stat-views').textContent = data.data.total_views;
+      }
+    }
 
-<script>
-const API=window.location.origin;
-let apps=[];
-let filters={search:'',sort:'recent',github:false};
-const BADGES={pioneer:{i:'🏆',l:'Pioneer'},highly_rated:{i:'⭐',l:'Highly Rated'},popular:{i:'🔥',l:'Popular'},open_source:{i:'💻',l:'Open Source'}};
-const TYPES={game:'🎮',tool:'🛠️',api:'🔌',design:'🎨',productivity:'📊',education:'📚',social:'💬',other:'🌟'};
+    async function loadWebApps() {
+      const data = await API.request('/api/webapps?status=approved');
+      const grid = document.getElementById('webapps-grid');
+      const loading = document.getElementById('loading');
+      const empty = document.getElementById('empty');
 
-async function fetchApps(){
-try{
-const p=new URLSearchParams({status:'approved',sort:filters.sort,limit:100});
-if(filters.search)p.append('search',filters.search);
-const r=await fetch(API+'/api/webapps?'+p);
-const d=await r.json();
-if(d.success){
-apps=d.data;
-if(filters.github)apps=apps.filter(a=>a.github_url);
-renderApps(apps);
-}
-}catch(e){console.error(e)}}
+      loading.classList.add('hidden');
 
-async function fetchStats(){
-try{
-const r=await fetch(API+'/api/stats');
-const d=await r.json();
-if(d.success){
-document.getElementById('stat-apps').textContent=d.data.total_apps;
-document.getElementById('stat-ratings').textContent=d.data.total_ratings;
-document.getElementById('stat-reviews').textContent=d.data.total_reviews;
-document.getElementById('stat-views').textContent=d.data.total_views;
-}
-}catch(e){console.error(e)}}
+      if (!data.success || data.data.length === 0) {
+        empty.classList.remove('hidden');
+        return;
+      }
 
-async function submitApp(data){
-try{
-const r=await fetch(API+'/api/webapps/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-return await r.json();
-}catch(e){return{success:false,error:'Network error'}}}
+      grid.innerHTML = data.data.map(app => \`
+        <div class="card fade-in">
+          <h3>\${app.name}</h3>
+          <p style="opacity: 0.8; margin: 0.5rem 0;">by \${app.developer}</p>
+          <p style="margin: 1rem 0;">\${app.description_short}</p>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0;">
+            \${JSON.parse(app.types).map(t => \`<span style="padding: 0.25rem 0.75rem; background: rgba(0, 217, 255, 0.2); border-radius: 12px; font-size: 0.85rem;">\${t}</span>\`).join('')}
+          </div>
+          <a href="\${app.url}" target="_blank" class="btn" style="display: block; text-align: center; text-decoration: none;">Open App</a>
+        </div>
+      \`).join('');
+    }
 
-async function submitRating(id,rating){
-try{
-const r=await fetch(API+'/api/ratings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({webapp_id:id,rating})});
-return await r.json();
-}catch(e){return{success:false,error:'Failed'}}}
+    function showSubmitForm() {
+      const section = document.getElementById('submit-section');
+      section.classList.toggle('hidden');
+      if (!section.classList.contains('hidden')) {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
 
-async function submitReview(id,name,comment){
-try{
-const r=await fetch(API+'/api/reviews',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({webapp_id:id,user_name:name,comment})});
-return await r.json();
-}catch(e){return{success:false,error:'Failed'}}}
+    document.getElementById('submitForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-function renderApps(list){
-const g=document.getElementById('webappsGrid');
-if(list.length===0){
-g.innerHTML='<div style="text-align:center;padding:4rem;grid-column:1/-1"><div style="font-size:4rem;margin-bottom:1rem">🔍</div><h2>No WebApps Found</h2><p style="color:var(--text-sec)">Try adjusting your search or filters</p></div>';
-return;
-}
-g.innerHTML=list.map(a=>{
-const types=a.types.map(t=>'<span class="type-badge">'+(TYPES[t]||'')+' '+t+'</span>').join('');
-const tags=a.tags.slice(0,5).map(t=>'<span class="tag">'+t+'</span>').join('');
-const badges=a.badges.map(b=>'<span title="'+(BADGES[b]?.l||b)+'">'+(BADGES[b]?.i||'🏅')+'</span>').join('');
-const stars=renderStars(a.rating);
-const descLong=a.description_long?'<div class="description-long"><h4 style="margin-bottom:0.5rem">Full Description:</h4><p>'+a.description_long+'</p></div>':'';
-const videoBtn=a.video_url?'<a href="'+a.video_url+'" target="_blank" class="btn btn-primary" onclick="event.stopPropagation()">📹 Video</a>':'';
-const githubBtn=a.github_url?'<a href="'+a.github_url+'" target="_blank" class="btn btn-primary" onclick="event.stopPropagation()">💻 GitHub</a>':'';
-const reviews=a.reviews&&a.reviews.length>0?a.reviews.map(r=>'<div style="background:rgba(0,0,0,0.2);padding:1rem;border-radius:8px;margin-bottom:1rem"><div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><strong style="color:var(--cyan)">'+r.user_name+'</strong><span style="color:var(--text-sec);font-size:0.85rem">'+formatDate(r.created_at)+'</span></div><p>'+r.comment+'</p></div>').join(''):'<p style="color:var(--text-sec)">No reviews yet. Be the first!</p>';
-return '<div class="webapp-card" id="card-'+a.id+'" onclick="toggleExpand(\''+a.id+'\')"><div class="webapp-preview"><iframe src="'+a.url+'" sandbox="allow-scripts allow-same-origin" loading="lazy" onerror="this.style.display=\'none\'"></iframe></div><div class="webapp-content"><div class="webapp-header"><div><div class="webapp-title">'+a.name+'</div><div style="color:var(--text-sec);font-size:0.9rem">by '+a.developer+'</div></div><div class="webapp-rating">'+stars+'</div></div><div class="webapp-description">'+a.description_short+'</div>'+descLong+'<div class="webapp-types">'+types+'</div><div class="webapp-tags">'+tags+'</div>'+(a.badges.length>0?'<div class="webapp-badges">'+badges+'</div>':'')+'<div class="webapp-actions"><a href="'+a.url+'" target="_blank" class="btn btn-primary" onclick="event.stopPropagation()">🌐 Open App</a>'+videoBtn+githubBtn+'</div></div><div class="expanded-content"><h3 style="margin-bottom:1rem">⭐ Rate this WebApp</h3><div style="display:flex;gap:0.5rem;margin-bottom:1rem;font-size:2rem"><span class="star" style="cursor:pointer" onclick="event.stopPropagation();rateApp(\''+a.id+'\',1)">⭐</span><span class="star" style="cursor:pointer" onclick="event.stopPropagation();rateApp(\''+a.id+'\',2)">⭐</span><span class="star" style="cursor:pointer" onclick="event.stopPropagation();rateApp(\''+a.id+'\',3)">⭐</span><span class="star" style="cursor:pointer" onclick="event.stopPropagation();rateApp(\''+a.id+'\',4)">⭐</span><span class="star" style="cursor:pointer" onclick="event.stopPropagation();rateApp(\''+a.id+'\',5)">⭐</span></div><h3 style="margin:2rem 0 1rem">💬 Leave a Review</h3><div class="form-group"><input type="text" id="rn-'+a.id+'" placeholder="Your name" onclick="event.stopPropagation()"></div><div class="form-group"><textarea id="rc-'+a.id+'" placeholder="Your review (min 10 characters)" onclick="event.stopPropagation()"></textarea></div><button class="btn btn-primary" onclick="event.stopPropagation();reviewApp(\''+a.id+'\')">Submit Review</button><div style="margin-top:2rem"><h3 style="margin-bottom:1rem">Recent Reviews</h3>'+reviews+'</div><button class="btn btn-primary" style="margin-top:2rem;width:100%" onclick="toggleExpand(\''+a.id+'\')">Close Details</button></div></div>';
-}).join('');}
+      const types = Array.from(document.getElementById('types').selectedOptions).map(opt => opt.value);
+      
+      if (types.length === 0 || types.length > 3) {
+        alert('Please select 1-3 types');
+        return;
+      }
 
-function renderStars(rating){
-const full=Math.floor(rating);
-const empty=5-full;
-let html='';
-for(let i=0;i<full;i++)html+='<span class="star">⭐</span>';
-for(let i=0;i<empty;i++)html+='<span class="star empty">⭐</span>';
-return html;
-}
+      const data = {
+        name: document.getElementById('name').value,
+        developer: document.getElementById('developer').value,
+        url: document.getElementById('url').value,
+        description_short: document.getElementById('desc_short').value,
+        description_long: document.getElementById('desc_long').value || null,
+        video_url: document.getElementById('video_url').value || null,
+        github_url: document.getElementById('github_url').value || null,
+        types,
+        tags: document.getElementById('tags').value.split(',').map(t => t.trim())
+      };
 
-function formatDate(ts){
-const d=new Date(ts*1000);
-return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
-}
+      const status = document.getElementById('submit-status');
+      status.textContent = 'Submitting...';
 
-function handleSearch(){
-filters.search=document.getElementById('searchInput').value;
-fetchApps();
-}
+      const result = await API.request('/api/webapps/submit', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
 
-function handleFilter(){
-filters.sort=document.getElementById('sortFilter').value;
-fetchApps();
-}
+      if (result.success) {
+        status.innerHTML = '<div style="color: var(--success); font-weight: bold;">✅ WebApp submitted successfully!</div>';
+        document.getElementById('submitForm').reset();
+        setTimeout(() => location.reload(), 2000);
+      } else {
+        status.innerHTML = \`<div style="color: var(--error); font-weight: bold;">❌ \${result.error}</div>\`;
+      }
+    });
 
-function toggleGithubFilter(){
-const btn=document.getElementById('githubFilter');
-filters.github=!filters.github;
-btn.classList.toggle('active');
-fetchApps();
-}
+    async function surpriseMe() {
+      const data = await API.request('/api/webapps?status=approved');
+      if (data.success && data.data.length > 0) {
+        const random = data.data[Math.floor(Math.random() * data.data.length)];
+        window.open(random.url, '_blank');
+      } else {
+        alert('No WebApps available yet!');
+      }
+    }
 
-function toggleExpand(id){
-const card=document.getElementById('card-'+id);
-const wasExpanded=card.classList.contains('expanded');
-document.querySelectorAll('.webapp-card').forEach(c=>c.classList.remove('expanded'));
-if(!wasExpanded){
-card.classList.add('expanded');
-card.scrollIntoView({behavior:'smooth',block:'start'});
-}}
-
-async function handleSubmit(e){
-e.preventDefault();
-const statusDiv=document.getElementById('submitStatus');
-statusDiv.innerHTML='<div style="color:var(--cyan)">⏳ Submitting...</div>';
-const typeCheckboxes=document.querySelectorAll('#typesCheckboxes input[type="checkbox"]:checked');
-const types=Array.from(typeCheckboxes).map(cb=>cb.value);
-if(types.length===0||types.length>3){
-statusDiv.innerHTML='<div style="color:var(--error)">❌ Please select 1-3 types</div>';
-return;
-}
-const formData={
-name:document.getElementById('name').value,
-developer:document.getElementById('developer').value,
-url:document.getElementById('url').value,
-description_short:document.getElementById('description_short').value,
-description_long:document.getElementById('description_long').value||undefined,
-types:types,
-tags:document.getElementById('tags').value.split(',').map(t=>t.trim()).filter(t=>t),
-video_url:document.getElementById('video_url').value||undefined,
-github_url:document.getElementById('github_url').value||undefined
-};
-const result=await submitApp(formData);
-if(result.success){
-statusDiv.innerHTML='<div style="color:var(--success)">✅ '+result.message+'</div>';
-e.target.reset();
-setTimeout(()=>{
-toggleSubmitForm();
-fetchApps();
-fetchStats();
-},2000);
-}else{
-statusDiv.innerHTML='<div style="color:var(--error)">❌ '+(result.error||'Submission failed')+'</div>';
-}}
-
-async function rateApp(id,rating){
-const result=await submitRating(id,rating);
-if(result.success){
-alert('✅ Rating submitted successfully!');
-fetchApps();
-}else{
-alert('❌ '+result.error);
-}}
-
-async function reviewApp(id){
-const userName=document.getElementById('rn-'+id).value;
-const comment=document.getElementById('rc-'+id).value;
-if(!userName||!comment){
-alert('Please fill in all fields');
-return;
-}
-if(comment.length<10){
-alert('Review must be at least 10 characters');
-return;
-}
-const result=await submitReview(id,userName,comment);
-if(result.success){
-alert('✅ Review submitted successfully!');
-document.getElementById('rn-'+id).value='';
-document.getElementById('rc-'+id).value='';
-fetchApps();
-}else{
-alert('❌ '+result.error);
-}}
-
-function toggleSubmitForm(){
-const form=document.getElementById('submitForm');
-form.classList.toggle('active');
-if(form.classList.contains('active')){
-form.scrollIntoView({behavior:'smooth'});
-}}
-
-function scrollToExplore(){
-document.getElementById('explore').scrollIntoView({behavior:'smooth'});
-}
-
-function surpriseMe(){
-if(apps.length>0){
-const randomApp=apps[Math.floor(Math.random()*apps.length)];
-toggleExpand(randomApp.id);
-}}
-
-async function init(){
-console.log('🌌 Nexus Web Hub initializing...');
-await fetchStats();
-await fetchApps();
-console.log('✅ Ready!');
-}
-
-if(document.readyState==='loading'){
-document.addEventListener('DOMContentLoaded',init);
-}else{
-init();
-}
-</script>
+    // Initialize
+    loadStats();
+    loadWebApps();
+  </script>
 </body>
 </html>`;
-  return html;
+  }
 }
 
 // ==========================================
-// API ROUTES
+// MODULE 5: ORCHESTRATOR (Intelligence)
 // ==========================================
 
-app.get('/', (req, res) => {
-  res.send(generateHTML());
-});
-
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'healthy', version: '1.0.0', timestamp: Date.now() });
-});
-
-app.get('/api/webapps', async (req, res) => {
-  try {
-    const { status = 'approved', types, tag, search, sort = 'recent', limit = 50, offset = 0 } = req.query;
-    
-    let sql = 'SELECT * FROM webapps WHERE status = ?';
-    const args = [status];
-    
-    if (types) {
-      sql += ' AND types LIKE ?';
-      args.push('%' + types + '%');
-    }
-    
-    if (tag) {
-      sql += ' AND tags LIKE ?';
-      args.push('%' + tag + '%');
-    }
-    
-    if (search) {
-      sql += ' AND (name LIKE ? OR description_short LIKE ? OR description_long LIKE ?)';
-      args.push('%' + search + '%', '%' + search + '%', '%' + search + '%');
-    }
-    
-    switch (sort) {
-      case 'recent':
-        sql += ' ORDER BY created_at DESC';
-        break;
-      case 'popular':
-        sql += ' ORDER BY views DESC';
-        break;
-      case 'name':
-        sql += ' ORDER BY name ASC';
-        break;
-    }
-    
-    sql += ' LIMIT ? OFFSET ?';
-    args.push(parseInt(limit), parseInt(offset));
-    
-    const result = await db.execute({ sql, args });
-    
-    const enriched = await Promise.all(result.rows.map(async (app) => {
-      const rating = await calculateRating(app.id);
-      const badges = await db.execute({ sql: 'SELECT badge_type FROM badges WHERE webapp_id = ?', args: [app.id] });
-      const reviews = await db.execute({ sql: 'SELECT user_name, comment, created_at FROM reviews WHERE webapp_id = ? ORDER BY created_at DESC LIMIT 5', args: [app.id] });
-      
-      return {
-        ...app,
-        types: JSON.parse(app.types),
-        tags: JSON.parse(app.tags),
-        rating: rating.average,
-        rating_count: rating.total,
-        badges: badges.rows.map(b => b.badge_type),
-        reviews: reviews.rows
-      };
-    }));
-    
-    res.json({ success: true, data: enriched, total: enriched.length });
-  } catch (error) {
-    console.error('Error fetching webapps:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
+class IntelligentOrchestrator {
+  constructor() {
+    this.security = new SecurityGateway();
+    this.database = new DatabaseModule();
+    this.business = null; // Initialized after DB
   }
-});
 
-app.get('/api/webapps/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    await db.execute({ sql: 'UPDATE webapps SET views = views + 1 WHERE id = ?', args: [id] });
-    
-    const result = await db.execute({ sql: 'SELECT * FROM webapps WHERE id = ?', args: [id] });
-    
-    if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'WebApp not found' });
+  async initialize() {
+    await this.database.initialize();
+    this.business = new BusinessLogic(this.database);
+    console.log('✅ Orchestrator initialized');
+  }
+
+  async execute(request) {
+    const { module, operation, params, clientId } = request;
+
+    // Security: Rate limiting
+    if (!this.security.checkRateLimit(clientId || 'anonymous', 100)) {
+      return { success: false, error: 'Rate limit exceeded', status: 429 };
     }
-    
-    const app = result.rows[0];
-    const rating = await calculateRating(id);
-    const reviews = await db.execute({ sql: 'SELECT * FROM reviews WHERE webapp_id = ? ORDER BY created_at DESC LIMIT 10', args: [id] });
-    const badges = await db.execute({ sql: 'SELECT badge_type FROM badges WHERE webapp_id = ?', args: [id] });
-    
-    res.json({
-      success: true,
-      data: {
-        ...app,
-        types: JSON.parse(app.types),
-        tags: JSON.parse(app.tags),
-        rating: rating.average,
-        rating_count: rating.total,
-        reviews: reviews.rows,
-        badges: badges.rows.map(b => b.badge_type)
+
+    // Security: Input validation
+    const validation = this.security.validateInput(JSON.stringify(params), 'generic');
+    if (!validation.valid) {
+      this.security.audit('VALIDATION_FAILED', { module, operation, reason: validation.reason });
+      return { success: false, error: validation.reason, status: 400 };
+    }
+
+    // Route to appropriate module
+    try {
+      let result;
+
+      switch (module) {
+        case 'database':
+          result = await this.database.query(operation, params);
+          break;
+
+        case 'business':
+          result = await this._executeBusinessLogic(operation, params);
+          break;
+
+        default:
+          throw new Error(`Unknown module: ${module}`);
+      }
+
+      // Audit success
+      this.security.audit('OPERATION_SUCCESS', { module, operation });
+
+      return { success: true, data: result };
+
+    } catch (error) {
+      this.security.audit('OPERATION_ERROR', { module, operation, error: error.message });
+      return { success: false, error: error.message, status: 500 };
+    }
+  }
+
+  async _executeBusinessLogic(operation, params) {
+    const operations = {
+      'checkDuplicate': () => this.business.checkDuplicate(params.url),
+      'calculateRating': () => this.business.calculateRating(params.webappId),
+      'awardBadges': () => this.business.awardBadges(params.webappId),
+      'getStats': () => this.business.getStats(),
+      'generateId': () => this.business.generateId()
+    };
+
+    const handler = operations[operation];
+    if (!handler) {
+      throw new Error(`Unknown business operation: ${operation}`);
+    }
+
+    return await handler();
+  }
+
+  getSecurityLogs() {
+    return this.security.getAuditLog();
+  }
+}
+
+// ==========================================
+// MODULE 6: API ROUTES (Express Integration)
+// ==========================================
+
+class APIRoutes {
+  constructor(app, orchestrator) {
+    this.app = app;
+    this.orchestrator = orchestrator;
+    this.setupRoutes();
+  }
+
+  setupRoutes() {
+    // Frontend
+    this.app.get('/', (req, res) => {
+      res.send(UIModule.getHTML());
+    });
+
+    // Health check
+    this.app.get('/api/health', (req, res) => {
+      res.json({ status: 'healthy', version: '1.0.0', timestamp: Date.now() });
+    });
+
+    // Get stats
+    this.app.get('/api/stats', async (req, res) => {
+      const result = await this.orchestrator.execute({
+        module: 'business',
+        operation: 'getStats',
+        params: {},
+        clientId: req.ip
+      });
+
+      if (result.success) {
+        res.json({ success: true, data: result.data });
+      } else {
+        res.status(result.status || 500).json(result);
       }
     });
-  } catch (error) {
-    console.error('Error fetching webapp:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
 
-app.post('/api/webapps/submit', async (req, res) => {
-  try {
-    const validated = WebAppSchema.parse(req.body);
-    
-    const isAccessible = await checkUrlAccessibility(validated.url);
-    if (!isAccessible) {
-      return res.status(400).json({ success: false, error: 'URL is not accessible. Please check and try again.' });
-    }
-    
-    const isDuplicate = await checkDuplicate(validated.url);
-    if (isDuplicate) {
-      return res.status(409).json({ success: false, error: 'This WebApp is already in our catalog.' });
-    }
-    
-    const id = generateId();
-    
-    await db.execute({
-      sql: 'INSERT INTO webapps (id, name, developer, url, description_short, description_long, video_url, github_url, types, tags, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      args: [id, validated.name, validated.developer, validated.url, validated.description_short, validated.description_long || null, validated.video_url || null, validated.github_url || null, JSON.stringify(validated.types), JSON.stringify(validated.tags), 'approved']
-    });
-    
-    res.json({ success: true, message: 'WebApp submitted successfully!', data: { id } });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ success: false, error: 'Validation failed', details: error.errors });
-    }
-    console.error('Error submitting webapp:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+    // Get webapps
+    this.app.get('/api/webapps', async (req, res) => {
+      const { status = 'approved', types, search, limit = 50, offset = 0 } = req.query;
 
-app.post('/api/ratings', async (req, res) => {
-  try {
-    const validated = RatingSchema.parse(req.body);
-    const userIp = getClientIp(req);
-    
-    const webapp = await db.execute({ sql: 'SELECT id FROM webapps WHERE id = ? AND status = "approved"', args: [validated.webapp_id] });
-    
-    if (webapp.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'WebApp not found' });
-    }
-    
-    await db.execute({
-      sql: 'INSERT INTO ratings (webapp_id, user_ip, rating) VALUES (?, ?, ?) ON CONFLICT(webapp_id, user_ip) DO UPDATE SET rating = ?, created_at = unixepoch()',
-      args: [validated.webapp_id, userIp, validated.rating, validated.rating]
-    });
-    
-    await awardBadges(validated.webapp_id);
-    
-    const rating = await calculateRating(validated.webapp_id);
-    
-    res.json({ success: true, message: 'Rating submitted successfully', data: rating });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ success: false, error: 'Validation failed', details: error.errors });
-    }
-    console.error('Error submitting rating:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+      let where = 'status = ?';
+      let args = [status];
 
-app.post('/api/reviews', async (req, res) => {
-  try {
-    const validated = ReviewSchema.parse(req.body);
-    const userIp = getClientIp(req);
-    
-    const webapp = await db.execute({ sql: 'SELECT id FROM webapps WHERE id = ? AND status = "approved"', args: [validated.webapp_id] });
-    
-    if (webapp.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'WebApp not found' });
-    }
-    
-    await db.execute({
-      sql: 'INSERT INTO reviews (webapp_id, user_name, user_ip, comment) VALUES (?, ?, ?, ?)',
-      args: [validated.webapp_id, validated.user_name, userIp, validated.comment]
-    });
-    
-    res.json({ success: true, message: 'Review submitted successfully' });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ success: false, error: 'Validation failed', details: error.errors });
-    }
-    console.error('Error submitting review:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+      if (types) {
+        where += ' AND types LIKE ?';
+        args.push(`%${types}%`);
+      }
 
-app.get('/api/stats', async (req, res) => {
-  try {
-    const totalApps = await db.execute('SELECT COUNT(*) as count FROM webapps WHERE status = "approved"');
-    const totalRatings = await db.execute('SELECT COUNT(*) as count FROM ratings');
-    const totalReviews = await db.execute('SELECT COUNT(*) as count FROM reviews');
-    const totalViews = await db.execute('SELECT SUM(views) as total FROM webapps');
-    
-    const topApps = await db.execute('SELECT w.id, w.name, w.views, (SELECT AVG(rating) FROM ratings WHERE webapp_id = w.id) as avg_rating FROM webapps w WHERE w.status = "approved" ORDER BY w.views DESC LIMIT 10');
-    
-    res.json({
-      success: true,
-      data: {
-        total_apps: totalApps.rows[0].count,
-        total_ratings: totalRatings.rows[0].count,
-        total_reviews: totalReviews.rows[0].count,
-        total_views: totalViews.rows[0].total || 0,
-        top_apps: topApps.rows
+      if (search) {
+        where += ' AND (name LIKE ? OR description_short LIKE ? OR description_long LIKE ?)';
+        args.push(`%${search}%`, `%${search}%`, `%${search}%`);
+      }
+
+      const result = await this.orchestrator.execute({
+        module: 'database',
+        operation: 'LIST',
+        params: {
+          table: 'webapps',
+          where,
+          args,
+          limit: parseInt(limit),
+          offset: parseInt(offset)
+        },
+        clientId: req.ip
+      });
+
+      if (result.success) {
+        res.json({ success: true, data: result.data.data, total: result.data.total });
+      } else {
+        res.status(result.status || 500).json(result);
       }
     });
-  } catch (error) {
-    console.error('Error fetching stats:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
+
+    // Get single webapp
+    this.app.get('/api/webapps/:id', async (req, res) => {
+      const { id } = req.params;
+
+      // Increment views
+      await this.orchestrator.execute({
+        module: 'database',
+        operation: 'UPDATE',
+        params: {
+          table: 'webapps',
+          id,
+          data: {} // Views updated via SQL trigger
+        },
+        clientId: req.ip
+      });
+
+      // Get webapp
+      const result = await this.orchestrator.execute({
+        module: 'database',
+        operation: 'CUSTOM',
+        params: {
+          sql: 'UPDATE webapps SET views = views + 1 WHERE id = ?; SELECT * FROM webapps WHERE id = ?;',
+          args: [id, id]
+        },
+        clientId: req.ip
+      });
+
+      if (result.success && result.data.data.length > 0) {
+        const webapp = result.data.data[0];
+
+        // Get rating
+        const rating = await this.orchestrator.execute({
+          module: 'business',
+          operation: 'calculateRating',
+          params: { webappId: id },
+          clientId: req.ip
+        });
+
+        // Get reviews
+        const reviews = await this.orchestrator.execute({
+          module: 'database',
+          operation: 'LIST',
+          params: {
+            table: 'reviews',
+            where: 'webapp_id = ?',
+            args: [id],
+            limit: 10
+          },
+          clientId: req.ip
+        });
+
+        // Get badges
+        const badges = await this.orchestrator.execute({
+          module: 'database',
+          operation: 'LIST',
+          params: {
+            table: 'badges',
+            where: 'webapp_id = ?',
+            args: [id]
+          },
+          clientId: req.ip
+        });
+
+        res.json({
+          success: true,
+          data: {
+            ...webapp,
+            types: JSON.parse(webapp.types),
+            tags: JSON.parse(webapp.tags),
+            rating: rating.data.average,
+            rating_count: rating.data.total,
+            reviews: reviews.data.data,
+            badges: badges.data.data.map(b => b.badge_type)
+          }
+        });
+      } else {
+        res.status(404).json({ success: false, error: 'WebApp not found' });
+      }
+    });
+
+    // Submit webapp
+    this.app.post('/api/webapps/submit', async (req, res) => {
+      const { name, developer, url, description_short, description_long, types, tags, video_url, github_url } = req.body;
+
+      // Validation
+      if (!name || !developer || !url || !description_short || !types || !tags) {
+        return res.status(400).json({ success: false, error: 'Missing required fields' });
+      }
+
+      if (!url.startsWith('https://')) {
+        return res.status(400).json({ success: false, error: 'URL must be HTTPS' });
+      }
+
+      if (!Array.isArray(types) || types.length === 0 || types.length > 3) {
+        return res.status(400).json({ success: false, error: 'Types must be array with 1-3 items' });
+      }
+
+      if (!Array.isArray(tags) || tags.length === 0 || tags.length > 10) {
+        return res.status(400).json({ success: false, error: 'Tags must be array with 1-10 items' });
+      }
+
+      if (description_short.length < 20 || description_short.length > 200) {
+        return res.status(400).json({ success: false, error: 'Short description must be 20-200 characters' });
+      }
+
+      if (description_long && description_long.length > 3000) {
+        return res.status(400).json({ success: false, error: 'Long description must be max 3000 characters' });
+      }
+
+      // Check duplicate
+      const duplicate = await this.orchestrator.execute({
+        module: 'business',
+        operation: 'checkDuplicate',
+        params: { url },
+        clientId: req.ip
+      });
+
+      if (duplicate.data) {
+        return res.status(409).json({ success: false, error: 'This URL is already in our catalog' });
+      }
+
+      // Generate ID
+      const idResult = await this.orchestrator.execute({
+        module: 'business',
+        operation: 'generateId',
+        params: {},
+        clientId: req.ip
+      });
+
+      const id = idResult.data;
+
+      // Create webapp
+      const result = await this.orchestrator.execute({
+        module: 'database',
+        operation: 'CREATE',
+        params: {
+          table: 'webapps',
+          data: {
+            id,
+            name,
+            developer,
+            url,
+            description_short,
+            description_long: description_long || null,
+            video_url: video_url || null,
+            github_url: github_url || null,
+            types: JSON.stringify(types),
+            tags: JSON.stringify(tags),
+            status: 'approved' // Auto-approve for MVP
+          }
+        },
+        clientId: req.ip
+      });
+
+      if (result.success) {
+        res.json({ success: true, message: 'WebApp submitted successfully!', data: { id } });
+      } else {
+        res.status(result.status || 500).json(result);
+      }
+    });
+
+    // Submit rating
+    this.app.post('/api/ratings', async (req, res) => {
+      const { webapp_id, rating } = req.body;
+      const user_ip = req.ip;
+
+      if (!webapp_id || !rating || rating < 1 || rating > 5) {
+        return res.status(400).json({ success: false, error: 'Invalid rating data' });
+      }
+
+      // Check webapp exists
+      const webappCheck = await this.orchestrator.execute({
+        module: 'database',
+        operation: 'READ',
+        params: { table: 'webapps', id: webapp_id },
+        clientId: req.ip
+      });
+
+      if (!webappCheck.success) {
+        return res.status(404).json({ success: false, error: 'WebApp not found' });
+      }
+
+      // Insert or update rating
+      await this.orchestrator.execute({
+        module: 'database',
+        operation: 'CUSTOM',
+        params: {
+          sql: 'INSERT INTO ratings (webapp_id, user_ip, rating) VALUES (?, ?, ?) ON CONFLICT(webapp_id, user_ip) DO UPDATE SET rating = ?, created_at = unixepoch()',
+          args: [webapp_id, user_ip, rating, rating]
+        },
+        clientId: req.ip
+      });
+
+      // Award badges
+      await this.orchestrator.execute({
+        module: 'business',
+        operation: 'awardBadges',
+        params: { webappId: webapp_id },
+        clientId: req.ip
+      });
+
+      // Get updated rating
+      const newRating = await this.orchestrator.execute({
+        module: 'business',
+        operation: 'calculateRating',
+        params: { webappId: webapp_id },
+        clientId: req.ip
+      });
+
+      res.json({ success: true, message: 'Rating submitted', data: newRating.data });
+    });
+
+    // Submit review
+    this.app.post('/api/reviews', async (req, res) => {
+      const { webapp_id, user_name, comment } = req.body;
+      const user_ip = req.ip;
+
+      if (!webapp_id || !user_name || !comment || comment.length < 10) {
+        return res.status(400).json({ success: false, error: 'Invalid review data' });
+      }
+
+      // Check webapp exists
+      const webappCheck = await this.orchestrator.execute({
+        module: 'database',
+        operation: 'READ',
+        params: { table: 'webapps', id: webapp_id },
+        clientId: req.ip
+      });
+
+      if (!webappCheck.success) {
+        return res.status(404).json({ success: false, error: 'WebApp not found' });
+      }
+
+      // Create review
+      await this.orchestrator.execute({
+        module: 'database',
+        operation: 'CUSTOM',
+        params: {
+          sql: 'INSERT INTO reviews (webapp_id, user_name, user_ip, comment) VALUES (?, ?, ?, ?)',
+          args: [webapp_id, user_name, user_ip, comment]
+        },
+        clientId: req.ip
+      });
+
+      res.json({ success: true, message: 'Review submitted' });
+    });
+
+    // Admin: Approve
+    this.app.post('/api/admin/approve/:id', async (req, res) => {
+      const { id } = req.params;
+
+      const result = await this.orchestrator.execute({
+        module: 'database',
+        operation: 'UPDATE',
+        params: {
+          table: 'webapps',
+          id,
+          data: { status: 'approved' }
+        },
+        clientId: req.ip
+      });
+
+      res.json(result);
+    });
+
+    // Admin: Reject
+    this.app.post('/api/admin/reject/:id', async (req, res) => {
+      const { id } = req.params;
+
+      const result = await this.orchestrator.execute({
+        module: 'database',
+        operation: 'UPDATE',
+        params: {
+          table: 'webapps',
+          id,
+          data: { status: 'rejected' }
+        },
+        clientId: req.ip
+      });
+
+      res.json(result);
+    });
+
+    // Security logs (admin only in production)
+    this.app.get('/api/admin/logs', (req, res) => {
+      const logs = this.orchestrator.getSecurityLogs();
+      res.json({ success: true, logs });
+    });
   }
-});
+}
 
 // ==========================================
-// SERVER STARTUP
+// MAIN APPLICATION INITIALIZATION
 // ==========================================
 
-async function startServer() {
-  await initDatabase();
+async function startApplication() {
+  console.log('🌌 NEXUS WEB HUB - Starting...');
+
+  // Create orchestrator
+  const orchestrator = new IntelligentOrchestrator();
   
+  // Initialize (database, modules, etc.)
+  await orchestrator.initialize();
+
+  // Setup API routes
+  new APIRoutes(app, orchestrator);
+
+  // Start server
   app.listen(PORT, () => {
-    console.log('\n╔════════════════════════════════════════╗');
-    console.log('║   🌌 NEXUS WEB HUB - Ready            ║');
-    console.log('║                                        ║');
-    console.log('║   🚀 Server: http://localhost:' + PORT + '   ║');
-    console.log('║   📊 Status: Production Ready          ║');
-    console.log('║   🗄️  Database: Turso (Connected)      ║');
-    console.log('║                                        ║');
-    console.log('║   Built with ❤️ by Nexus Studio       ║');
-    console.log('║   DAOUDA Abdoul Anzize - CEO          ║');
-    console.log('╚════════════════════════════════════════╝\n');
+    console.log(`
+╔════════════════════════════════════════╗
+║   🌌 NEXUS WEB HUB - Ready           ║
+║                                        ║
+║   🚀 Server: http://localhost:${PORT}   ║
+║   📊 Status: Production Ready          ║
+║   🗄️  Database: Turso (Connected)      ║
+║   🏗️  Architecture: Mono-File Modular  ║
+║                                        ║
+║   Built by Nexus Studio               ║
+║   DAOUDA Abdoul Anzize - CEO           ║
+╚════════════════════════════════════════╝
+    `);
   });
 }
 
-startServer().catch(error => {
-  console.error('Failed to start server:', error);
+// Start the application
+startApplication().catch(error => {
+  console.error('❌ Failed to start application:', error);
   process.exit(1);
 });
