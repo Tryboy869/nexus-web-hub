@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-label="Nexus Web Hub - Animation d'introduction du projet">
+  <title>Nexus Web Hub - Le store communautaire du Web</title>
+  <desc>Animation en boucle expliquant le projet Nexus Web Hub : présentation de Nexus Studio, problème résolu, solution proposée, et contributeurs. Durée 30 secondes avec boucle infinie.</desc>
+  
+  <!-- Respect prefers-reduced-motion -->
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+    }
+  </style>
+  
+  <!-- Defs : Gradients & Filters -->
+  <defs>
+    <!-- Gradient Background -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0e27;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1f3a;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradient Cyan -->
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00d9ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0099cc;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradient Purple -->
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6d28d9;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradient Gold -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow Filter -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="600" fill="url(#bgGrad)"/>
+  
+  <!-- ========== SCÈNE 1 : NEXUS STUDIO (0-5s) ========== -->
+  <g id="scene1">
+    <!-- Fade in progressif -->
+    <animate attributeName="opacity" 
+             values="0;0;1;1;1;0;0" 
+             keyTimes="0;0.03;0.07;0.13;0.16;0.18;0.2"
+             dur="30s" 
+             repeatCount="indefinite"/>
+    <!-- Logo Hexagonal Nexus Studio -->
+    <g transform="translate(600, 250)">
+      <polygon points="0,-60 52,-30 52,30 0,60 -52,30 -52,-30" 
+               fill="none" stroke="url(#cyanGrad)" stroke-width="3" filter="url(#glow)"/>
+      
+      <!-- Lettres NS -->
+      <text x="-30" y="10" font-family="'JetBrains Mono', monospace" font-size="48" 
+            font-weight="bold" fill="url(#cyanGrad)" text-anchor="start">
+        NS
+      </text>
+    </g>
+    
+    <!-- Texte Nexus Studio -->
+    <text x="600" y="360" font-family="Inter, system-ui" font-size="32" 
+          font-weight="600" fill="#00d9ff" text-anchor="middle">
+      Nexus Studio
+    </text>
+    
+    <!-- Tagline -->
+    <text x="600" y="400" font-family="Inter, system-ui" font-size="18" 
+          fill="#c0c0c0" text-anchor="middle">
+      Building tomorrow technology, today.
+    </text>
+  </g>
+  
+  <!-- ========== SCÈNE 2 : PROBLÈME (5-10s) ========== -->
+  <g id="scene2">
+    <!-- Fade in/out -->
+    <animate attributeName="opacity" 
+             values="0;0;1;1;1;0;0" 
+             keyTimes="0.2;0.23;0.27;0.3;0.33;0.35;0.37"
+             dur="30s" 
+             repeatCount="indefinite"/>
+    <!-- Titre -->
+    <text x="600" y="100" font-family="Inter, system-ui" font-size="36" 
+          font-weight="700" fill="#ef4444" text-anchor="middle">
+      Le Problème
+    </text>
+    
+    <!-- Fragmentation du Web -->
+    <g transform="translate(600, 300)">
+      <!-- Icônes dispersées -->
+      <circle cx="-200" cy="-50" r="30" fill="#3b82f6" opacity="0.3"/>
+      <text x="-200" y="-50" font-size="24" text-anchor="middle" dominant-baseline="middle">🎮</text>
+      
+      <circle cx="0" cy="-80" r="30" fill="#8b5cf6" opacity="0.3"/>
+      <text x="0" y="-80" font-size="24" text-anchor="middle" dominant-baseline="middle">🛠️</text>
+      
+      <circle cx="200" cy="-50" r="30" fill="#10b981" opacity="0.3"/>
+      <text x="200" y="-50" font-size="24" text-anchor="middle" dominant-baseline="middle">🔌</text>
+      
+      <circle cx="-100" cy="50" r="30" fill="#ec4899" opacity="0.3"/>
+      <text x="-100" y="50" font-size="24" text-anchor="middle" dominant-baseline="middle">🎨</text>
+      
+      <circle cx="100" cy="50" r="30" fill="#f59e0b" opacity="0.3"/>
+      <text x="100" y="50" font-size="24" text-anchor="middle" dominant-baseline="middle">🌐</text>
+      
+      <!-- Lignes de séparation (fragmentation) -->
+      <line x1="-250" y1="0" x2="250" y2="0" stroke="#ef4444" stroke-width="2" 
+            stroke-dasharray="5,5" opacity="0.5"/>
+    </g>
+    
+    <!-- Texte problème -->
+    <text x="600" y="480" font-family="Inter, system-ui" font-size="20" 
+          fill="#c0c0c0" text-anchor="middle">
+      Le Web est fragmenté. Comment découvrir
+    </text>
+    <text x="600" y="510" font-family="Inter, system-ui" font-size="20" 
+          fill="#c0c0c0" text-anchor="middle">
+      les meilleures webapps, outils et jeux ?
+    </text>
+  </g>
+  
+  <!-- ========== SCÈNE 3 : SOLUTION (10-15s) ========== -->
+  <g id="scene3">
+    <!-- Fade in/out -->
+    <animate attributeName="opacity" 
+             values="0;0;1;1;1;0;0" 
+             keyTimes="0.37;0.4;0.43;0.47;0.5;0.52;0.54"
+             dur="30s" 
+             repeatCount="indefinite"/>
+    <!-- Titre -->
+    <text x="600" y="100" font-family="Inter, system-ui" font-size="36" 
+          font-weight="700" fill="#10b981" text-anchor="middle">
+      La Solution
+    </text>
+    
+    <!-- Logo NWH Central -->
+    <g transform="translate(600, 280)">
+      <!-- Hexagone central -->
+      <polygon points="0,-80 69,-40 69,40 0,80 -69,40 -69,-40" 
+               fill="url(#cyanGrad)" stroke="#00d9ff" stroke-width="4" 
+               filter="url(#glow)"/>
+      
+      <!-- Lettres NWH -->
+      <text x="0" y="15" font-family="'JetBrains Mono', monospace" font-size="42" 
+            font-weight="bold" fill="#0a0e27" text-anchor="middle">
+        NWH
+      </text>
+      
+      <!-- Connexions vers icônes -->
+      <g>
+        <line x1="-69" y1="-40" x2="-150" y2="-100" stroke="#00d9ff" stroke-width="2"/>
+        <circle cx="-150" cy="-100" r="25" fill="#3b82f6"/>
+        <text x="-150" y="-100" font-size="20" text-anchor="middle" dominant-baseline="middle">🎮</text>
+        
+        <line x1="0" y1="-80" x2="0" y2="-160" stroke="#00d9ff" stroke-width="2"/>
+        <circle cx="0" cy="-160" r="25" fill="#8b5cf6"/>
+        <text x="0" y="-160" font-size="20" text-anchor="middle" dominant-baseline="middle">🛠️</text>
+        
+        <line x1="69" y1="-40" x2="150" y2="-100" stroke="#00d9ff" stroke-width="2"/>
+        <circle cx="150" cy="-100" r="25" fill="#10b981"/>
+        <text x="150" y="-100" font-size="20" text-anchor="middle" dominant-baseline="middle">🔌</text>
+        
+        <line x1="-69" y1="40" x2="-150" y2="100" stroke="#00d9ff" stroke-width="2"/>
+        <circle cx="-150" cy="100" r="25" fill="#ec4899"/>
+        <text x="-150" y="100" font-size="20" text-anchor="middle" dominant-baseline="middle">🎨</text>
+        
+        <line x1="69" y1="40" x2="150" y2="100" stroke="#00d9ff" stroke-width="2"/>
+        <circle cx="150" cy="100" r="25" fill="#f59e0b"/>
+        <text x="150" y="100" font-size="20" text-anchor="middle" dominant-baseline="middle">🌐</text>
+      </g>
+    </g>
+    
+    <!-- Nom du projet -->
+    <text x="600" y="460" font-family="Inter, system-ui" font-size="32" 
+          font-weight="700" fill="#00d9ff" text-anchor="middle">
+      Nexus Web Hub
+    </text>
+    
+    <!-- Tagline -->
+    <text x="600" y="500" font-family="Inter, system-ui" font-size="18" 
+          fill="#c0c0c0" text-anchor="middle">
+      Le store communautaire du Web
+    </text>
+  </g>
+  
+  <!-- ========== SCÈNE 4 : FONCTIONNALITÉS (15-20s) ========== -->
+  <g id="scene4">
+    <!-- Fade in/out -->
+    <animate attributeName="opacity" 
+             values="0;0;1;1;1;0;0" 
+             keyTimes="0.54;0.57;0.6;0.63;0.67;0.69;0.71"
+             dur="30s" 
+             repeatCount="indefinite"/>
+    <!-- Titre -->
+    <text x="600" y="80" font-family="Inter, system-ui" font-size="32" 
+          font-weight="700" fill="#8b5cf6" text-anchor="middle">
+      Fonctionnalités Clés
+    </text>
+    
+    <!-- 3 Colonnes de fonctionnalités -->
+    <!-- Colonne 1 : Découverte -->
+    <g transform="translate(200, 200)">
+      <circle cx="0" cy="0" r="60" fill="url(#cyanGrad)" filter="url(#glow)"/>
+      <text x="0" y="0" font-size="36" text-anchor="middle" dominant-baseline="middle">🔍</text>
+      <text x="0" y="100" font-family="Inter, system-ui" font-size="20" 
+            font-weight="600" fill="#00d9ff" text-anchor="middle">
+        Découverte
+      </text>
+      <text x="0" y="130" font-family="Inter, system-ui" font-size="14" 
+            fill="#c0c0c0" text-anchor="middle">
+        Recherche intelligente
+      </text>
+      <text x="0" y="150" font-family="Inter, system-ui" font-size="14" 
+            fill="#c0c0c0" text-anchor="middle">
+        Collections curées
+      </text>
+    </g>
+    
+    <!-- Colonne 2 : Publication -->
+    <g transform="translate(600, 200)">
+      <circle cx="0" cy="0" r="60" fill="url(#purpleGrad)" filter="url(#glow)"/>
+      <text x="0" y="0" font-size="36" text-anchor="middle" dominant-baseline="middle">✍️</text>
+      <text x="0" y="100" font-family="Inter, system-ui" font-size="20" 
+            font-weight="600" fill="#8b5cf6" text-anchor="middle">
+        Publication
+      </text>
+      <text x="0" y="130" font-family="Inter, system-ui" font-size="14" 
+            fill="#c0c0c0" text-anchor="middle">
+        Formulaire 30 secondes
+      </text>
+      <text x="0" y="150" font-family="Inter, system-ui" font-size="14" 
+            fill="#c0c0c0" text-anchor="middle">
+        Modération automatique
+      </text>
+    </g>
+    
+    <!-- Colonne 3 : Évaluation -->
+    <g transform="translate(1000, 200)">
+      <circle cx="0" cy="0" r="60" fill="url(#goldGrad)" filter="url(#glow)"/>
+      <text x="0" y="0" font-size="36" text-anchor="middle" dominant-baseline="middle">⭐</text>
+      <text x="0" y="100" font-family="Inter, system-ui" font-size="20" 
+            font-weight="600" fill="#fbbf24" text-anchor="middle">
+        Évaluation
+      </text>
+      <text x="0" y="130" font-family="Inter, system-ui" font-size="14" 
+            fill="#c0c0c0" text-anchor="middle">
+        Testeurs badgés
+      </text>
+      <text x="0" y="150" font-family="Inter, system-ui" font-size="14" 
+            fill="#c0c0c0" text-anchor="middle">
+        Avis vérifiés
+      </text>
+    </g>
+    
+    <!-- Principe fondamental -->
+    <text x="600" y="450" font-family="Inter, system-ui" font-size="22" 
+          font-weight="600" fill="#10b981" text-anchor="middle">
+      Visibilité Méritocratique
+    </text>
+    <text x="600" y="485" font-family="Inter, system-ui" font-size="16" 
+          fill="#c0c0c0" text-anchor="middle">
+      Qualité supérieure au Budget publicitaire
+    </text>
+  </g>
+  
+  <!-- ========== SCÈNE 5 : CONTRIBUTEURS (20-25s) ========== -->
+  <g id="scene5">
+    <!-- Fade in/out -->
+    <animate attributeName="opacity" 
+             values="0;0;1;1;1;0;0" 
+             keyTimes="0.71;0.74;0.77;0.8;0.83;0.85;0.87"
+             dur="30s" 
+             repeatCount="indefinite"/>
+    <!-- Titre -->
+    <text x="600" y="100" font-family="Inter, system-ui" font-size="36" 
+          font-weight="700" fill="#00d9ff" text-anchor="middle">
+      Fondateur
+    </text>
+    
+    <!-- Carte contributeur -->
+    <g transform="translate(600, 300)">
+      <!-- Cadre -->
+      <rect x="-180" y="-120" width="360" height="200" rx="15" 
+            fill="#1a1f3a" stroke="url(#cyanGrad)" stroke-width="3" 
+            filter="url(#glow)"/>
+      
+      <!-- Avatar (initiales) -->
+      <circle cx="-80" cy="-20" r="40" fill="url(#purpleGrad)"/>
+      <text x="-80" y="-10" font-family="'JetBrains Mono', monospace" 
+            font-size="24" font-weight="bold" fill="#fff" text-anchor="middle">
+        AD
+      </text>
+      
+      <!-- Infos -->
+      <g>
+        <text x="20" y="-50" font-family="Inter, system-ui" font-size="20" 
+              font-weight="600" fill="#00d9ff">
+          Daouda Abdoul Anzize
+        </text>
+        <text x="20" y="-20" font-family="Inter, system-ui" font-size="14" 
+              fill="#c0c0c0">
+          CEO et Founder - Nexus Studio
+        </text>
+        
+        <!-- Badges -->
+        <g transform="translate(20, 10)">
+          <rect x="0" y="0" width="80" height="24" rx="12" fill="#8b5cf6"/>
+          <text x="40" y="12" font-size="12" font-weight="600" 
+                fill="#fff" text-anchor="middle" dominant-baseline="middle">
+            🏆 Creator
+          </text>
+        </g>
+        
+        <g transform="translate(110, 10)">
+          <rect x="0" y="0" width="90" height="24" rx="12" fill="#00d9ff"/>
+          <text x="45" y="12" font-size="12" font-weight="600" 
+                fill="#0a0e27" text-anchor="middle" dominant-baseline="middle">
+            💎 Architect
+          </text>
+        </g>
+      </g>
+    </g>
+    
+    <!-- Appel à l'action -->
+    <text x="600" y="480" font-family="Inter, system-ui" font-size="18" 
+          fill="#c0c0c0" text-anchor="middle">
+      Devenez contributeur !
+    </text>
+  </g>
+  
+  <!-- ========== SCÈNE FINALE : CTA (25-30s) ========== -->
+  <g id="sceneFinal">
+    <!-- Fade in maintenu jusqu'à boucle -->
+    <animate attributeName="opacity" 
+             values="0;0;1;1;1;1;0" 
+             keyTimes="0.87;0.9;0.93;0.95;0.97;0.99;1"
+             dur="30s" 
+             repeatCount="indefinite"/>
+    <!-- Logo central -->
+    <g transform="translate(600, 220)">
+      <polygon points="0,-60 52,-30 52,30 0,60 -52,30 -52,-30" 
+               fill="url(#cyanGrad)" stroke="#00d9ff" stroke-width="3" 
+               filter="url(#glow)"/>
+      
+      <text x="0" y="10" font-family="'JetBrains Mono', monospace" font-size="36" 
+            font-weight="bold" fill="#0a0e27" text-anchor="middle">
+        NWH
+      </text>
+    </g>
+    
+    <!-- Tagline principal -->
+    <text x="600" y="330" font-family="Inter, system-ui" font-size="32" 
+          font-weight="700" fill="#00d9ff" text-anchor="middle">
+      Nexus Web Hub
+    </text>
+    
+    <!-- Verbes d'action -->
+    <g>
+      <text x="350" y="400" font-family="Inter, system-ui" font-size="24" 
+            font-weight="600" fill="#10b981" text-anchor="middle">
+        Découvrir
+      </text>
+      
+      <text x="600" y="400" font-family="Inter, system-ui" font-size="24" 
+            font-weight="600" fill="#8b5cf6" text-anchor="middle">
+        Publier
+      </text>
+      
+      <text x="850" y="400" font-family="Inter, system-ui" font-size="24" 
+            font-weight="600" fill="#fbbf24" text-anchor="middle">
+        Évaluer
+      </text>
+    </g>
+    
+    <!-- CTA Button avec animation pulse -->
+    <g transform="translate(600, 470)">
+      <rect x="-100" y="-25" width="200" height="50" rx="25" 
+            fill="url(#cyanGrad)" filter="url(#glow)">
+        <!-- Pulse continu -->
+        <animate attributeName="opacity" 
+                 values="1;0.7;1" 
+                 dur="2s" 
+                 repeatCount="indefinite"/>
+      </rect>
+      
+      <text x="0" y="0" font-family="Inter, system-ui" font-size="20" 
+            font-weight="700" fill="#0a0e27" text-anchor="middle" dominant-baseline="middle">
+        Explorer →
+      </text>
+    </g>
+  </g>
+  
+</svg>
