@@ -1,440 +1,389 @@
-# 🌌 Nexus Web Hub
+# 🌐 Nexus Web Hub
 
-**Universal WebApps Catalog - Discover, Explore, and Share the Best Open Web Applications**
+[![License: Custom](https://img.shields.io/badge/License-Custom-blue.svg)](./LICENSE)
+[![Maintained](https://img.shields.io/badge/Maintained-Yes-green.svg)](https://github.com/Tryboy869/nexus-web-hub)
 
-![Nexus Web Hub Banner](public/assets/logo.png)
+> **La plateforme communautaire pour découvrir, publier et évaluer le meilleur du Web.**
 
-[![License: MIT + Commercial](https://img.shields.io/badge/License-Dual-blue.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
-[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
-
-> ⚠️ **Important Notice**: This project will include premium features in the future to ensure sustainability. Core catalog access will always remain free. See [Sustainability & Monetization](#-sustainability--monetization) section below.
+![Nexus Web Hub Intro](./assets/storyline/nexus-web-hub-intro.svg)
 
 ---
 
-## 🎯 Vision
+## 🎯 Le Problème Qu'On Résout
 
-Nexus Web Hub is an open-source platform that aims to become the **universal catalog** for web applications. Unlike closed app stores, we believe in:
+Les stores d'applications (Google Play, App Store) sont réservés aux apps natives. Le Web est fragmenté : comment découvrir les meilleures **webapps, outils, jeux et APIs** ?
 
-- **🌍 Openness**: Anyone can submit and discover WebApps
-- **🔓 Freedom**: No gatekeeping, no approval delays
-- **💎 Quality**: Community-driven ratings and reviews
-- **🚀 Innovation**: Showcase the best of the open web
-- **🤝 Sustainability**: Building a financially sustainable platform without compromising our values
+**Nexus Web Hub** est la réponse :
 
-### Our Core Commitment
-
-**What will ALWAYS be free:**
-- ✅ Full access to the entire WebApp catalog
-- ✅ Submitting your WebApps
-- ✅ Rating and reviewing WebApps
-- ✅ Using the public API (with fair rate limits)
-- ✅ Contributing to the codebase
-
-**What we will NEVER do:**
-- ❌ Paid placement or featured listings
-- ❌ Advertising-based monetization
-- ❌ Selling user data
-- ❌ Biasing search results based on payment
-- ❌ Paywall on core catalog access
+- ✅ **Store universel** pour tout ce qui fonctionne dans un navigateur
+- ✅ **Visibilité méritocratique** (qualité, pas budget publicitaire)
+- ✅ **Communauté auto-régulée** (testeurs badgés, avis vérifiés)
+- ✅ **Gratuit et ouvert** (publier = gratuit, découvrir = gratuit)
 
 ---
 
-## ✨ Features
+## 🌟 Pourquoi Nexus Web Hub ?
 
-### For Users
-- 🔍 **Advanced Search & Filtering**: Find WebApps by type, tags, popularity
-- ⭐ **Rating System**: Rate and review your favorite apps
-- 🏆 **Badge System**: Discover highly-rated and popular apps
-- 🎲 **Surprise Me**: Random discovery for exploration
-- 📊 **Real-time Stats**: Track platform growth
-- 🖼️ **Live Previews**: See WebApps in action via iframe
+| Caractéristique | Stores classiques | Product Hunt | **Nexus Web Hub** |
+|-----------------|-------------------|--------------|-------------------|
+| **Type de contenu** | Apps natives | Produits tech | **Webapps uniquement** ✅ |
+| **Visibilité** | Pay-to-win | Gaming (upvotes) | **Méritocratique** ✅ |
+| **Reviews** | Anonymes | Superficielles | **Testeurs badgés** ✅ |
+| **Coût publication** | 25-99$/an | Gratuit mais ranking payant | **100% gratuit** ✅ |
+| **Modération** | Opaque | Humaine lente | **Auto + communautaire** ✅ |
+| **Collections** | Algorithme | Listes éditeurs | **Curation communautaire** ✅ |
 
-### For Developers
-- 📝 **Easy Submission**: Submit your WebApp via web form
-- ⚡ **Instant Validation**: Automatic URL checking and screenshot capture
-- 🤖 **Auto-approval**: No manual review required
-- 💻 **Open Source Friendly**: Special badges for GitHub projects
-- 📈 **Analytics**: Track views and engagement
-
-### Technical
-- 🗄️ **Persistent Database**: Turso (SQLite) for reliability
-- 🔒 **Security**: Rate limiting, input validation, XSS protection
-- 🚀 **Performance**: Optimized queries and caching
-- 📱 **Responsive**: Works on all devices
-- 🎨 **Modern UI**: Beautiful constellation-themed design
+**Verdict** : La première plateforme **Web-first, community-driven, quality-focused**.
 
 ---
 
-## 🚀 Quick Start
+## ✨ Fonctionnalités Principales
 
-### Prerequisites
-- **Node.js** 18+ ([Download](https://nodejs.org/))
-- **Turso Account** ([Sign up free](https://turso.tech/))
+### 🔍 **Découverte Intelligente**
 
-### Installation
+- **Catalogue universel** : Tous les types de webapps (jeux, outils, APIs, UI kits, sites créatifs)
+- **Recherche sémantique** : Trouve par besoin ("créer un logo rapidement") pas juste par mots-clés
+- **Filtres avancés** : Catégorie, note, date, trending
+- **Collections curées** : Listes communautaires par thématiques
 
-1. **Clone the repository**
+![Catalog](./assets/screenshots/catalog-preview.svg)
+
+### ✍️ **Publication Simple**
+
+- **Formulaire intuitif** : Nom, description, URL, catégorie → publié en 30 secondes
+- **Modération automatique** : Vérification doublons, liens valides, contenu approprié
+- **Aperçu instantané** : Iframe sécurisée + screenshot auto-généré
+- **Édition libre** : Modifier/supprimer vos projets à tout moment
+
+### ⭐ **Système d'Évaluation Professionnel**
+
+- **Avis détaillés** : Texte + note étoilée + vote "utile"
+- **Testeurs badgés** : ![Beginner](./assets/badges/system/badge-beginner-tester.svg) ![Pro](./assets/badges/system/badge-pro-tester.svg) ![Legendary](./assets/badges/system/badge-legendary-tester.svg)
+- **Score de fiabilité** : Uptime, sécurité, note communauté
+- **Marketplace testers** : Engagez des testeurs légendaires pour audits payants
+
+### 🏆 **Gamification & Communauté**
+
+**Progression Testeurs** :
+```
+🔰 Beginner Tester → ⚡ Pro Tester → 👑 Legendary Tester
+(10 avis)          (50 avis + 70% utiles)  (200 avis + 80% utiles)
+```
+
+**Badges Disponibles** :
+
+![Verified Creator](./assets/badges/system/badge-verified-creator.svg) ![Supporter](./assets/badges/system/badge-supporter.svg) ![Contributor](./assets/badges/system/badge-contributor.svg) ![Trending](./assets/badges/system/badge-trending.svg) ![Featured](./assets/badges/system/badge-featured.svg)
+
+---
+
+## 🚀 Démarrage Rapide
+
+### Pour les Utilisateurs
+
+1. **Découvrir** : Visitez [nexus-web-hub.com](https://nexus-web-hub.onrender.com)
+2. **Explorer** : Parcourez le catalogue sans inscription
+3. **S'inscrire** (optionnel) : Créer un compte pour publier/évaluer
+
+### Pour les Créateurs
+
+1. **Publier** : Cliquez "Publier votre webapp"
+2. **Remplir** : Nom, description, URL (30 secondes)
+3. **Validé** : Votre projet est public instantanément !
+
+### Pour les Développeurs
+
 ```bash
+# Cloner le repo
 git clone https://github.com/Tryboy869/nexus-web-hub.git
 cd nexus-web-hub
-```
 
-2. **Install dependencies**
-```bash
+# Installer les dépendances
 npm install
-```
 
-3. **Configure environment**
-```bash
+# Configurer l'environnement
 cp .env.example .env
-# Edit .env with your Turso credentials
+# Éditer .env avec vos variables
+
+# Lancer en développement
+npm run dev
 ```
 
-4. **Start the server**
-```bash
-npm start
-```
-
-5. **Open your browser**
-```
-http://localhost:3000
-```
+**Stack** : React + TypeScript + Tailwind (frontend) / Python + FastAPI (backend) / Turso (database)
 
 ---
 
-## 🔧 Configuration
+## 🏗️ Architecture
 
-### Environment Variables
+**Nexus Web Hub** suit la philosophie **NEXUS AXION 3.5** :
 
-Create a `.env` file with the following:
-
-```env
-# Required
-PORT=3000
-TURSO_DATABASE_URL=libsql://your-database.turso.io
-TURSO_AUTH_TOKEN=your-token-here
-
-# Optional
-NODE_ENV=production
+```
+nexus-web-hub/
+├── app.tsx              # Frontend complet (React/TypeScript)
+├── server.py            # Backend complet (FastAPI/Python)
+├── package.json         # Dépendances Node.js
+├── requirements.txt     # Dépendances Python
+├── .env.example         # Template variables d'environnement
+└── assets/              # SVG animations & assets statiques
+    ├── logos/
+    ├── badges/
+    ├── storyline/
+    ├── contributors/
+    └── icons/
 ```
 
-### Turso Database Setup
+**Principes** :
+- ✅ 2 fichiers code maximum (frontend + backend)
+- ✅ Déploiement instant (Render, Railway, Vercel)
+- ✅ Zéro configuration complexe
+- ✅ Production-ready immédiatement
 
-1. **Install Turso CLI**
-```bash
-curl -sSfL https://get.tur.so/install.sh | bash
-```
-
-2. **Create database**
-```bash
-turso db create nexus-web-hub
-```
-
-3. **Get credentials**
-```bash
-turso db show nexus-web-hub --url
-turso db tokens create nexus-web-hub
-```
-
-4. **Add to `.env`**
+[Lire la documentation architecture complète →](./docs/ARCHITECTURE.md)
 
 ---
 
-## 📚 API Documentation
+## 💎 Philosophie & Valeurs
 
-### Public Endpoints
+### 🎯 **Méritocracie Pure**
 
-#### Get All WebApps
-```http
-GET /api/webapps?type=game&sort=popular&limit=50
-```
+> "La visibilité se gagne par la qualité, jamais par le budget."
 
-**Query Parameters:**
-- `type`: Filter by type (game, tool, api, design, etc.)
-- `sort`: Sort by (recent, popular, name)
-- `search`: Search by name or description
-- `tag`: Filter by tag
-- `limit`: Results per page (default: 50)
-- `offset`: Pagination offset
+- **Pas de ranking payant** : Tous les projets ont la même chance d'être découverts
+- **Algorithme transparent** : Score calculé sur uptime, sécurité, notes réelles
+- **Pas de sponsored posts** : Zéro publicité déguisée
 
-**Response:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "app-123",
-      "name": "Awesome WebApp",
-      "developer": "John Doe",
-      "url": "https://example.com",
-      "description_short": "A great webapp",
-      "type": "tool",
-      "tags": ["productivity", "open-source"],
-      "rating": 4.5,
-      "rating_count": 42,
-      "views": 1337,
-      "badges": ["highly_rated", "open_source"]
-    }
-  ]
-}
-```
+### 🤝 **Communauté Auto-Régulée**
 
-#### Get Single WebApp
-```http
-GET /api/webapps/{id}
-```
+- **Testeurs badgés** : Progression méritée (avis utiles)
+- **Signalements communautaires** : Jury aléatoire pour décisions
+- **Pénalités transparentes** : Avis fake = badge perdu + ban 1 an
 
-#### Submit WebApp
-```http
-POST /api/webapps/submit
-Content-Type: application/json
+### 🚀 **Accessible à Tous**
 
-{
-  "name": "My WebApp",
-  "developer": "Jane Dev",
-  "url": "https://myapp.com",
-  "description_short": "Description here",
-  "type": "tool",
-  "tags": ["productivity", "web"]
-}
-```
-
-#### Submit Rating
-```http
-POST /api/ratings
-Content-Type: application/json
-
-{
-  "webapp_id": "app-123",
-  "rating": 5
-}
-```
-
-#### Submit Review
-```http
-POST /api/reviews
-Content-Type: application/json
-
-{
-  "webapp_id": "app-123",
-  "user_name": "John",
-  "comment": "Great app!"
-}
-```
-
-#### Get Stats
-```http
-GET /api/stats
-```
+- **Publier = gratuit** : Aucun coût pour soumettre votre projet
+- **Découvrir = gratuit** : Catalogue ouvert à tous
+- **Monétisation éthique** : Options pro pour créateurs avancés (analytics, curation)
 
 ---
 
-## 🎨 Customization
+## 💰 Modèle Économique (Éthique)
 
-### Theme Colors
+### ✅ **Gratuit pour Toujours**
 
-Edit the CSS variables in `public/index.html`:
+- Publication illimitée
+- Découverte du catalogue
+- Avis et notes
+- Collections personnelles (1 gratuite)
 
-```css
-:root {
-  --bg-primary: #0a0e27;
-  --accent-cyan: #00D9FF;
-  --accent-violet: #8A2BE2;
-  --accent-gold: #FFD700;
-}
-```
+### 💎 **Nexus Pro (5$/mois - Optionnel)**
 
-### Badge System
+**Pour créateurs actifs** :
+- Analytics avancées (origine trafic, taux de conversion)
+- A/B testing descriptions
+- 3 collections curées publiques
+- Badge "Soutient Nexus 💎"
+- Support prioritaire
 
-Add custom badges in `src/app.js`:
+### 🏢 **Enterprise (25$/mois)**
 
-```javascript
-async function awardBadges(webappId) {
-  // Add your custom badge logic
-  if (someCondition) {
-    badges.push('your_badge');
-  }
-}
-```
+**Pour équipes/entreprises** :
+- 10 collections curées
+- Collaboration multi-utilisateurs
+- API access privé
+- White-label collections
+- Onboarding dédié
 
----
+### 🛠️ **Services Connexes (Séparés)**
 
-## 🚀 Deployment
+- **Nexus Deploy** : Hébergement optimisé webapps
+- **Nexus Analytics** : Analytics respectueux vie privée
+- **Nexus CDN** : CDN rapide pour assets
 
-### Deploy to Render
-
-1. **Create account**: [render.com](https://render.com)
-
-2. **New Web Service**:
-   - Connect your GitHub repo
-   - Build Command: `npm install`
-   - Start Command: `npm start`
-
-3. **Environment Variables**:
-   - Add `TURSO_DATABASE_URL`
-   - Add `TURSO_AUTH_TOKEN`
-
-4. **Deploy!**
-
-### Deploy to Railway
-
-1. **Create account**: [railway.app](https://railway.app)
-
-2. **New Project**:
-   - Import from GitHub
-   - Add environment variables
-
-3. **Deploy!**
-
-### Deploy to Fly.io
-
-```bash
-# Install Fly CLI
-curl -L https://fly.io/install.sh | sh
-
-# Launch app
-fly launch
-
-# Set secrets
-fly secrets set TURSO_DATABASE_URL=your-url
-fly secrets set TURSO_AUTH_TOKEN=your-token
-
-# Deploy
-fly deploy
-```
+**Principe sacré** : La plateforme reste neutre. Les services techniques financent le projet sans biaiser la visibilité.
 
 ---
 
-## 🤝 Contributing
+## 🛠️ Technologies
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+### Frontend
+- **React 18** + TypeScript
+- **Tailwind CSS** (design system)
+- **Zustand** (state management)
+- **Lucide React** (icônes)
 
-### Ways to Contribute
+### Backend
+- **Python 3.11** + FastAPI
+- **Turso** (SQLite distribué)
+- **Redis** (cache temps réel)
+- **Meilisearch** (recherche sémantique)
 
-1. 🐛 **Report Bugs**: Open an issue
-2. 💡 **Suggest Features**: Share your ideas
-3. 🔧 **Fix Issues**: Submit a PR
-4. 📝 **Improve Docs**: Help others understand
-5. 🎨 **Design**: Improve UI/UX
-6. 🌍 **Translate**: Add language support
+### Déploiement
+- **Frontend** : Cloudflare Pages
+- **Backend** : Fly.io / Railway
+- **Database** : Turso (global edge)
+- **CDN** : Cloudflare
+
+### Modération
+- **Détection spam** : Heuristiques + ML léger
+- **Doublons** : Hash URL + fuzzy matching
+- **Contenu** : Keyword filtering + OpenAI Moderation API
 
 ---
 
-## 📊 Project Stats
+## 🤝 Contribution
 
-- **Total WebApps**: 0 (just launched!)
-- **Contributors**: 1 (you could be next!)
-- **Stars**: ⭐ (give us one!)
-- **Forks**: 🍴 (fork and customize!)
+**Nexus Web Hub** accepte les contributions sur le **code de la plateforme uniquement**.
+
+**Vous pouvez contribuer sur** :
+- ✅ Amélioration UI/UX
+- ✅ Optimisation performance
+- ✅ Corrections bugs
+- ✅ Tests automatisés
+- ✅ Documentation
+
+**Vous NE pouvez PAS** :
+- ❌ Soumettre des webapps via PR (utilisez le formulaire sur le site)
+- ❌ Modifier le catalogue directement
+- ❌ Changer l'algorithme de ranking sans validation
+
+[Lire le guide complet de contribution →](./CONTRIBUTING.md)
+
+### Workflow Contribution
+
+1. Fork le repo
+2. Créer une branche : `git checkout -b feature/ma-feature`
+3. Commit : `git commit -m "feat: description"`
+4. Push : `git push origin feature/ma-feature`
+5. Ouvrir une Pull Request
+
+**Standards** :
+- Code TypeScript strict (pas de `any`)
+- Tests unitaires pour nouvelles features
+- Documentation inline en français
+- Respect des conventions Prettier/ESLint
 
 ---
 
-## 💰 Sustainability & Monetization
+## 👥 Équipe & Contributeurs
 
-### Our Philosophy
+### Fondateur
 
-Nexus Web Hub is committed to remaining a **fair and accessible platform** for all. To ensure long-term sustainability and continuous development, we plan to introduce **optional premium features** in the future.
+[![Anzize](./assets/contributors/contributor-anzize.svg)](https://github.com/Tryboy869)
 
-### Transparency Promise
+**Daouda Abdoul Anzize**  
+CEO & Founder - Nexus Studio
 
-**Current Status**: 100% Free  
-**Future Plan**: Hybrid model (Free Core + Optional Premium)
+- 🏆 Architecte logiciel
+- 💎 Créateur NEXUS AXION
+- 🚀 Visionnaire Web
 
-**Our Commitments:**
-1. 📖 **Full Transparency**: Any monetization will be clearly communicated
-2. 🆓 **Free Core**: Catalog access and basic features will always be free
-3. 🚫 **No Pay-to-Win**: Rankings and visibility based solely on quality and engagement
-4. 💎 **Value-Driven**: Premium features will provide genuine value, not artificial limitations
-5. 👥 **Community First**: Major decisions will involve community feedback
+📧 **Contact** :
+- Pro : nexusstudio100@gmail.com
+- Perso : anzizdaouda0@gmail.com
+- GitHub : [@Tryboy869](https://github.com/Tryboy869)
 
-### What Premium Might Include (Future)
+### Contributeurs
 
-While details are not finalized, premium features may include:
-- 📊 Advanced analytics for WebApp creators
-- 🎨 Enhanced customization options
-- 🔌 Extended API access limits
-- 🛠️ Professional tools and services
-- ⚡ Priority support
+*Aucun contributeur externe pour le moment. Soyez le premier !*
 
-**None of these will affect the core experience of discovering and using WebApps.**
+[Rejoindre l'équipe →](./CONTRIBUTING.md)
 
-### Why This Approach?
+---
 
-Building and maintaining a quality platform requires:
-- 💻 Infrastructure costs (servers, databases, CDN)
-- 🔧 Ongoing development and maintenance
-- 🛡️ Security and moderation
-- 📈 Scaling as the community grows
-- 👨‍💻 Compensating maintainers and contributors
+## 📚 Documentation
 
-By monetizing optional premium features (not the core catalog), we can:
-- ✅ Keep the platform accessible to everyone
-- ✅ Sustain long-term development
-- ✅ Remain independent from advertisers
-- ✅ Reward maintainers fairly
-- ✅ Invest in better features for all users
+- [**Guide d'Architecture**](./docs/ARCHITECTURE.md) - Structure technique détaillée
+- [**Guide API**](./docs/API.md) - Documentation endpoints REST
+- [**Guide Modération**](./docs/MODERATION.md) - Règles et automatisation
+- [**Guide Badges**](./docs/BADGES.md) - Système de progression
+- [**FAQ**](./docs/FAQ.md) - Questions fréquentes
 
-### Inspired By
+---
 
-We follow the model of successful open-source projects like:
-- **GitLab**: Open core + Enterprise features
-- **Ghost**: Self-hosted free + Managed hosting premium
-- **Discourse**: Free software + Paid hosting/support
+## 🗺️ Roadmap
+
+### ✅ **Phase 1 : MVP (Mois 1-3)** - EN COURS
+
+- [x] Architecture backend/frontend
+- [x] Catalogue + recherche
+- [x] Soumission webapps
+- [x] Système auth
+- [ ] Ratings/Avis basiques
+- [ ] Modération automatique V1
+
+### 📅 **Phase 2 : Communauté (Mois 4-6)**
+
+- [ ] Système badges complet
+- [ ] Profils utilisateurs
+- [ ] Collections curées
+- [ ] Signalements communautaires
+- [ ] Dashboard créateurs
+
+### 📅 **Phase 3 : Marketplace (Mois 7-9)**
+
+- [ ] Marketplace testeurs (engagement payant)
+- [ ] API publique
+- [ ] Analytics avancées
+- [ ] Abonnements Pro/Enterprise
+
+### 📅 **Phase 4 : Écosystème (Mois 10-12)**
+
+- [ ] Nexus Deploy (hébergement)
+- [ ] Nexus Analytics (privacy-first)
+- [ ] PWA mobile
+- [ ] Internationalisation
 
 ---
 
 ## 📜 License
 
-This project uses a **dual licensing model**:
+**Custom License** - Nexus Web Hub
 
-- **Core Platform**: MIT License (see [LICENSE](LICENSE))
-- **Future Premium Features**: May use commercial licensing
+Ce projet utilise une licence personnalisée pour protéger son modèle économique tout en restant ouvert :
 
-By contributing to this project, you agree that:
-- Your contributions to the core platform are licensed under MIT
-- The project may include premium features in the future
-- You do not expect compensation for contributions unless explicitly agreed
-- You support the sustainability model described above
+**Vous POUVEZ** :
+- ✅ Utiliser le code pour apprendre
+- ✅ Contribuer au projet via PRs
+- ✅ Fork pour usage personnel/éducatif
+- ✅ Utiliser l'API publique
 
-See [LICENSE](LICENSE) and [CONTRIBUTING.md](CONTRIBUTING.md) for full details.
+**Vous NE POUVEZ PAS** :
+- ❌ Créer un clone commercial de Nexus Web Hub
+- ❌ Revendre le code ou services dérivés
+- ❌ Utiliser le nom/logo "Nexus Web Hub" sans autorisation
 
----
-
-## 👨‍💻 Author
-
-**DAOUDA Abdoul Anzize**
-- 🏢 CEO of **Nexus Studio**
-- 💼 GitHub: [@Tryboy869](https://github.com/Tryboy869)
-- 📧 Email: anzizdaouda0@gmail.com
-- 🏢 Business: nexusstudio100@gmail.com
-- 🌐 Organization: [Nexus Studio](https://github.com/nexus-studio)
+[Lire la licence complète →](./LICENSE)
 
 ---
 
-## 🙏 Acknowledgments
+## 🌟 Soutenir le Projet
 
-- Design inspired by modern web3 aesthetics
-- Built with passion for the open web by **Nexus Studio**
-- Community-driven development
+**Nexus Web Hub** est gratuit et le restera. Vous pouvez nous soutenir en :
+
+1. ⭐ **Starrant ce repo** (visibilité GitHub)
+2. 💎 **Devenant Supporter** (badge + reconnaissance)
+3. 🔗 **Partageant** la plateforme dans vos réseaux
+4. 🐛 **Signalant des bugs** via Issues
+5. 💡 **Proposant des idées** via Discussions
 
 ---
 
-## 📞 Support
+## 📧 Contact
 
-- 📧 Personal: anzizdaouda0@gmail.com
-- 🏢 Business: nexusstudio100@gmail.com
-- 💬 Discord: [Join our community](https://discord.gg/nexus-web-hub)
-- 🐛 Issues: [GitHub Issues](https://github.com/Tryboy869/nexus-web-hub/issues)
+**Questions ? Feedback ? Partenariats ?**
+
+- **Email pro** : nexusstudio100@gmail.com
+- **Email perso** : anzizdaouda0@gmail.com
+- **GitHub Issues** : [Ouvrir une issue](https://github.com/Tryboy869/nexus-web-hub/issues)
+- **Discussions** : [Démarrer une discussion](https://github.com/Tryboy869/nexus-web-hub/discussions)
 
 ---
 
 <div align="center">
 
-**🌌 Built with ❤️ by [Nexus Studio](https://github.com/Tryboy869)**
+**Fait avec ❤️ par [Nexus Studio](https://github.com/Tryboy869)**
 
-**DAOUDA Abdoul Anzize - CEO**
+*Découvrir. Publier. Évaluer. Le meilleur du Web, en un seul endroit.*
 
-[Website](https://nexus-web-hub.com) • [Documentation](https://docs.nexus-web-hub.com) • [API](https://api.nexus-web-hub.com)
+![Logo NWH](./assets/logos/logo-nwh.svg)
 
 </div>
