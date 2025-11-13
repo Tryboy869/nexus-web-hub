@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="200" 
+     height="200" 
+     viewBox="0 0 200 200"
+     role="img"
+     aria-labelledby="logo-title logo-desc">
+  
+  <title id="logo-title">Nexus Web Hub Logo</title>
+  <desc id="logo-desc">Logo NWH avec constellation interconnectée cyan et violet</desc>
+  
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+    }
+  </style>
+  
+  <defs>
+    <!-- Gradient cyan vers violet -->
+    <linearGradient id="nwhGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d9ff;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1"/>
+    </linearGradient>
+    
+    <!-- Filtre glow cyan -->
+    <filter id="glowCyan">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Filtre glow violet -->
+    <filter id="glowPurple">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background hexagone subtil -->
+  <polygon points="100,20 170,60 170,140 100,180 30,140 30,60"
+           fill="none"
+           stroke="#00d9ff"
+           stroke-width="1"
+           opacity="0.2">
+    <animate attributeName="opacity" 
+             values="0.2;0.4;0.2" 
+             dur="4s" 
+             repeatCount="indefinite"/>
+  </polygon>
+  
+  <!-- Lettre N -->
+  <g opacity="0">
+    <animate attributeName="opacity" 
+             values="0;1" 
+             begin="0s" 
+             dur="0.8s" 
+             fill="freeze"/>
+    
+    <!-- Barre gauche N -->
+    <line x1="40" y1="85" x2="40" y2="115" 
+          stroke="url(#nwhGradient)" 
+          stroke-width="6" 
+          stroke-linecap="round"
+          filter="url(#glowCyan)"/>
+    
+    <!-- Diagonale N -->
+    <line x1="40" y1="85" x2="60" y2="115" 
+          stroke="url(#nwhGradient)" 
+          stroke-width="6" 
+          stroke-linecap="round"
+          filter="url(#glowCyan)"/>
+    
+    <!-- Barre droite N -->
+    <line x1="60" y1="85" x2="60" y2="115" 
+          stroke="url(#nwhGradient)" 
+          stroke-width="6" 
+          stroke-linecap="round"
+          filter="url(#glowCyan)"/>
+    
+    <!-- Point lumineux N -->
+    <circle cx="40" cy="100" r="3" fill="#00d9ff">
+      <animate attributeName="r" 
+               values="3;5;3" 
+               dur="2s" 
+               repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Lettre W -->
+  <g opacity="0">
+    <animate attributeName="opacity" 
+             values="0;1" 
+             begin="0.3s" 
+             dur="0.8s" 
+             fill="freeze"/>
+    
+    <!-- W (forme en M inversé) -->
+    <polyline points="75,115 85,85 95,115 105,85 115,115"
+              fill="none"
+              stroke="url(#nwhGradient)"
+              stroke-width="6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              filter="url(#glowCyan)"/>
+    
+    <!-- Point lumineux W -->
+    <circle cx="95" cy="100" r="3" fill="#8b5cf6">
+      <animate attributeName="r" 
+               values="3;5;3" 
+               dur="2s" 
+               begin="0.5s"
+               repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Lettre H -->
+  <g opacity="0">
+    <animate attributeName="opacity" 
+             values="0;1" 
+             begin="0.6s" 
+             dur="0.8s" 
+             fill="freeze"/>
+    
+    <!-- Barre gauche H -->
+    <line x1="140" y1="85" x2="140" y2="115" 
+          stroke="url(#nwhGradient)" 
+          stroke-width="6" 
+          stroke-linecap="round"
+          filter="url(#glowPurple)"/>
+    
+    <!-- Barre horizontale H -->
+    <line x1="140" y1="100" x2="160" y2="100" 
+          stroke="url(#nwhGradient)" 
+          stroke-width="6" 
+          stroke-linecap="round"
+          filter="url(#glowPurple)"/>
+    
+    <!-- Barre droite H -->
+    <line x1="160" y1="85" x2="160" y2="115" 
+          stroke="url(#nwhGradient)" 
+          stroke-width="6" 
+          stroke-linecap="round"
+          filter="url(#glowPurple)"/>
+    
+    <!-- Point lumineux H -->
+    <circle cx="160" cy="100" r="3" fill="#8b5cf6">
+      <animate attributeName="r" 
+               values="3;5;3" 
+               dur="2s" 
+               begin="1s"
+               repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Lignes de connexion (constellation) -->
+  <g opacity="0">
+    <animate attributeName="opacity" 
+             values="0;0.6" 
+             begin="1.2s" 
+             dur="1s" 
+             fill="freeze"/>
+    
+    <!-- Connexion N-W -->
+    <line x1="60" y1="100" x2="75" y2="100" 
+          stroke="#00d9ff" 
+          stroke-width="1" 
+          stroke-dasharray="2,2"
+          opacity="0.4">
+      <animate attributeName="stroke-dashoffset" 
+               from="0" 
+               to="4" 
+               dur="1s" 
+               repeatCount="indefinite"/>
+    </line>
+    
+    <!-- Connexion W-H -->
+    <line x1="115" y1="100" x2="140" y2="100" 
+          stroke="#8b5cf6" 
+          stroke-width="1" 
+          stroke-dasharray="2,2"
+          opacity="0.4">
+      <animate attributeName="stroke-dashoffset" 
+               from="0" 
+               to="4" 
+               dur="1s" 
+               repeatCount="indefinite"/>
+    </line>
+  </g>
+  
+  <!-- Particules orbitales -->
+  <g opacity="0">
+    <animate attributeName="opacity" 
+             values="0;1" 
+             begin="1.5s" 
+             dur="0.5s" 
+             fill="freeze"/>
+    
+    <!-- Particule 1 -->
+    <circle r="2" fill="#00d9ff" opacity="0.6">
+      <animateMotion dur="8s" repeatCount="indefinite"
+                     path="M40,60 Q100,40 160,60 T40,60"/>
+    </circle>
+    
+    <!-- Particule 2 -->
+    <circle r="2" fill="#8b5cf6" opacity="0.6">
+      <animateMotion dur="10s" repeatCount="indefinite"
+                     path="M160,140 Q100,160 40,140 T160,140"/>
+    </circle>
+  </g>
+  
+  <!-- Pulse ring global -->
+  <circle cx="100" cy="100" r="80" 
+          fill="none" 
+          stroke="#00d9ff" 
+          stroke-width="1" 
+          opacity="0">
+    <animate attributeName="r" 
+             values="80;100;120" 
+             dur="3s" 
+             repeatCount="indefinite"/>
+    <animate attributeName="opacity" 
+             values="0.4;0.2;0" 
+             dur="3s" 
+             repeatCount="indefinite"/>
+  </circle>
+  
+</svg>
