@@ -1,1 +1,43 @@
-.
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="120" 
+     height="20" 
+     viewBox="0 0 120 20"
+     role="img"
+     aria-labelledby="tests-title tests-desc">
+  
+  <title id="tests-title">Tests Status - 100% Passed</title>
+  <desc id="tests-desc">Badge de statut de tests : 100% de réussite</desc>
+  
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+    }
+  </style>
+  
+  <!-- Background -->
+  <rect width="120" height="20" rx="3" fill="#555"/>
+  
+  <!-- Label "tests" -->
+  <rect width="40" height="20" rx="3" fill="#555"/>
+  <text x="20" y="14" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+    tests
+  </text>
+  
+  <!-- Status "100% passed" -->
+  <rect x="40" width="80" height="20" rx="3" fill="#10b981"/>
+  <text x="80" y="14" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">
+    100% passed
+  </text>
+  
+  <!-- Barre de progression animée -->
+  <rect x="44" y="16" width="72" height="2" fill="white" opacity="0.3"/>
+  <rect x="44" y="16" width="0" height="2" fill="white" opacity="0.9">
+    <animate attributeName="width" 
+             from="0" 
+             to="72" 
+             dur="2s" 
+             fill="freeze"/>
+  </rect>
+  
+</svg>
