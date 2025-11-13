@@ -1,1 +1,82 @@
-.
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="64" 
+     height="64" 
+     viewBox="0 0 64 64"
+     role="img"
+     aria-labelledby="websites-title websites-desc">
+  
+  <title id="websites-title">Catégorie Sites Web</title>
+  <desc id="websites-desc">Icône de catégorie pour les sites web et plateformes</desc>
+  
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+    }
+  </style>
+  
+  <defs>
+    <linearGradient id="websitesGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#34d399;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Hexagone background -->
+  <polygon points="32,5 55,18 55,46 32,59 9,46 9,18"
+           fill="url(#websitesGrad)"
+           opacity="0.2"/>
+  <polygon points="32,5 55,18 55,46 32,59 9,46 9,18"
+           fill="none"
+           stroke="url(#websitesGrad)"
+           stroke-width="2">
+    <animate attributeName="opacity" 
+             values="1;0.7;1" 
+             dur="2s" 
+             repeatCount="indefinite"/>
+  </polygon>
+  
+  <!-- Globe -->
+  <g transform="translate(32, 32)">
+    <circle r="14" fill="none" stroke="url(#websitesGrad)" stroke-width="2"/>
+    
+    <!-- Lignes horizontales -->
+    <line x1="-14" y1="0" x2="14" y2="0" stroke="url(#websitesGrad)" stroke-width="1" opacity="0.6"/>
+    <line x1="-12" y1="-7" x2="12" y2="-7" stroke="url(#websitesGrad)" stroke-width="1" opacity="0.4"/>
+    <line x1="-12" y1="7" x2="12" y2="7" stroke="url(#websitesGrad)" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Courbes verticales -->
+    <path d="M0,-14 Q-8,-7 0,0 Q8,7 0,14" 
+          fill="none" 
+          stroke="url(#websitesGrad)" 
+          stroke-width="1" 
+          opacity="0.6"/>
+    <path d="M0,-14 Q8,-7 0,0 Q-8,7 0,14" 
+          fill="none" 
+          stroke="url(#websitesGrad)" 
+          stroke-width="1" 
+          opacity="0.6"/>
+    
+    <!-- Orbites animées -->
+    <g opacity="0.8">
+      <circle r="18" fill="none" stroke="#10b981" stroke-width="1" stroke-dasharray="2,4" opacity="0.4">
+        <animateTransform attributeName="transform"
+                          type="rotate"
+                          from="0"
+                          to="360"
+                          dur="10s"
+                          repeatCount="indefinite"/>
+      </circle>
+      
+      <circle cx="0" cy="-18" r="2" fill="#10b981">
+        <animateTransform attributeName="transform"
+                          type="rotate"
+                          from="0"
+                          to="360"
+                          dur="10s"
+                          repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+  
+</svg>
