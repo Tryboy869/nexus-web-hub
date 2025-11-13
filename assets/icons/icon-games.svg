@@ -1,1 +1,69 @@
-.
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="64" 
+     height="64" 
+     viewBox="0 0 64 64"
+     role="img"
+     aria-labelledby="games-title games-desc">
+  
+  <title id="games-title">Catégorie Jeux</title>
+  <desc id="games-desc">Icône de catégorie pour les webapps de jeux</desc>
+  
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+    }
+  </style>
+  
+  <defs>
+    <linearGradient id="gamesGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Hexagone background -->
+  <polygon points="32,5 55,18 55,46 32,59 9,46 9,18"
+           fill="url(#gamesGrad)"
+           opacity="0.2"/>
+  <polygon points="32,5 55,18 55,46 32,59 9,46 9,18"
+           fill="none"
+           stroke="url(#gamesGrad)"
+           stroke-width="2">
+    <animate attributeName="opacity" 
+             values="1;0.7;1" 
+             dur="2s" 
+             repeatCount="indefinite"/>
+  </polygon>
+  
+  <!-- Manette de jeu stylisée -->
+  <g transform="translate(32, 32)">
+    <!-- Corps manette -->
+    <path d="M-12,-6 Q-16,-2 -12,4 L-4,4 Q-2,2 0,2 Q2,2 4,4 L12,4 Q16,-2 12,-6 Z"
+          fill="url(#gamesGrad)"
+          stroke="white"
+          stroke-width="1.5"/>
+    
+    <!-- Croix directionnelle (gauche) -->
+    <g transform="translate(-10, -1)">
+      <rect x="-1" y="-4" width="2" height="8" fill="white" rx="0.5"/>
+      <rect x="-4" y="-1" width="8" height="2" fill="white" rx="0.5"/>
+    </g>
+    
+    <!-- Boutons (droite) -->
+    <circle cx="7" cy="-2" r="2" fill="white" opacity="0.9">
+      <animate attributeName="opacity" 
+               values="0.9;0.6;0.9" 
+               dur="1.5s" 
+               repeatCount="indefinite"/>
+    </circle>
+    <circle cx="10" cy="1" r="2" fill="white" opacity="0.9">
+      <animate attributeName="opacity" 
+               values="0.9;0.6;0.9" 
+               begin="0.3s"
+               dur="1.5s" 
+               repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+</svg>
