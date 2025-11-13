@@ -1,1 +1,27 @@
-.
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="100" 
+     height="20" 
+     viewBox="0 0 100 20"
+     role="img"
+     aria-labelledby="license-title license-desc">
+  
+  <title id="license-title">License - Custom</title>
+  <desc id="license-desc">Badge de licence : licence personnalisée</desc>
+  
+  <!-- Background -->
+  <rect width="100" height="20" rx="3" fill="#555"/>
+  
+  <!-- Label "license" -->
+  <rect width="50" height="20" rx="3" fill="#555"/>
+  <text x="25" y="14" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+    license
+  </text>
+  
+  <!-- Status "Custom" -->
+  <rect x="50" width="50" height="20" rx="3" fill="#00d9ff"/>
+  <text x="75" y="14" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">
+    Custom
+  </text>
+  
+</svg>
