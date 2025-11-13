@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Badge Administrateur Nexus Web Hub">
+  <title>Badge Administrateur</title>
+  <desc>Badge système pour les administrateurs de Nexus Web Hub avec couronne et étoiles</desc>
+  
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+    }
+  </style>
+  
+  <defs>
+    <linearGradient id="adminGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#f59e0b;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#d97706;stop-opacity:1"/>
+    </linearGradient>
+    
+    <filter id="adminGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <radialGradient id="shineGrad">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  
+  <circle cx="40" cy="40" r="35" fill="url(#adminGrad)" filter="url(#adminGlow)">
+    <animate attributeName="r" values="35;37;35" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  
+  <path d="M 40 15 L 45 25 L 56 27 L 48 35 L 50 46 L 40 40 L 30 46 L 32 35 L 24 27 L 35 25 Z" 
+        fill="#fff" opacity="0.9"/>
+  
+  <path d="M 25 48 L 27 50 L 25 52 L 30 52 L 30 54 L 25 54 L 27 56 L 25 58 L 22 55 L 25 52 Z" 
+        fill="#fff" opacity="0.8"/>
+  
+  <path d="M 55 48 L 53 50 L 55 52 L 50 52 L 50 54 L 55 54 L 53 56 L 55 58 L 58 55 L 55 52 Z" 
+        fill="#fff" opacity="0.8"/>
+  
+  <text x="40" y="70" font-family="Arial, sans-serif" font-size="10" font-weight="bold" 
+        fill="#fff" text-anchor="middle" opacity="0.9">
+    ADMIN
+  </text>
+  
+  <circle cx="40" cy="40" r="35" fill="url(#shineGrad)" opacity="0.5">
+    <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  
+  <circle cx="40" cy="40" r="35" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.6">
+    <animate attributeName="r" values="35;50" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;0" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>
