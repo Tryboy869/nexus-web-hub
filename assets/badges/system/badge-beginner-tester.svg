@@ -1,1 +1,105 @@
-.
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="80" 
+     height="80" 
+     viewBox="0 0 80 80"
+     role="img"
+     aria-labelledby="beginner-title beginner-desc">
+  
+  <title id="beginner-title">Badge Beginner Tester</title>
+  <desc id="beginner-desc">Badge bouclier vert avec étoile, niveau débutant testeur (10 avis)</desc>
+  
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+    }
+  </style>
+  
+  <defs>
+    <!-- Gradient vert -->
+    <linearGradient id="beginnerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1"/>
+    </linearGradient>
+    
+    <!-- Glow vert -->
+    <filter id="beginnerGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Bouclier background -->
+  <path d="M40,10 L60,20 L60,45 Q60,60 40,70 Q20,60 20,45 L20,20 Z"
+        fill="url(#beginnerGrad)"
+        filter="url(#beginnerGlow)">
+    <animate attributeName="opacity" 
+             values="1;0.9;1" 
+             dur="2s" 
+             repeatCount="indefinite"/>
+  </path>
+  
+  <!-- Étoile centrale -->
+  <g transform="translate(40, 40)">
+    <polygon points="0,-12 3.5,-3.5 12,0 3.5,3.5 0,12 -3.5,3.5 -12,0 -3.5,-3.5"
+             fill="white"
+             opacity="0">
+      <animate attributeName="opacity" 
+               values="0;1" 
+               begin="0.5s"
+               dur="0.8s" 
+               fill="freeze"/>
+      <animateTransform attributeName="transform"
+                        type="rotate"
+                        from="0"
+                        to="360"
+                        dur="10s"
+                        repeatCount="indefinite"/>
+    </polygon>
+  </g>
+  
+  <!-- Particules montantes -->
+  <circle cx="30" cy="60" r="2" fill="#10b981" opacity="0.6">
+    <animate attributeName="cy" 
+             values="60;20;60" 
+             dur="3s" 
+             repeatCount="indefinite"/>
+    <animate attributeName="opacity" 
+             values="0.6;0;0.6" 
+             dur="3s" 
+             repeatCount="indefinite"/>
+  </circle>
+  
+  <circle cx="50" cy="65" r="2" fill="#10b981" opacity="0.6">
+    <animate attributeName="cy" 
+             values="65;25;65" 
+             dur="4s" 
+             repeatCount="indefinite"/>
+    <animate attributeName="opacity" 
+             values="0.6;0;0.6" 
+             dur="4s" 
+             repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Pulse ring -->
+  <path d="M40,10 L60,20 L60,45 Q60,60 40,70 Q20,60 20,45 L20,20 Z"
+        fill="none"
+        stroke="#10b981"
+        stroke-width="2"
+        opacity="0">
+    <animate attributeName="opacity" 
+             values="0.5;0;0" 
+             dur="2s" 
+             repeatCount="indefinite"/>
+    <animateTransform attributeName="transform"
+                      type="scale"
+                      values="1;1.2;1.4"
+                      additive="sum"
+                      dur="2s"
+                      repeatCount="indefinite"/>
+  </path>
+  
+</svg>
