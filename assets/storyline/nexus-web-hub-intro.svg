@@ -1,39 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
   <defs>
-    <!-- Gradient Background Animé -->
+    <!-- Gradient Background -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#0a0e27;stop-opacity:1">
-        <animate attributeName="stop-color" values="#0a0e27;#16213e;#0a0e27" dur="10s" repeatCount="indefinite"/>
+        <animate attributeName="stop-color" values="#0a0e27;#16213e;#0a0e27" dur="8s" repeatCount="indefinite"/>
       </stop>
       <stop offset="100%" style="stop-color:#1a1f3a;stop-opacity:1">
-        <animate attributeName="stop-color" values="#1a1f3a;#0a0e27;#1a1f3a" dur="10s" repeatCount="indefinite"/>
+        <animate attributeName="stop-color" values="#1a1f3a;#0a0e27;#1a1f3a" dur="8s" repeatCount="indefinite"/>
       </stop>
     </linearGradient>
     
-    <!-- Gradients Couleurs -->
+    <!-- Gradient Cyan -->
     <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" style="stop-color:#00d9ff;stop-opacity:1"/>
       <stop offset="100%" style="stop-color:#0099cc;stop-opacity:1"/>
-    </linearGradient>
-    
-    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#6d28d9;stop-opacity:1"/>
-    </linearGradient>
-    
-    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1"/>
-    </linearGradient>
-    
-    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1"/>
-    </linearGradient>
-    
-    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#059669;stop-opacity:1"/>
     </linearGradient>
     
     <!-- Glow Filter -->
@@ -45,376 +25,152 @@
       </feMerge>
     </filter>
     
-    <!-- Logo Hexagone Réutilisable -->
-    <symbol id="hexLogo" viewBox="-60 -60 120 120">
-      <polygon points="0,-60 52,-30 52,30 0,60 -52,30 -52,-30" 
-               fill="none" stroke="url(#cyanGrad)" stroke-width="3" filter="url(#glow)"/>
-      <text x="-30" y="10" font-family="monospace" font-size="48" 
-            font-weight="bold" fill="url(#cyanGrad)">NS</text>
-    </symbol>
+    <!-- Strong Glow -->
+    <filter id="strongGlow">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
   
   <!-- Background -->
-  <rect width="1200" height="600" fill="url(#bgGrad)"/>
+  <rect width="800" height="600" fill="url(#bgGrad)"/>
   
-  <!-- Particules flottantes (toujours visibles) -->
-  <g opacity="0.2">
-    <circle cx="100" cy="100" r="3" fill="#00d9ff">
-      <animateMotion dur="20s" repeatCount="indefinite" 
-                     path="M0,0 Q200,-100 400,0 Q600,100 800,0"/>
-      <animate attributeName="opacity" values="0;1;0" dur="20s" repeatCount="indefinite"/>
+  <!-- Titre Principal -->
+  <text x="400" y="80" font-family="Arial, sans-serif" font-size="42" 
+        font-weight="bold" text-anchor="middle" fill="url(#cyanGrad)">
+    Nexus Web Hub
+    <animate attributeName="opacity" from="0" to="1" dur="1s" fill="freeze"/>
+  </text>
+  
+  <!-- HUB CENTRAL (Hexagone avec pulse) -->
+  <g transform="translate(400, 300)">
+    <!-- Pulse rings (3 vagues) -->
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#00d9ff" stroke-width="2" opacity="0">
+      <animate attributeName="r" values="60;120;180" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0.3;0" dur="4s" repeatCount="indefinite"/>
     </circle>
-    <circle cx="300" cy="500" r="2" fill="#8b5cf6">
-      <animateMotion dur="25s" repeatCount="indefinite" 
-                     path="M0,0 Q-100,200 0,400 Q100,200 0,0"/>
-      <animate attributeName="opacity" values="0;1;0" dur="25s" repeatCount="indefinite"/>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#00d9ff" stroke-width="2" opacity="0">
+      <animate attributeName="r" values="60;120;180" dur="4s" begin="1.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0.3;0" dur="4s" begin="1.3s" repeatCount="indefinite"/>
     </circle>
-    <circle cx="900" cy="200" r="4" fill="#fbbf24">
-      <animateMotion dur="18s" repeatCount="indefinite" 
-                     path="M0,0 Q-200,150 -400,300"/>
-      <animate attributeName="opacity" values="0;1;0" dur="18s" repeatCount="indefinite"/>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#00d9ff" stroke-width="2" opacity="0">
+      <animate attributeName="r" values="60;120;180" dur="4s" begin="2.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0.3;0" dur="4s" begin="2.6s" repeatCount="indefinite"/>
     </circle>
+    
+    <!-- Hexagone central -->
+    <polygon points="0,-60 52,-30 52,30 0,60 -52,30 -52,-30" 
+             fill="url(#cyanGrad)" stroke="#00d9ff" stroke-width="3" filter="url(#strongGlow)">
+      <animate attributeName="opacity" values="1;0.8;1" dur="3s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="rotate"
+                        from="0 0 0" to="360 0 0"
+                        dur="20s" repeatCount="indefinite"/>
+    </polygon>
+    
+    <!-- Texte NWH -->
+    <text x="0" y="15" font-family="monospace" font-size="42" 
+          font-weight="bold" fill="#0a0e27" text-anchor="middle">NWH</text>
   </g>
   
-  <!-- ========== SCÈNE 1 : NEXUS STUDIO (0-6s) ========== -->
-  <g id="scene1" opacity="0">
-    <animate attributeName="opacity" from="0" to="1" begin="0s" dur="1s" fill="freeze"/>
-    <animate attributeName="opacity" from="1" to="0" begin="5s" dur="1s" fill="freeze"/>
-    
-    <!-- Logo Hexagonal avec rotation -->
-    <g transform="translate(600, 250)">
-      <use href="#hexLogo" width="120" height="120">
-        <animateTransform attributeName="transform" type="rotate"
-                          from="0" to="360"
-                          dur="4s" begin="0s" repeatCount="indefinite"/>
-      </use>
-    </g>
-    
-    <!-- Titre principal -->
-    <text x="600" y="360" font-family="Arial, sans-serif" font-size="48" 
-          font-weight="bold" text-anchor="middle" fill="url(#cyanGrad)">
-      Nexus Studio
-      <animate attributeName="opacity" from="0" to="1" begin="0.5s" dur="1s" fill="freeze"/>
-    </text>
-    
-    <!-- Sous-titre -->
-    <text x="600" y="400" font-family="Arial, sans-serif" font-size="20" 
-          text-anchor="middle" fill="#c0c0c0">
-      Building Tomorrow's Technology, Today
-      <animate attributeName="opacity" from="0" to="1" begin="1s" dur="1s" fill="freeze"/>
-    </text>
-  </g>
+  <!-- SATELLITES ORBITAUX (4 icônes en rotation) -->
   
-  <!-- ========== SCÈNE 2 : PROBLÈME (6-12s) ========== -->
-  <g id="scene2" opacity="0">
-    <animate attributeName="opacity" from="0" to="1" begin="6s" dur="1s" fill="freeze"/>
-    <animate attributeName="opacity" from="1" to="0" begin="11s" dur="1s" fill="freeze"/>
-    
-    <!-- Titre -->
-    <text x="600" y="100" font-family="Arial, sans-serif" font-size="42" 
-          font-weight="bold" text-anchor="middle" fill="url(#redGrad)">
-      Le Problème
-    </text>
-    
-    <!-- Icônes fragmentées -->
-    <g transform="translate(600, 300)">
-      <!-- Icône 1 -->
-      <g opacity="0.5">
-        <circle cx="-200" cy="-50" r="35" fill="#3b82f6">
-          <animate attributeName="cy" values="-50;-65;-50" dur="2.5s" begin="6s" repeatCount="indefinite"/>
+  <!-- Satellite 1 : Gaming (position 12h) -->
+  <g transform="translate(400, 300)">
+    <g transform="rotate(0)">
+      <animateTransform attributeName="transform" type="rotate"
+                        from="0 0 0" to="360 0 0"
+                        dur="12s" repeatCount="indefinite"/>
+      <g transform="translate(0, -160)">
+        <!-- Ligne de connexion -->
+        <line x1="0" y1="60" x2="0" y2="100" stroke="#00d9ff" stroke-width="2" opacity="0.5">
+          <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite"/>
+        </line>
+        <!-- Cercle satellite -->
+        <circle cx="0" cy="0" r="40" fill="#3b82f6" filter="url(#glow)">
+          <animate attributeName="r" values="40;44;40" dur="2s" repeatCount="indefinite"/>
         </circle>
-        <text x="-200" y="-35" font-size="30" text-anchor="middle">🎮</text>
+        <text x="0" y="12" font-size="32" text-anchor="middle">🎮</text>
+        <!-- Label -->
+        <text x="0" y="65" font-family="Arial, sans-serif" font-size="16" 
+              font-weight="600" fill="#3b82f6" text-anchor="middle">Jeux Web</text>
       </g>
-      
-      <!-- Icône 2 -->
-      <g opacity="0.5">
-        <circle cx="0" cy="-80" r="35" fill="#8b5cf6">
-          <animate attributeName="cy" values="-80;-95;-80" dur="3s" begin="6s" repeatCount="indefinite"/>
-        </circle>
-        <text x="0" y="-65" font-size="30" text-anchor="middle">🛠️</text>
-      </g>
-      
-      <!-- Icône 3 -->
-      <g opacity="0.5">
-        <circle cx="200" cy="-50" r="35" fill="#10b981">
-          <animate attributeName="cy" values="-50;-65;-50" dur="2.8s" begin="6s" repeatCount="indefinite"/>
-        </circle>
-        <text x="200" y="-35" font-size="30" text-anchor="middle">🔌</text>
-      </g>
-      
-      <!-- Icône 4 -->
-      <g opacity="0.5">
-        <circle cx="-100" cy="60" r="35" fill="#ec4899">
-          <animate attributeName="cy" values="60;45;60" dur="3.2s" begin="6s" repeatCount="indefinite"/>
-        </circle>
-        <text x="-100" y="75" font-size="30" text-anchor="middle">🎨</text>
-      </g>
-      
-      <!-- Icône 5 -->
-      <g opacity="0.5">
-        <circle cx="100" cy="60" r="35" fill="#f59e0b">
-          <animate attributeName="cy" values="60;45;60" dur="2.6s" begin="6s" repeatCount="indefinite"/>
-        </circle>
-        <text x="100" y="75" font-size="30" text-anchor="middle">🌐</text>
-      </g>
-      
-      <!-- Ligne de fragmentation -->
-      <line x1="-280" y1="0" x2="280" y2="0" stroke="#ef4444" stroke-width="3" 
-            stroke-dasharray="8,8" opacity="0.6">
-        <animate attributeName="stroke-dashoffset" from="0" to="16" dur="1s" begin="6s" repeatCount="indefinite"/>
-      </line>
     </g>
-    
-    <!-- Description -->
-    <text x="600" y="480" font-family="Arial, sans-serif" font-size="22" 
-          text-anchor="middle" fill="#e0e0e0">
-      Le Web est fragmenté. Comment découvrir
-    </text>
-    <text x="600" y="515" font-family="Arial, sans-serif" font-size="22" 
-          text-anchor="middle" fill="#e0e0e0">
-      les meilleures webapps, outils et jeux ?
-    </text>
   </g>
   
-  <!-- ========== SCÈNE 3 : SOLUTION (12-18s) ========== -->
-  <g id="scene3" opacity="0">
-    <animate attributeName="opacity" from="0" to="1" begin="12s" dur="1s" fill="freeze"/>
-    <animate attributeName="opacity" from="1" to="0" begin="17s" dur="1s" fill="freeze"/>
-    
-    <!-- Titre -->
-    <text x="600" y="100" font-family="Arial, sans-serif" font-size="42" 
-          font-weight="bold" text-anchor="middle" fill="url(#greenGrad)">
-      La Solution
-    </text>
-    
-    <!-- Hub central -->
-    <g transform="translate(600, 300)">
-      <!-- Hexagone central avec pulse -->
-      <polygon points="0,-70 61,-35 61,35 0,70 -61,35 -61,-35" 
-               fill="url(#cyanGrad)" stroke="#00d9ff" stroke-width="4" filter="url(#glow)">
-        <animate attributeName="opacity" values="1;0.7;1" dur="2s" begin="12s" repeatCount="indefinite"/>
-      </polygon>
-      
-      <!-- Texte NWH -->
-      <text x="0" y="15" font-family="monospace" font-size="38" 
-            font-weight="bold" fill="#0a0e27" text-anchor="middle">NWH</text>
-      
-      <!-- Connexions aux icônes (apparition séquentielle) -->
-      <g opacity="0">
-        <animate attributeName="opacity" from="0" to="1" begin="12.8s" dur="0.4s" fill="freeze"/>
-        <line x1="-61" y1="-35" x2="-140" y2="-90" stroke="#00d9ff" stroke-width="3"/>
-        <circle cx="-140" cy="-90" r="28" fill="#3b82f6"/>
-        <text x="-140" y="-75" font-size="24" text-anchor="middle">🎮</text>
-      </g>
-      
-      <g opacity="0">
-        <animate attributeName="opacity" from="0" to="1" begin="13.2s" dur="0.4s" fill="freeze"/>
-        <line x1="0" y1="-70" x2="0" y2="-150" stroke="#00d9ff" stroke-width="3"/>
-        <circle cx="0" cy="-150" r="28" fill="#8b5cf6"/>
-        <text x="0" y="-135" font-size="24" text-anchor="middle">🛠️</text>
-      </g>
-      
-      <g opacity="0">
-        <animate attributeName="opacity" from="0" to="1" begin="13.6s" dur="0.4s" fill="freeze"/>
-        <line x1="61" y1="-35" x2="140" y2="-90" stroke="#00d9ff" stroke-width="3"/>
-        <circle cx="140" cy="-90" r="28" fill="#10b981"/>
-        <text x="140" y="-75" font-size="24" text-anchor="middle">🔌</text>
-      </g>
-      
-      <g opacity="0">
-        <animate attributeName="opacity" from="0" to="1" begin="14s" dur="0.4s" fill="freeze"/>
-        <line x1="-61" y1="35" x2="-140" y2="90" stroke="#00d9ff" stroke-width="3"/>
-        <circle cx="-140" cy="90" r="28" fill="#ec4899"/>
-        <text x="-140" y="105" font-size="24" text-anchor="middle">🎨</text>
-      </g>
-      
-      <g opacity="0">
-        <animate attributeName="opacity" from="0" to="1" begin="14.4s" dur="0.4s" fill="freeze"/>
-        <line x1="61" y1="35" x2="140" y2="90" stroke="#00d9ff" stroke-width="3"/>
-        <circle cx="140" cy="90" r="28" fill="#f59e0b"/>
-        <text x="140" y="105" font-size="24" text-anchor="middle">🌐</text>
+  <!-- Satellite 2 : Outils (position 3h) -->
+  <g transform="translate(400, 300)">
+    <g transform="rotate(90)">
+      <animateTransform attributeName="transform" type="rotate"
+                        from="90 0 0" to="450 0 0"
+                        dur="12s" repeatCount="indefinite"/>
+      <g transform="translate(0, -160)">
+        <line x1="0" y1="60" x2="0" y2="100" stroke="#00d9ff" stroke-width="2" opacity="0.5">
+          <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+        </line>
+        <circle cx="0" cy="0" r="40" fill="#8b5cf6" filter="url(#glow)">
+          <animate attributeName="r" values="40;44;40" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+        </circle>
+        <text x="0" y="12" font-size="32" text-anchor="middle">🛠️</text>
+        <text x="0" y="65" font-family="Arial, sans-serif" font-size="16" 
+              font-weight="600" fill="#8b5cf6" text-anchor="middle" transform="rotate(-90)">Outils</text>
       </g>
     </g>
-    
-    <!-- Nom du projet -->
-    <text x="600" y="470" font-family="Arial, sans-serif" font-size="36" 
-          font-weight="bold" text-anchor="middle" fill="url(#cyanGrad)">
-      Nexus Web Hub
-      <animate attributeName="opacity" from="0" to="1" begin="15s" dur="1s" fill="freeze"/>
-    </text>
-    
-    <!-- Tagline -->
-    <text x="600" y="510" font-family="Arial, sans-serif" font-size="20" 
-          text-anchor="middle" fill="#c0c0c0">
-      Le store communautaire du Web
-      <animate attributeName="opacity" from="0" to="1" begin="15.5s" dur="1s" fill="freeze"/>
-    </text>
   </g>
   
-  <!-- ========== SCÈNE 4 : FONCTIONNALITÉS (18-24s) ========== -->
-  <g id="scene4" opacity="0">
-    <animate attributeName="opacity" from="0" to="1" begin="18s" dur="1s" fill="freeze"/>
-    <animate attributeName="opacity" from="1" to="0" begin="23s" dur="1s" fill="freeze"/>
-    
-    <!-- Titre -->
-    <text x="600" y="90" font-family="Arial, sans-serif" font-size="38" 
-          font-weight="bold" text-anchor="middle" fill="url(#purpleGrad)">
-      Fonctionnalités Clés
-    </text>
-    
-    <!-- Feature 1 : Découverte -->
-    <g transform="translate(250, 230)">
-      <circle cx="0" cy="0" r="55" fill="url(#cyanGrad)" filter="url(#glow)">
-        <animate attributeName="r" values="55;60;55" dur="2.5s" begin="18.5s" repeatCount="indefinite"/>
-      </circle>
-      <text x="0" y="12" font-size="40" text-anchor="middle">🔍</text>
-      <text x="0" y="100" font-family="Arial, sans-serif" font-size="22" 
-            font-weight="600" fill="#00d9ff" text-anchor="middle">Découverte</text>
-      <text x="0" y="135" font-family="Arial, sans-serif" font-size="16" 
-            fill="#c0c0c0" text-anchor="middle">Recherche intelligente</text>
-      <text x="0" y="160" font-family="Arial, sans-serif" font-size="16" 
-            fill="#c0c0c0" text-anchor="middle">Collections curées</text>
-    </g>
-    
-    <!-- Feature 2 : Publication -->
-    <g transform="translate(600, 230)">
-      <circle cx="0" cy="0" r="55" fill="url(#purpleGrad)" filter="url(#glow)">
-        <animate attributeName="r" values="55;60;55" dur="2.5s" begin="19s" repeatCount="indefinite"/>
-      </circle>
-      <text x="0" y="12" font-size="40" text-anchor="middle">✍️</text>
-      <text x="0" y="100" font-family="Arial, sans-serif" font-size="22" 
-            font-weight="600" fill="#8b5cf6" text-anchor="middle">Publication</text>
-      <text x="0" y="135" font-family="Arial, sans-serif" font-size="16" 
-            fill="#c0c0c0" text-anchor="middle">Formulaire 30 secondes</text>
-      <text x="0" y="160" font-family="Arial, sans-serif" font-size="16" 
-            fill="#c0c0c0" text-anchor="middle">Modération automatique</text>
-    </g>
-    
-    <!-- Feature 3 : Évaluation -->
-    <g transform="translate(950, 230)">
-      <circle cx="0" cy="0" r="55" fill="url(#goldGrad)" filter="url(#glow)">
-        <animate attributeName="r" values="55;60;55" dur="2.5s" begin="19.5s" repeatCount="indefinite"/>
-      </circle>
-      <text x="0" y="12" font-size="40" text-anchor="middle">⭐</text>
-      <text x="0" y="100" font-family="Arial, sans-serif" font-size="22" 
-            font-weight="600" fill="#fbbf24" text-anchor="middle">Évaluation</text>
-      <text x="0" y="135" font-family="Arial, sans-serif" font-size="16" 
-            fill="#c0c0c0" text-anchor="middle">Testeurs badgés</text>
-      <text x="0" y="160" font-family="Arial, sans-serif" font-size="16" 
-            fill="#c0c0c0" text-anchor="middle">Avis vérifiés</text>
-    </g>
-    
-    <!-- Principe fondamental -->
-    <text x="600" y="490" font-family="Arial, sans-serif" font-size="26" 
-          font-weight="bold" text-anchor="middle" fill="url(#greenGrad)">
-      Visibilité Méritocratique
-      <animate attributeName="opacity" from="0" to="1" begin="20.5s" dur="1s" fill="freeze"/>
-    </text>
-    <text x="600" y="530" font-family="Arial, sans-serif" font-size="18" 
-          text-anchor="middle" fill="#c0c0c0">
-      Qualité supérieure au Budget publicitaire
-      <animate attributeName="opacity" from="0" to="1" begin="21s" dur="1s" fill="freeze"/>
-    </text>
-  </g>
-  
-  <!-- ========== SCÈNE 5 : FONDATEUR (24-29s) ========== -->
-  <g id="scene5" opacity="0">
-    <animate attributeName="opacity" from="0" to="1" begin="24s" dur="1s" fill="freeze"/>
-    <animate attributeName="opacity" from="1" to="0" begin="28s" dur="1s" fill="freeze"/>
-    
-    <!-- Titre -->
-    <text x="600" y="110" font-family="Arial, sans-serif" font-size="40" 
-          font-weight="bold" text-anchor="middle" fill="url(#cyanGrad)">
-      Fondateur
-    </text>
-    
-    <!-- Carte contributeur -->
-    <g transform="translate(600, 320)">
-      <!-- Cadre -->
-      <rect x="-200" y="-130" width="400" height="220" rx="15" 
-            fill="#1a1f3a" stroke="url(#cyanGrad)" stroke-width="3" filter="url(#glow)"/>
-      
-      <!-- Avatar -->
-      <circle cx="-90" cy="-25" r="45" fill="url(#purpleGrad)"/>
-      <text x="-90" y="-12" font-family="monospace" 
-            font-size="28" font-weight="bold" fill="#fff" text-anchor="middle">AD</text>
-      
-      <!-- Infos -->
-      <text x="30" y="-60" font-family="Arial, sans-serif" font-size="22" 
-            font-weight="600" fill="url(#cyanGrad)">Daouda Abdoul Anzize</text>
-      <text x="30" y="-25" font-family="Arial, sans-serif" font-size="16" 
-            fill="#c0c0c0">CEO et Founder - Nexus Studio</text>
-      
-      <!-- Badges -->
-      <g transform="translate(30, 15)">
-        <rect x="0" y="0" width="90" height="28" rx="14" fill="#8b5cf6"/>
-        <text x="45" y="19" font-size="14" font-weight="600" 
-              fill="#fff" text-anchor="middle">🏆 Creator</text>
-      </g>
-      
-      <g transform="translate(130, 15)">
-        <rect x="0" y="0" width="100" height="28" rx="14" fill="#00d9ff"/>
-        <text x="50" y="19" font-size="14" font-weight="600" 
-              fill="#0a0e27" text-anchor="middle">💎 Architect</text>
+  <!-- Satellite 3 : Design (position 6h) -->
+  <g transform="translate(400, 300)">
+    <g transform="rotate(180)">
+      <animateTransform attributeName="transform" type="rotate"
+                        from="180 0 0" to="540 0 0"
+                        dur="12s" repeatCount="indefinite"/>
+      <g transform="translate(0, -160)">
+        <line x1="0" y1="60" x2="0" y2="100" stroke="#00d9ff" stroke-width="2" opacity="0.5">
+          <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" begin="1s" repeatCount="indefinite"/>
+        </line>
+        <circle cx="0" cy="0" r="40" fill="#ec4899" filter="url(#glow)">
+          <animate attributeName="r" values="40;44;40" dur="2s" begin="1s" repeatCount="indefinite"/>
+        </circle>
+        <text x="0" y="12" font-size="32" text-anchor="middle">🎨</text>
+        <text x="0" y="65" font-family="Arial, sans-serif" font-size="16" 
+              font-weight="600" fill="#ec4899" text-anchor="middle" transform="rotate(-180)">Design</text>
       </g>
     </g>
-    
-    <!-- Appel à l'action -->
-    <text x="600" y="510" font-family="Arial, sans-serif" font-size="20" 
-          text-anchor="middle" fill="#c0c0c0">
-      Devenez contributeur !
-      <animate attributeName="opacity" from="0" to="1" begin="25.5s" dur="1s" fill="freeze"/>
-    </text>
   </g>
   
-  <!-- ========== SCÈNE FINALE : CTA (29s+) ========== -->
-  <g id="sceneFinal" opacity="0">
-    <animate attributeName="opacity" from="0" to="1" begin="29s" dur="1.5s" fill="freeze"/>
-    
-    <!-- Logo central rotatif -->
-    <g transform="translate(600, 230)">
-      <polygon points="0,-55 48,-27 48,27 0,55 -48,27 -48,-27" 
-               fill="url(#cyanGrad)" stroke="#00d9ff" stroke-width="3" filter="url(#glow)">
-        <animateTransform attributeName="transform" type="rotate"
-                          from="0 0 0" to="360 0 0"
-                          dur="6s" begin="29s" repeatCount="indefinite"/>
-      </polygon>
-      <text x="0" y="12" font-family="monospace" font-size="34" 
-            font-weight="bold" fill="#0a0e27" text-anchor="middle">NWH</text>
-    </g>
-    
-    <!-- Titre principal -->
-    <text x="600" y="340" font-family="Arial, sans-serif" font-size="38" 
-          font-weight="bold" text-anchor="middle" fill="url(#cyanGrad)">
-      Nexus Web Hub
-    </text>
-    
-    <!-- Verbes d'action -->
-    <g>
-      <text x="320" y="410" font-family="Arial, sans-serif" font-size="26" 
-            font-weight="600" text-anchor="middle" fill="url(#greenGrad)">
-        Découvrir
-      </text>
-      <text x="600" y="410" font-family="Arial, sans-serif" font-size="26" 
-            font-weight="600" text-anchor="middle" fill="url(#purpleGrad)">
-        Publier
-      </text>
-      <text x="880" y="410" font-family="Arial, sans-serif" font-size="26" 
-            font-weight="600" text-anchor="middle" fill="url(#goldGrad)">
-        Évaluer
-      </text>
-    </g>
-    
-    <!-- Bouton CTA avec pulse -->
-    <g transform="translate(600, 490)">
-      <rect x="-110" y="-28" width="220" height="56" rx="28" 
-            fill="url(#cyanGrad)" filter="url(#glow)">
-        <animate attributeName="opacity" values="1;0.7;1" dur="2s" begin="29s" repeatCount="indefinite"/>
-      </rect>
-      <text x="0" y="8" font-family="Arial, sans-serif" font-size="22" 
-            font-weight="bold" fill="#0a0e27" text-anchor="middle">
-        Explorer →
-      </text>
+  <!-- Satellite 4 : WebApps (position 9h) -->
+  <g transform="translate(400, 300)">
+    <g transform="rotate(270)">
+      <animateTransform attributeName="transform" type="rotate"
+                        from="270 0 0" to="630 0 0"
+                        dur="12s" repeatCount="indefinite"/>
+      <g transform="translate(0, -160)">
+        <line x1="0" y1="60" x2="0" y2="100" stroke="#00d9ff" stroke-width="2" opacity="0.5">
+          <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" begin="1.5s" repeatCount="indefinite"/>
+        </line>
+        <circle cx="0" cy="0" r="40" fill="#10b981" filter="url(#glow)">
+          <animate attributeName="r" values="40;44;40" dur="2s" begin="1.5s" repeatCount="indefinite"/>
+        </circle>
+        <text x="0" y="12" font-size="32" text-anchor="middle">🌐</text>
+        <text x="0" y="65" font-family="Arial, sans-serif" font-size="16" 
+              font-weight="600" fill="#10b981" text-anchor="middle" transform="rotate(-270)">WebApps</text>
+      </g>
     </g>
   </g>
+  
+  <!-- TAGLINE PRINCIPAL -->
+  <text x="400" y="520" font-family="Arial, sans-serif" font-size="24" 
+        font-weight="600" text-anchor="middle" fill="#00d9ff">
+    Le store communautaire du Web
+    <animate attributeName="opacity" from="0" to="1" begin="1s" dur="1.5s" fill="freeze"/>
+  </text>
+  
+  <!-- SOUS-TAGLINE -->
+  <text x="400" y="555" font-family="Arial, sans-serif" font-size="16" 
+        text-anchor="middle" fill="#c0c0c0" opacity="0.8">
+    Découvrir · Publier · Évaluer
+    <animate attributeName="opacity" from="0" to="0.8" begin="2s" dur="1.5s" fill="freeze"/>
+  </text>
 </svg>
