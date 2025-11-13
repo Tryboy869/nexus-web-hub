@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="64" 
+     height="64" 
+     viewBox="0 0 64 64"
+     role="img"
+     aria-labelledby="tools-title tools-desc">
+  
+  <title id="tools-title">Catégorie Outils</title>
+  <desc id="tools-desc">Icône de catégorie pour les webapps outils</desc>
+  
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+    }
+  </style>
+  
+  <defs>
+    <linearGradient id="toolsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#67e8f9;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#00d9ff;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Hexagone background -->
+  <polygon points="32,5 55,18 55,46 32,59 9,46 9,18"
+           fill="url(#toolsGrad)"
+           opacity="0.2"/>
+  <polygon points="32,5 55,18 55,46 32,59 9,46 9,18"
+           fill="none"
+           stroke="url(#toolsGrad)"
+           stroke-width="2">
+    <animate attributeName="opacity" 
+             values="1;0.7;1" 
+             dur="2s" 
+             repeatCount="indefinite"/>
+  </polygon>
+  
+  <!-- Clé à molette -->
+  <g transform="translate(24, 30) rotate(-45)">
+    <rect x="-2" y="-12" width="4" height="20" fill="url(#toolsGrad)" rx="1"/>
+    <circle cy="-12" r="4" fill="url(#toolsGrad)" stroke="white" stroke-width="1"/>
+    <rect x="-6" y="6" width="12" height="6" fill="url(#toolsGrad)" rx="1"/>
+  </g>
+  
+  <!-- Tournevis -->
+  <g transform="translate(40, 30) rotate(45)">
+    <rect x="-1.5" y="-12" width="3" height="20" fill="url(#toolsGrad)" rx="0.5"/>
+    <polygon points="0,-12 -3,-16 3,-16" fill="url(#toolsGrad)"/>
+    <rect x="-2" y="6" width="4" height="4" fill="#00d9ff"/>
+  </g>
+  
+  <!-- Sparkle animation -->
+  <path d="M32,20 L33,22 L35,22 L33,24 L34,26 L32,25 L30,26 L31,24 L29,22 L31,22 Z"
+        fill="#00d9ff"
+        opacity="0">
+    <animate attributeName="opacity" 
+             values="0;1;0" 
+             dur="2s" 
+             repeatCount="indefinite"/>
+  </path>
+  
+</svg>
