@@ -80,37 +80,37 @@ Les stores d'applications (Google Play, App Store) sont réservés aux apps nati
 
 ### Pour les Utilisateurs
 
-1. **Découvrir** : Visitez [nexus-web-hub.com](https://nexus-web-hub.onrender.com)
-2. **Explorer** : Parcourez le catalogue sans inscription
-3. **S'inscrire** (optionnel) : Créer un compte pour publier/évaluer
+1. **Découvrir** : Visitez [nexus-web-hub.onrender.com](https://nexus-web-hub.onrender.com)
+2. **Explorer** : Parcourez le catalogue (aucun compte requis)
+3. **S'inscrire** : Créez un compte pour publier et évaluer
 
 ### Pour les Créateurs
 
-1. **Publier** : Cliquez "Publier votre webapp"
-2. **Remplir** : Nom, description, URL (30 secondes)
-3. **Validé** : Votre projet est public instantanément !
+1. **Publier** : Cliquez "Soumettre votre webapp"
+2. **Remplir** : Nom, URL (HTTPS), description
+3. **Modération** : Votre projet sera validé sous 48h
 
 ### Pour les Développeurs
 
 ```bash
-# Cloner le repo
 git clone https://github.com/Tryboy869/nexus-web-hub.git
 cd nexus-web-hub
 
-# Installer les dépendances
-npm install
+pip install -r requirements.txt
 
-# Configurer l'environnement
 cp .env.example .env
-# Éditer .env avec vos variables
 
-# Lancer en développement
-npm run dev
+python server.py
 ```
 
-**Stack** : React + TypeScript + Tailwind (frontend) / Python + FastAPI (backend) / Turso (database)
+Ouvrir http://localhost:8000
 
----
+**Stack** : 
+- **Frontend** : HTML + CSS + JavaScript vanilla (mobile-first, bilinguisme FR/EN, thème auto)
+- **Backend** : Python + Flask (ultra-minimal, compatible Render Free)
+- **Database** : Turso (SQLite distribué) / Supabase (collaborateurs)
+
+[📖 Guide complet →](./SETUP.md)
 
 ## 🏗️ Architecture
 
@@ -118,24 +118,35 @@ npm run dev
 
 ```
 nexus-web-hub/
-├── app.tsx              # Frontend complet (React/TypeScript)
-├── server.py            # Backend complet (FastAPI/Python)
-├── package.json         # Dépendances Node.js
-├── requirements.txt     # Dépendances Python
-├── .env.example         # Template variables d'environnement
-└── assets/              # SVG animations & assets statiques
+├── index.html           # Frontend complet (HTML + CSS + JS vanilla)
+├── server.py            # Backend Flask ultra-minimal
+├── requirements.txt     # 4 lignes (Flask, Flask-CORS, libsql, dotenv)
+├── .env.example         # Template variables
+├── .env                 # Variables locales (pas commit)
+├── DEPLOYMENT.md        # Guide déploiement production
+├── SETUP.md             # Guide installation locale
+└── assets/              # SVG animations & badges
     ├── logos/
     ├── badges/
+    │   └── system/
+    │       ├── badge-admin.svg
+    │       ├── badge-verified-creator.svg
+    │       ├── badge-beginner-tester.svg
+    │       ├── badge-pro-tester.svg
+    │       └── badge-legendary-tester.svg
     ├── storyline/
     ├── contributors/
     └── icons/
 ```
 
 **Principes** :
-- ✅ 2 fichiers code maximum (frontend + backend)
-- ✅ Déploiement instant (Render, Railway, Vercel)
-- ✅ Zéro configuration complexe
-- ✅ Production-ready immédiatement
+- ✅ **2 fichiers code** maximum (frontend + backend)
+- ✅ **Mobile-first** responsive design
+- ✅ **Bilinguisme** FR/EN avec détection auto
+- ✅ **Thème auto** Light/Dark selon système utilisateur
+- ✅ **Déploiement instant** (Render, Railway, Vercel)
+- ✅ **Zéro configuration** complexe
+- ✅ **Production-ready** immédiatement
 
 [Lire la documentation architecture complète →](./docs/ARCHITECTURE.md)
 
@@ -205,27 +216,30 @@ nexus-web-hub/
 ## 🛠️ Technologies
 
 ### Frontend
-- **React 18** + TypeScript
-- **Tailwind CSS** (design system)
-- **Zustand** (state management)
-- **Lucide React** (icônes)
+- **HTML5** + CSS3 (variables, grid, flexbox)
+- **JavaScript ES6+** (vanilla, pas de framework)
+- **Mobile-first** responsive
+- **Bilinguisme** FR/EN automatique
+- **Thème auto** Light/Dark (prefers-color-scheme)
 
 ### Backend
-- **Python 3.11** + FastAPI
-- **Turso** (SQLite distribué)
-- **Redis** (cache temps réel)
-- **Meilisearch** (recherche sémantique)
+- **Python 3.11** + Flask 3.0
+- **Turso** (SQLite distribué, production)
+- **SQLite** (développement local)
+- **libsql-experimental** (client Turso)
+- **Flask-CORS** (API CORS)
+
+### Base de Données
+- **5 tables** : users, webapps, reviews, reports, collections
+- **Auth** : Hash SHA256 + tokens sécurisés
+- **Rôles** : user, admin
+- **Migration** : Support Supabase pour collaborateurs
 
 ### Déploiement
-- **Frontend** : Cloudflare Pages
-- **Backend** : Fly.io / Railway
-- **Database** : Turso (global edge)
-- **CDN** : Cloudflare
-
-### Modération
-- **Détection spam** : Heuristiques + ML léger
-- **Doublons** : Hash URL + fuzzy matching
-- **Contenu** : Keyword filtering + OpenAI Moderation API
+- **Frontend** : Static serve via Flask
+- **Backend** : Render Free Tier (compatible)
+- **Database** : Turso (global edge, gratuit)
+- **CDN** : Cloudflare (assets)
 
 ---
 
@@ -234,32 +248,41 @@ nexus-web-hub/
 **Nexus Web Hub** accepte les contributions sur le **code de la plateforme uniquement**.
 
 **Vous pouvez contribuer sur** :
-- ✅ Amélioration UI/UX
-- ✅ Optimisation performance
+- ✅ Amélioration UI/UX (HTML/CSS/JS)
+- ✅ Optimisation performance (backend Flask)
 - ✅ Corrections bugs
-- ✅ Tests automatisés
+- ✅ Tests
 - ✅ Documentation
 
 **Vous NE pouvez PAS** :
-- ❌ Soumettre des webapps via PR (utilisez le formulaire sur le site)
+- ❌ Soumettre des webapps via PR (utilisez le formulaire)
 - ❌ Modifier le catalogue directement
 - ❌ Changer l'algorithme de ranking sans validation
 
 [Lire le guide complet de contribution →](./CONTRIBUTING.md)
 
-### Workflow Contribution
+### Système Admin
 
-1. Fork le repo
-2. Créer une branche : `git checkout -b feature/ma-feature`
-3. Commit : `git commit -m "feat: description"`
-4. Push : `git push origin feature/ma-feature`
-5. Ouvrir une Pull Request
+**Création admin sécurisée** :
+```bash
+curl -X POST https://nexus-web-hub.onrender.com/api/admin/create \
+  -H "Content-Type: application/json" \
+  -d '{
+    "admin_secret": "VOTRE_SECRET",
+    "name": "Admin Name",
+    "email": "admin@example.com",
+    "password": "SecurePassword123"
+  }'
+```
 
-**Standards** :
-- Code TypeScript strict (pas de `any`)
-- Tests unitaires pour nouvelles features
-- Documentation inline en français
-- Respect des conventions Prettier/ESLint
+**Badge admin** : `./assets/badges/system/badge-admin.svg` (or avec couronne)
+
+**Permissions admin** :
+- Modérer les signalements (`/api/admin/reports`)
+- Approuver/rejeter webapps (`/api/admin/webapps/:id/approve`)
+- Créer d'autres admins (avec ADMIN_SECRET)
+
+[Documentation complète admin →](./DEPLOYMENT.md#admin-system)
 
 ---
 
@@ -301,36 +324,44 @@ CEO & Founder - Nexus Studio
 
 ## 🗺️ Roadmap
 
-### ✅ **Phase 1 : MVP (Mois 1-3)** - EN COURS
+### ✅ **Phase 1 : MVP (Actuel)**
 
 - [x] Architecture backend/frontend
-- [x] Catalogue + recherche
-- [x] Soumission webapps
-- [x] Système auth
-- [ ] Ratings/Avis basiques
-- [ ] Modération automatique V1
+- [x] Système auth complet (signup/login)
+- [x] Catalogue + recherche + filtres
+- [x] Soumission webapps avec modération
+- [x] Système admin sécurisé
+- [x] Bilinguisme FR/EN
+- [x] Thème auto Light/Dark
+- [x] Mobile-first responsive
+- [x] Base de données Turso
+- [x] Reset database automatique
+- [x] Migration Supabase préparée
 
-### 📅 **Phase 2 : Communauté (Mois 4-6)**
+### 📅 **Phase 2 : Communauté (Q1 2025)**
 
-- [ ] Système badges complet
-- [ ] Profils utilisateurs
-- [ ] Collections curées
+- [ ] Système badges complet (testeurs)
+- [ ] Ratings/Avis avec dimensions multiples
+- [ ] Profils utilisateurs enrichis
+- [ ] Collections curées (1 gratuite, 3 Pro)
 - [ ] Signalements communautaires
 - [ ] Dashboard créateurs
 
-### 📅 **Phase 3 : Marketplace (Mois 7-9)**
+### 📅 **Phase 3 : Marketplace (Q2 2025)**
 
-- [ ] Marketplace testeurs (engagement payant)
-- [ ] API publique
-- [ ] Analytics avancées
-- [ ] Abonnements Pro/Enterprise
+- [ ] Marketplace testeurs légendaires
+- [ ] API publique REST
+- [ ] Analytics avancées (Pro)
+- [ ] Abonnements (Nexus Pro 5€/mois)
+- [ ] Système de paiement (Stripe)
 
-### 📅 **Phase 4 : Écosystème (Mois 10-12)**
+### 📅 **Phase 4 : Écosystème (Q3 2025)**
 
 - [ ] Nexus Deploy (hébergement)
 - [ ] Nexus Analytics (privacy-first)
 - [ ] PWA mobile
-- [ ] Internationalisation
+- [ ] Internationalisation (plus de langues)
+- [ ] Système de badges NFT (optionnel)
 
 ---
 
