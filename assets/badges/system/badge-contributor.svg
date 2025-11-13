@@ -1,1 +1,112 @@
-.
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="80" 
+     height="80" 
+     viewBox="0 0 80 80"
+     role="img"
+     aria-labelledby="contributor-title contributor-desc">
+  
+  <title id="contributor-title">Badge Contributor</title>
+  <desc id="contributor-desc">Badge étoile argentée avec branches Git, indiquant un contributeur open source</desc>
+  
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+    }
+  </style>
+  
+  <defs>
+    <!-- Gradient argenté -->
+    <linearGradient id="silverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e5e7eb;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#c0c0c0;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#9ca3af;stop-opacity:1"/>
+    </linearGradient>
+    
+    <!-- Glow argenté -->
+    <filter id="silverGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Cercle background -->
+  <circle cx="40" cy="40" r="32"
+          fill="#0a0e27"
+          stroke="url(#silverGrad)"
+          stroke-width="2"/>
+  
+  <!-- Étoile principale (rotation lente) -->
+  <g transform="translate(40, 40)">
+    <animateTransform attributeName="transform"
+                      type="rotate"
+                      from="0 40 40"
+                      to="360 40 40"
+                      dur="20s"
+                      repeatCount="indefinite"/>
+    
+    <polygon points="0,-16 4,-5 16,-5 6,3 10,14 0,7 -10,14 -6,3 -16,-5 -4,-5"
+             fill="url(#silverGrad)"
+             filter="url(#silverGlow)">
+      <animate attributeName="opacity" 
+               values="1;0.9;1" 
+               dur="2s" 
+               repeatCount="indefinite"/>
+    </polygon>
+  </g>
+  
+  <!-- Branches Git stylisées -->
+  <g stroke="#c0c0c0" stroke-width="2" fill="none" opacity="0.7">
+    <!-- Branche principale -->
+    <line x1="40" y1="55" x2="40" y2="25"/>
+    
+    <!-- Branches latérales -->
+    <path d="M40,35 Q30,30 25,35" stroke-linecap="round"/>
+    <path d="M40,45 Q50,40 55,45" stroke-linecap="round"/>
+    
+    <!-- Commits (cercles) -->
+    <circle cx="40" cy="25" r="3" fill="#c0c0c0">
+      <animate attributeName="r" 
+               values="3;4;3" 
+               dur="2s" 
+               repeatCount="indefinite"/>
+    </circle>
+    <circle cx="40" cy="40" r="3" fill="#c0c0c0">
+      <animate attributeName="r" 
+               values="3;4;3" 
+               begin="0.3s"
+               dur="2s" 
+               repeatCount="indefinite"/>
+    </circle>
+    <circle cx="40" cy="55" r="3" fill="#c0c0c0">
+      <animate attributeName="r" 
+               values="3;4;3" 
+               begin="0.6s"
+               dur="2s" 
+               repeatCount="indefinite"/>
+    </circle>
+    
+    <circle cx="25" cy="35" r="2.5" fill="#c0c0c0"/>
+    <circle cx="55" cy="45" r="2.5" fill="#c0c0c0"/>
+  </g>
+  
+  <!-- Pulse ring -->
+  <circle cx="40" cy="40" r="32"
+          fill="none"
+          stroke="#c0c0c0"
+          stroke-width="2"
+          opacity="0">
+    <animate attributeName="r" 
+             values="32;42;52" 
+             dur="3s" 
+             repeatCount="indefinite"/>
+    <animate attributeName="opacity" 
+             values="0.5;0.2;0" 
+             dur="3s" 
+             repeatCount="indefinite"/>
+  </circle>
+  
+</svg>
