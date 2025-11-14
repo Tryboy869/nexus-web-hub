@@ -392,8 +392,8 @@
         }
 
         .badge-icon {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
         }
 
         .card-developer {
@@ -1030,21 +1030,19 @@
 
         function renderWebAppCard(app) {
             const stars = '⭐'.repeat(Math.round(app.rating));
-            const adminBadge = app.creator_role === 'admin' ? '<img src="./assets/badges/system/badge-admin.svg" width="20" height="20" title="Créé par admin">' : '';
-            const verifiedBadge = app.is_verified ? '<img src="./assets/badges/system/badge-verified-creator.svg" width="20" height="20" title="Créateur vérifié">' : '';
-            
+            const badgesHTML = `
+                ${app.trending ? '<span title="Trending">🔥</span>' : ''}
+                ${app.new ? '<span title="New">✨</span>' : ''}
+                ${app.developer_role === 'admin' ? '<img src="./assets/badges/system/badge-admin.svg" class="badge-icon" title="Admin">' : ''}
+                ${app.developer_verified ? '<img src="./assets/badges/system/badge-verified-creator.svg" class="badge-icon" title="Créateur Vérifié">' : ''}
+            `;
             return `
                 <div class="webapp-card" data-id="${app.id}">
                     <img class="card-image" src="${app.image}" alt="${app.name}">
                     <div class="card-content">
                         <div class="card-header">
                             <h3 class="card-title">${app.name}</h3>
-                            <div class="card-badges">
-                                ${adminBadge}
-                                ${verifiedBadge}
-                                ${app.trending ? '<span title="Trending">🔥</span>' : ''}
-                                ${app.new ? '<span title="New">✨</span>' : ''}
-                            </div>
+                            <div class="card-badges">${badgesHTML}</div>
                         </div>
                         <p class="card-developer">${app.developer}</p>
                         <div class="card-rating">
@@ -1148,16 +1146,17 @@
         }
 
         function initAuth() {
-            if (currentUser) {
+            if (currentUser.role === 'admin') {
                 document.getElementById('login-btn').classList.add('hidden');
                 document.getElementById('user-menu').style.display = 'block';
                 const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
                 document.getElementById('user-avatar').textContent = initials;
-                
-                if (currentUser.role === 'admin') {
-                    document.getElementById('user-avatar').style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
-                    document.getElementById('user-avatar').title = 'Administrateur';
-                }
+                document.getElementById('user-avatar').style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
+            } else if (currentUser) {
+                document.getElementById('login-btn').classList.add('hidden');
+                document.getElementById('user-menu').style.display = 'block';
+                const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.getElementById('user-avatar').textContent = initials;
             } else {
                 document.getElementById('login-btn').classList.remove('hidden');
                 document.getElementById('user-menu').style.display = 'none';
@@ -1210,66 +1209,27 @@
             document.getElementById('login-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const email = e.target.querySelector('input[type="email"]').value;
-                const password = e.target.querySelector('input[type="password"]').value;
-                
-                fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({email, password})
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        currentUser = data.data;
-                        localStorage.setItem('user', JSON.stringify(currentUser));
-                        localStorage.setItem('token', currentUser.token);
-                        document.getElementById('auth-modal').classList.remove('active');
-                        initAuth();
-                        filterWebApps();
-                    } else {
-                        alert(data.error || 'Erreur de connexion');
-                    }
-                })
-                .catch(err => {
-                    alert('Erreur réseau');
-                });
+                currentUser = { name: 'Anzize Daouda', email };
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                document.getElementById('auth-modal').classList.remove('active');
+                initAuth();
             });
 
             document.getElementById('signup-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const name = e.target.querySelectorAll('input')[0].value;
                 const email = e.target.querySelectorAll('input')[1].value;
-                const password = e.target.querySelectorAll('input')[2].value;
-                
-                fetch('/api/auth/signup', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({name, email, password})
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        currentUser = data.data;
-                        localStorage.setItem('user', JSON.stringify(currentUser));
-                        localStorage.setItem('token', currentUser.token);
-                        document.getElementById('auth-modal').classList.remove('active');
-                        initAuth();
-                    } else {
-                        alert(data.error || 'Erreur inscription');
-                    }
-                })
-                .catch(err => {
-                    alert('Erreur réseau');
-                });
+                currentUser = { name, email };
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                document.getElementById('auth-modal').classList.remove('active');
+                initAuth();
             });
 
             document.getElementById('logout-btn').addEventListener('click', () => {
                 currentUser = null;
                 localStorage.removeItem('user');
-                localStorage.removeItem('token');
                 initAuth();
                 document.getElementById('user-dropdown').classList.remove('active');
-                location.reload();
             });
 
             document.getElementById('user-avatar').addEventListener('click', () => {
@@ -1294,41 +1254,9 @@
 
             document.getElementById('submit-form').addEventListener('submit', (e) => {
                 e.preventDefault();
-                const token = localStorage.getItem('token');
-                
-                if (!token) {
-                    alert('Vous devez être connecté');
-                    return;
-                }
-                
-                const formData = {
-                    name: e.target.querySelectorAll('input')[0].value,
-                    url: e.target.querySelectorAll('input')[1].value,
-                    description_short: e.target.querySelectorAll('input')[2].value,
-                    category: e.target.querySelector('select').value
-                };
-                
-                fetch('/api/webapps', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
-                    body: JSON.stringify(formData)
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('WebApp soumise avec succès ! En attente de modération.');
-                        document.getElementById('submit-modal').classList.remove('active');
-                        e.target.reset();
-                    } else {
-                        alert(data.error || 'Erreur soumission');
-                    }
-                })
-                .catch(err => {
-                    alert('Erreur réseau');
-                });
+                alert('Webapp soumise avec succès ! (fonctionnalité backend à venir)');
+                document.getElementById('submit-modal').classList.remove('active');
+                e.target.reset();
             });
 
             document.querySelectorAll('.modal-close').forEach(btn => {
