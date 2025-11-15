@@ -56,11 +56,12 @@ Nexus Web Hub utilise un système de badges animés SVG pour reconnaître les co
 ### Icônes Catégories
 
 <p align="center">
-  <img src="assets/icons/icon-productivity.svg" width="50" title="Productivité">
-  <img src="assets/icons/icon-design.svg" width="50" title="Design">
+  <img src="assets/icons/icon-tools.svg" width="50" title="Productivité">
+  <img src="assets/icons/icon-ui-kits.svg" width="50" title="Design">
   <img src="assets/icons/icon-games.svg" width="50" title="Jeu">
   <img src="assets/icons/icon-apis.svg" width="50" title="API">
-  <img src="assets/icons/icon-nocode.svg" width="50" title="No-Code">
+  <img src="assets/icons/icon-websites.svg" width="50" title="No-Code">
+  <img src="assets/icons/icon-other.svg" width="50" title="Autre">
 </p>
 
 ---
