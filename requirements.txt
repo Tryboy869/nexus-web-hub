@@ -1,5 +1,30 @@
-Flask==3.0.0
-Flask-CORS==4.0.0
-Flask-Limiter==3.5.0
-libsql-experimental
-python-dotenv==1.0.0
+{
+  "name": "nexus-web-hub",
+  "version": "1.0.0",
+  "description": "Le store communautaire pour webapps - Nexus Studio",
+  "type": "module",
+  "main": "api.js",
+  "scripts": {
+    "start": "node api.js",
+    "dev": "node --watch api.js"
+  },
+  "keywords": [
+    "nexus-axion",
+    "webapps",
+    "store",
+    "community"
+  ],
+  "author": "Daouda Abdoul Anzize <nexusstudio100@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "@libsql/client": "^0.4.0",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5",
+    "express-rate-limit": "^7.1.5"
+  }
+}
