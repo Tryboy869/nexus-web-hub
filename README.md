@@ -1,11 +1,67 @@
 # 🌌 Nexus Web Hub
 
-> Le store communautaire pour webapps, outils et jeux évalués par la communauté
+<p align="center">
+  <img src="assets/storyline/nexus-web-hub-intro.svg" alt="Nexus Web Hub - Animation Intro" width="600">
+</p>
 
-[![Nexus Axion](https://img.shields.io/badge/Nexus%20Axion-3.5-00d9ff?style=for-the-badge)](https://github.com/Tryboy869/nexus-web-hub)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+<p align="center">
+  <strong>Le store communautaire pour webapps, outils et jeux évalués par la communauté</strong>
+</p>
 
-Créé par **Daouda Abdoul Anzize** - [Nexus Studio](mailto:nexusstudio100@gmail.com)
+<p align="center">
+  <a href="https://github.com/Tryboy869/nexus-web-hub">
+    <img src="https://img.shields.io/badge/Nexus%20Axion-3.5-00d9ff?style=for-the-badge" alt="Nexus Axion 3.5">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License">
+  </a>
+</p>
+
+<p align="center">
+  <img src="assets/logos/logo-nwh.svg" alt="Nexus Web Hub Logo" width="80">
+</p>
+
+---
+
+<p align="center">
+  <img src="assets/contributors/contributor-anzize.svg" alt="Créé par Daouda Abdoul Anzize" width="400">
+</p>
+
+---
+
+## 🏆 Système de Badges
+
+Nexus Web Hub utilise un système de badges animés SVG pour reconnaître les contributions :
+
+### Badges Système
+
+<p align="center">
+  <img src="assets/badges/system/badge-verified-creator.svg" width="80" title="Créateur Vérifié">
+  <img src="assets/badges/system/badge-beginner-tester.svg" width="80" title="Testeur Débutant">
+  <img src="assets/badges/system/badge-pro-tester.svg" width="80" title="Testeur Pro">
+  <img src="assets/badges/system/badge-legendary-tester.svg" width="80" title="Testeur Légendaire">
+  <img src="assets/badges/system/badge-admin.svg" width="80" title="Admin">
+  <img src="assets/badges/system/badge-supporter.svg" width="80" title="Supporter">
+  <img src="assets/badges/system/badge-contributor.svg" width="80" title="Contributeur">
+</p>
+
+### Badges Webapp
+
+<p align="center">
+  <img src="assets/badges/system/badge-trending.svg" width="60" title="Trending">
+  <img src="assets/badges/system/badge-featured.svg" width="60" title="Featured">
+  <img src="assets/badges/system/badge-new.svg" width="60" title="Nouveau">
+</p>
+
+### Icônes Catégories
+
+<p align="center">
+  <img src="assets/icons/icon-productivity.svg" width="50" title="Productivité">
+  <img src="assets/icons/icon-design.svg" width="50" title="Design">
+  <img src="assets/icons/icon-game.svg" width="50" title="Jeu">
+  <img src="assets/icons/icon-api.svg" width="50" title="API">
+  <img src="assets/icons/icon-nocode.svg" width="50" title="No-Code">
+</p>
 
 ---
 
