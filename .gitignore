@@ -1,176 +1,33 @@
-# 🌐 Nexus Web Hub - .gitignore
-# ===============================
+# Dependencies
+node_modules/
 
-# ========== ENVIRONNEMENT ==========
+# Environment variables
 .env
 .env.local
-.env.production
-.env.*.local
-*.env
 
-# ========== NODE.JS ==========
-node_modules/
+# Database local
+local.db
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-# ========== PYTHON ==========
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-pip-log.txt
-pip-delete-this-directory.txt
+# OS files
+.DS_Store
+Thumbs.db
 
-# ========== DATABASES ==========
-*.db
-*.sqlite
-*.sqlite3
-local.db
-*.db-journal
-
-# ========== CACHE ==========
-.cache/
-.parcel-cache/
-.turbo/
-*.log
-logs/
-*.pid
-*.seed
-*.pid.lock
-
-# ========== BUILD ==========
-dist/
-dist-ssr/
-*.local
-.vite/
-.next/
-out/
-.nuxt/
-.output/
-.vercel/
-.netlify/
-
-# ========== IDE / EDITORS ==========
-# VSCode
+# Editor
 .vscode/
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-*.code-workspace
-
-# IntelliJ / PyCharm
 .idea/
-*.iml
-*.iws
-*.ipr
-out/
-
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
-
-# Vim
 *.swp
 *.swo
 *~
 
-# Emacs
-*~
-\#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
-*.elc
-
-# ========== OS ==========
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-.Spotlight-V100
-.Trashes
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-
-# Linux
-*~
-.directory
-.Trash-*
-
-# ========== UPLOADS / STORAGE ==========
-uploads/
-temp/
-tmp/
-screenshots/
-assets/uploads/
-
-# ========== TESTING ==========
-coverage/
-.nyc_output/
-*.coverage
-.hypothesis/
-.pytest_cache/
-nosetests.xml
-coverage.xml
-*.cover
-.tox/
-
-# ========== SENSITIVE DATA ==========
-# Credentials
-credentials.json
-service-account.json
-*.pem
-*.key
-*.cert
-
-# Backups
-*.bak
-*.backup
-*.old
-*.orig
-
-# ========== DOCKER ==========
-docker-compose.override.yml
-.dockerignore
-
-# ========== CLOUDFLARE ==========
-wrangler.toml.local
-
-# ========== SENTRY ==========
-.sentryclirc
-
-# ========== MISC ==========
-*.log
-*.lock
-!package-lock.json
-!yarn.lock
-!pnpm-lock.yaml
+# Build (si ajouté plus tard)
+dist/
+build/
