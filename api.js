@@ -6,6 +6,7 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import jwt from 'jsonwebtoken';
 import { BackendService } from './server.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -51,8 +52,7 @@ function extractUserId(req, res, next) {
     const token = authHeader.substring(7);
     
     try {
-      const jwt = await import('jsonwebtoken');
-      const decoded = jwt.default.verify(token, process.env.JWT_SECRET || 'nexus-web-hub-secret-change-in-production');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'nexus-web-hub-secret-change-in-production');
       req.headers['x-user-id'] = decoded.userId;
       console.log(`🔐 [API GATEWAY] Authenticated user: ${decoded.userId}`);
     } catch (error) {
