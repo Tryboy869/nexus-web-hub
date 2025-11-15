@@ -157,8 +157,6 @@ export const CATEGORIES = [
   { id: 'game', name: 'Jeu', icon: '🎮' },
   { id: 'api', name: 'API/Outils Dev', icon: '🔧' },
   { id: 'nocode', name: 'No-Code', icon: '🚀' },
-  { id: 'education', name: 'Éducation', icon: '📚' },
-  { id: 'social', name: 'Social', icon: '👥' },
   { id: 'other', name: 'Autre', icon: '📦' }
 ];
 
