@@ -1,13 +1,10 @@
-// api.js - API GATEWAY (Point d'entrée unique)
-// NEXUS WEB HUB - Nexus Studio
+// api.js - API GATEWAY CONFIDENCE BOOK
+// Point d'entrée unique selon architecture NEXUS AXION 3.5
 
 import express from 'express';
-import cors from 'cors';
-import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import jwt from 'jsonwebtoken';
-import { BackendService } from './server.js';
+import { ConfidenceBookService } from './server.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,254 +13,196 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ========== MIDDLEWARE ==========
-
 app.use(express.json());
-app.use(cors());
-
-// Trust proxy (requis pour Render/Heroku/etc.)
-app.set('trust proxy', 1);
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Max 100 requêtes par IP
-  message: { success: false, message: 'Trop de requêtes, veuillez réessayer plus tard' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use('/api/', limiter);
-
-// Serve static files (frontend)
 app.use(express.static(__dirname));
 
-// ========== BACKEND INITIALIZATION ==========
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`📡 [API GATEWAY] ${req.method} ${req.path}`);
+  next();
+});
 
+// ========== INITIALISER BACKEND ==========
 let backend;
 
 async function initBackend() {
-  console.log('🔧 [API GATEWAY] Initializing backend...');
-  backend = new BackendService();
+  console.log('🔧 [API GATEWAY] Initializing Confidence Book backend...');
+  backend = new ConfidenceBookService();
   await backend.init();
   console.log('✅ [API GATEWAY] Backend ready');
 }
 
-// ========== MIDDLEWARE AUTH ==========
-
-function extractUserId(req, res, next) {
-  const authHeader = req.headers.authorization;
-  
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.substring(7);
-    
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'nexus-web-hub-secret-change-in-production');
-      req.headers['x-user-id'] = decoded.userId;
-      console.log(`🔐 [API GATEWAY] Authenticated user: ${decoded.userId}`);
-    } catch (error) {
-      console.warn('⚠️ [API GATEWAY] Invalid token');
-    }
-  }
-  
-  next();
-}
-
-app.use(extractUserId);
-
-// ========== ROUTE MAP ==========
-
-const routeMap = {
-  // Auth
-  'POST:/api/auth/signup': (req) => backend.signup(req.body),
-  'POST:/api/auth/login': (req) => backend.login(req.body),
-  'GET:/api/auth/me': (req) => backend.getMe(req.headers),
-  
-  // Webapps
-  'GET:/api/webapps': (req) => backend.getWebapps(req.query),
-  'GET:/api/webapps/:id': (req) => backend.getWebapp(req.params.id),
-  'POST:/api/webapps': (req) => backend.createWebapp(req.body, req.headers),
-  'PUT:/api/webapps/:id': (req) => backend.updateWebapp(req.params.id, req.body, req.headers),
-  'DELETE:/api/webapps/:id': (req) => backend.deleteWebapp(req.params.id, req.headers),
-  
-  // Reviews
-  'POST:/api/webapps/:id/reviews': (req) => backend.createReview(req.params.id, req.body, req.headers),
-  
-  // Reports
-  'POST:/api/reports': (req) => backend.createReport(req.body, req.headers),
-  
-  // Stats
-  'GET:/api/stats': () => backend.getStats(),
-  
-  // Health
-  'GET:/api/health': () => backend.healthCheck()
-};
-
-// ========== ROUTER CENTRAL ==========
-
-async function routeRequest(method, path, req) {
-  const routeKey = `${method}:${path}`;
-  
-  console.log(`📡 [API GATEWAY] ${routeKey}`);
-  console.log(`   └─ User: ${req.headers['x-user-id'] || 'anonymous'}`);
-  
-  const handler = routeMap[routeKey];
-  
-  if (!handler) {
-    console.error(`❌ [API GATEWAY] Route not found: ${routeKey}`);
-    throw new Error(`Route not mapped: ${routeKey}`);
-  }
-  
-  return await handler(req);
-}
-
-// ========== FRONTEND ==========
-
+// ========== EXPOSE FRONTEND ==========
 app.get('/', (req, res) => {
   console.log('🌐 [API GATEWAY] Serving frontend');
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// ========== AUTH ENDPOINTS ==========
+// ========== API ENDPOINTS ==========
 
-app.post('/api/auth/signup', async (req, res) => {
-  try {
-    const result = await routeRequest('POST', '/api/auth/signup', req);
-    res.json(result);
-  } catch (error) {
-    console.error('❌ [API GATEWAY] Error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-app.post('/api/auth/login', async (req, res) => {
-  try {
-    const result = await routeRequest('POST', '/api/auth/login', req);
-    res.json(result);
-  } catch (error) {
-    console.error('❌ [API GATEWAY] Error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-app.get('/api/auth/me', async (req, res) => {
-  try {
-    const result = await routeRequest('GET', '/api/auth/me', req);
-    res.json(result);
-  } catch (error) {
-    console.error('❌ [API GATEWAY] Error:', error);
-    res.status(401).json({ success: false, message: 'Unauthorized' });
-  }
-});
-
-// ========== WEBAPP ENDPOINTS ==========
-
-app.get('/api/webapps', async (req, res) => {
-  try {
-    const result = await routeRequest('GET', '/api/webapps', req);
-    console.log(`✅ [API GATEWAY] Returned ${result.data?.webapps?.length || 0} webapps`);
-    res.json(result);
-  } catch (error) {
-    console.error('❌ [API GATEWAY] Error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-app.get('/api/webapps/:id', async (req, res) => {
-  try {
-    const result = await routeRequest('GET', '/api/webapps/:id', req);
-    res.json(result);
-  } catch (error) {
-    console.error('❌ [API GATEWAY] Error:', error);
-    res.status(404).json({ success: false, message: 'Webapp not found' });
-  }
-});
-
-app.post('/api/webapps', async (req, res) => {
-  try {
-    console.log('📝 [API GATEWAY] Creating webapp:', req.body.name);
-    const result = await routeRequest('POST', '/api/webapps', req);
-    res.json(result);
-  } catch (error) {
-    console.error('❌ [API GATEWAY] Error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-app.put('/api/webapps/:id', async (req, res) => {
-  try {
-    console.log('📝 [API GATEWAY] Updating webapp:', req.params.id);
-    const result = await routeRequest('PUT', '/api/webapps/:id', req);
-    res.json(result);
-  } catch (error) {
-    console.error('❌ [API GATEWAY] Error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-app.delete('/api/webapps/:id', async (req, res) => {
-  try {
-    console.log('🗑️ [API GATEWAY] Deleting webapp:', req.params.id);
-    const result = await routeRequest('DELETE', '/api/webapps/:id', req);
-    res.json(result);
-  } catch (error) {
-    console.error('❌ [API GATEWAY] Error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// ========== REVIEW ENDPOINTS ==========
-
-app.post('/api/webapps/:id/reviews', async (req, res) => {
-  try {
-    console.log('⭐ [API GATEWAY] Creating review for webapp:', req.params.id);
-    const result = await routeRequest('POST', '/api/webapps/:id/reviews', req);
-    res.json(result);
-  } catch (error) {
-    console.error('❌ [API GATEWAY] Error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// ========== REPORT ENDPOINTS ==========
-
-app.post('/api/reports', async (req, res) => {
-  try {
-    console.log('🚩 [API GATEWAY] Creating report');
-    const result = await routeRequest('POST', '/api/reports', req);
-    res.json(result);
-  } catch (error) {
-    console.error('❌ [API GATEWAY] Error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// ========== STATS ENDPOINTS ==========
-
-app.get('/api/stats', async (req, res) => {
-  try {
-    const result = await routeRequest('GET', '/api/stats', req);
-    res.json(result);
-  } catch (error) {
-    console.error('❌ [API GATEWAY] Error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// ========== HEALTH CHECK ==========
-
+// Health check
 app.get('/api/health', async (req, res) => {
   try {
-    const health = await routeRequest('GET', '/api/health', req);
-    const statusCode = health.status === 'ok' ? 200 : 503;
-    res.status(statusCode).json(health);
+    const result = await backend.healthCheck();
+    res.json(result);
   } catch (error) {
-    console.error('❌ [API GATEWAY] Health check failed:', error);
-    res.status(503).json({ status: 'error', message: error.message });
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Authentification anonyme
+app.post('/api/auth/anonymous', async (req, res) => {
+  try {
+    console.log('📡 [API GATEWAY] POST /api/auth/anonymous');
+    const result = await backend.createAnonymousUser();
+    console.log(`✅ [API GATEWAY] Anonymous user created: ${result.userId}`);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Authentification par device
+app.post('/api/auth/device', async (req, res) => {
+  try {
+    console.log('📡 [API GATEWAY] POST /api/auth/device');
+    const { deviceId } = req.body;
+    const result = await backend.authenticateDevice(deviceId);
+    console.log(`✅ [API GATEWAY] Device authenticated: ${deviceId} → ${result.userId}`);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Récupérer notifications
+app.get('/api/notifications', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    console.log(`📡 [API GATEWAY] GET /api/notifications for user ${userId}`);
+    const result = await backend.getNotifications(userId);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Compter notifications non lues
+app.get('/api/notifications/unread', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    const result = await backend.getUnreadCount(userId);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Marquer notification comme lue
+app.put('/api/notifications/:id/read', async (req, res) => {
+  try {
+    const result = await backend.markNotificationAsRead(req.params.id);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Récupérer confidences
+app.get('/api/confidences', async (req, res) => {
+  try {
+    console.log('📡 [API GATEWAY] GET /api/confidences');
+    const result = await backend.getConfidences(req.query);
+    console.log(`✅ [API GATEWAY] Returned ${result.data?.length || 0} confidences`);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Créer confidence
+app.post('/api/confidences', async (req, res) => {
+  try {
+    console.log(`📝 [API GATEWAY] Creating confidence:`, {
+      emotion: req.body.emotion,
+      contentLength: req.body.content?.length
+    });
+    const result = await backend.createConfidence(req.body, req.headers);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Ajouter réaction
+app.post('/api/reactions', async (req, res) => {
+  try {
+    console.log(`💙 [API GATEWAY] Adding reaction:`, req.body);
+    const result = await backend.addReaction(req.body, req.headers);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Ajouter réponse
+app.post('/api/responses', async (req, res) => {
+  try {
+    console.log(`💬 [API GATEWAY] Adding response to confidence ${req.body.confidenceId}`);
+    const result = await backend.addResponse(req.body, req.headers);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Supprimer confidence
+app.delete('/api/confidences/:id', async (req, res) => {
+  try {
+    console.log(`🗑️ [API GATEWAY] Deleting confidence ${req.params.id}`);
+    const result = await backend.deleteConfidence(req.params.id, req.headers);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Modifier confidence
+app.put('/api/confidences/:id', async (req, res) => {
+  try {
+    console.log(`✏️ [API GATEWAY] Updating confidence ${req.params.id}`);
+    const result = await backend.updateConfidence(req.params.id, req.body, req.headers);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Ajouter réaction sur réponse
+app.post('/api/response-reactions', async (req, res) => {
+  try {
+    console.log(`💙 [API GATEWAY] Adding response reaction:`, req.body);
+    const result = await backend.addResponseReaction(req.body, req.headers);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
 // ========== ERROR HANDLERS ==========
-
 app.use((err, req, res, next) => {
   console.error('💥 [API GATEWAY] Unhandled error:', err);
   res.status(500).json({ success: false, message: 'Internal server error' });
@@ -275,22 +214,17 @@ app.use((req, res) => {
 });
 
 // ========== START SERVER ==========
-
 async function startServer() {
   await initBackend();
   
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════╗
-║   🌌 NEXUS WEB HUB - API GATEWAY                      ║
-║   🌐 Server:     http://0.0.0.0:${PORT.toString().padEnd(28)}║
+║   🌌 CONFIDENCE BOOK - API GATEWAY                    ║
+║   🌐 Server:     http://0.0.0.0:${PORT.toString().padEnd(27)}║
 ║   📂 Frontend:   index.html                           ║
 ║   ⚙️  Backend:    server.js                            ║
-║   🔀 Gateway:    api.js (this file)                   ║
-║   ✅ Routing:    ${Object.keys(routeMap).length} endpoints mapped                   ║
-║                                                       ║
-║   👤 Created by: Daouda Abdoul Anzize                 ║
-║   🏢 Nexus Studio                                     ║
+║   🔀 Gateway:     api.js (this file)                  ║
 ╚═══════════════════════════════════════════════════════╝
     `);
   });
