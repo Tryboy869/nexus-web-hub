@@ -1,1529 +1,920 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus Web Hub - Le store communautaire pour webapps</title>
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  
-  <style>
-    /* ========== RESET & VARIABLES ========== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --bg-deep-space: #0a0e27;
-      --bg-card: #1a1f3a;
-      --text-primary: #E0E6ED;
-      --text-secondary: #a0aec0;
-      --accent-cyan: #00d9ff;
-      --accent-purple: #8b5cf6;
-      --accent-green: #10b981;
-      --accent-gold: #fbbf24;
-      --accent-red: #ef4444;
-      --border-glow: rgba(0, 217, 255, 0.1);
-      
-      --font-body: 'Inter', sans-serif;
-      --font-heading: 'Space Grotesk', sans-serif;
-    }
-
-    @media (prefers-color-scheme: light) {
-      :root {
-        --bg-deep-space: #f5f7fa;
-        --bg-card: #ffffff;
-        --text-primary: #1a202c;
-        --text-secondary: #4a5568;
-        --border-glow: rgba(0, 0, 0, 0.1);
-      }
-    }
-
-    body {
-      font-family: var(--font-body);
-      background: var(--bg-deep-space);
-      color: var(--text-primary);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* ========== HEADER ========== */
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border-glow);
-      padding: 1rem 2rem;
-      backdrop-filter: blur(10px);
-    }
-
-    .header-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 2rem;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-family: var(--font-heading);
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--accent-cyan);
-      text-decoration: none;
-    }
-
-    .logo img {
-      width: 40px;
-      height: 40px;
-    }
-
-    .stats {
-      display: flex;
-      gap: 2rem;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-
-    .stat {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .stat-value {
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-    }
-
-    .btn-primary {
-      background: var(--accent-cyan);
-      color: #000;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 217, 255, 0.4);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--text-primary);
-      border: 1px solid var(--border-glow);
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--accent-cyan);
-      color: var(--accent-cyan);
-    }
-
-    .lang-toggle {
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      cursor: pointer;
-      font-size: 0.9rem;
-      padding: 0.5rem;
-    }
-
-    .lang-toggle:hover {
-      color: var(--accent-cyan);
-    }
-
-    /* ========== HERO ========== */
-    .hero {
-      text-align: center;
-      padding: 4rem 2rem;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .hero h1 {
-      font-family: var(--font-heading);
-      font-size: 3.5rem;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero p {
-      font-size: 1.25rem;
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-    }
-
-    .hero-cta {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    /* ========== SEARCH & FILTERS ========== */
-    .search-section {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .search-bar {
-      position: relative;
-      margin-bottom: 2rem;
-    }
-
-    .search-bar input {
-      width: 100%;
-      padding: 1rem 1rem 1rem 3rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border-glow);
-      border-radius: 12px;
-      color: var(--text-primary);
-      font-size: 1rem;
-      font-family: var(--font-body);
-    }
-
-    .search-bar input:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-secondary);
-    }
-
-    .filters {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-
-    .filter-group {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .filter-btn {
-      padding: 0.5rem 1rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border-glow);
-      border-radius: 8px;
-      color: var(--text-primary);
-      cursor: pointer;
-      transition: all 0.3s;
-      font-family: var(--font-body);
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .filter-btn img {
-      width: 20px;
-      height: 20px;
-    }
-
-    .filter-btn:hover,
-    .filter-btn.active {
-      background: var(--accent-cyan);
-      color: #000;
-      border-color: var(--accent-cyan);
-    }
-
-    /* ========== TABS ========== */
-    .tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-      border-bottom: 1px solid var(--border-glow);
-    }
-
-    .tab {
-      padding: 1rem 1.5rem;
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      cursor: pointer;
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-      font-weight: 500;
-      border-bottom: 2px solid transparent;
-      transition: all 0.3s;
-    }
-
-    .tab:hover {
-      color: var(--text-primary);
-    }
-
-    .tab.active {
-      color: var(--accent-cyan);
-      border-bottom-color: var(--accent-cyan);
-    }
-
-    /* ========== CATALOG ========== */
-    .catalog {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .webapp-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      margin-bottom: 3rem;
-    }
-
-    @media (min-width: 768px) {
-      .webapp-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .webapp-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    .webapp-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-glow);
-      border-radius: 12px;
-      overflow: hidden;
-      transition: all 0.3s;
-      cursor: pointer;
-    }
-
-    .webapp-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent-cyan);
-      box-shadow: 0 8px 24px rgba(0, 217, 255, 0.2);
-    }
-
-    .webapp-image {
-      width: 100%;
-      height: 200px;
-      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .webapp-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .webapp-image .default-logo {
-      width: 100px;
-      height: 100px;
-    }
-
-    .webapp-content {
-      padding: 1.5rem;
-    }
-
-    .webapp-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      margin-bottom: 0.5rem;
-    }
-
-    .webapp-title {
-      font-weight: 600;
-      font-size: 1.1rem;
-      color: var(--text-primary);
-    }
-
-    .webapp-badges {
-      display: flex;
-      gap: 0.25rem;
-    }
-
-    .badge-icon {
-      width: 24px;
-      height: 24px;
-    }
-
-    .webapp-developer {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      margin-bottom: 1rem;
-    }
-
-    .webapp-rating {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .stars {
-      color: var(--accent-gold);
-    }
-
-    .webapp-description {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .webapp-tags {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-
-    .tag {
-      padding: 0.25rem 0.75rem;
-      background: rgba(0, 217, 255, 0.1);
-      border-radius: 4px;
-      font-size: 0.85rem;
-      color: var(--accent-cyan);
-    }
-
-    .webapp-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .btn-small {
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-      flex: 1;
-    }
-
-    /* ========== MODAL ========== */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .modal.active {
-      display: flex;
-    }
-
-    .modal-content {
-      background: var(--bg-card);
-      border-radius: 16px;
-      max-width: 600px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 2rem;
-      position: relative;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: transparent;
-      border: none;
-      font-size: 1.5rem;
-      color: var(--text-secondary);
-      cursor: pointer;
-    }
-
-    .modal-close:hover {
-      color: var(--text-primary);
-    }
-
-    .modal-title {
-      font-family: var(--font-heading);
-      font-size: 1.8rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.75rem;
-      background: var(--bg-deep-space);
-      border: 1px solid var(--border-glow);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-    }
-
-    .form-group textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-    }
-
-    .form-note {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      margin-top: 0.25rem;
-    }
-
-    .error-message {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid var(--accent-red);
-      color: var(--accent-red);
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-
-    .success-message {
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid var(--accent-green);
-      color: var(--accent-green);
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-
-    /* ========== PROFILE BADGES ========== */
-    .user-badges {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin: 1rem 0;
-    }
-
-    .user-badge {
-      width: 32px;
-      height: 32px;
-    }
-
-    /* ========== LOADING ========== */
-    .loading {
-      text-align: center;
-      padding: 3rem;
-      color: var(--text-secondary);
-    }
-
-    .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--border-glow);
-      border-top-color: var(--accent-cyan);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* ========== EMPTY STATE ========== */
-    .empty-state {
-      text-align: center;
-      padding: 4rem 2rem;
-    }
-
-    .empty-state-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
-    }
-
-    .empty-state h3 {
-      font-family: var(--font-heading);
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .empty-state p {
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-    }
-
-    /* ========== FOOTER ========== */
-    footer {
-      border-top: 1px solid var(--border-glow);
-      padding: 3rem 2rem;
-      margin-top: 4rem;
-      text-align: center;
-      color: var(--text-secondary);
-    }
-
-    .footer-content {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .contributor-card {
-      max-width: 400px;
-      margin: 2rem auto;
-    }
-
-    .contributor-card img {
-      width: 100%;
-      height: auto;
-    }
-
-    footer a {
-      color: var(--accent-cyan);
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    /* ========== RESPONSIVE ========== */
-    @media (max-width: 768px) {
-      .header-content {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .stats {
-        display: none;
-      }
-
-      .hero h1 {
-        font-size: 2rem;
-      }
-
-      .hero p {
-        font-size: 1rem;
-      }
-
-      .filters {
-        flex-direction: column;
-      }
-
-      .modal-content {
-        padding: 1.5rem;
-      }
-    }
-
-    /* ========== UTILITIES ========== */
-    .hidden {
-      display: none !important;
-    }
-
-    .text-center {
-      text-align: center;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confidence Book - Votre Refuge Émotionnel</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa; 
+        }
+        
+        .theme-calm {
+            --theme-bg: #f8f9fa;
+            --theme-surface: #ffffff;
+            --theme-primary: #3b82f6;
+            --theme-primary-hover: #2563eb;
+            --theme-text-primary: #1f2937;
+            --theme-text-secondary: #6b7280;
+            --theme-border: #e5e7eb;
+        }
+
+        .dark .theme-calm {
+            --theme-bg: #111827;
+            --theme-surface: #1f2937;
+            --theme-primary: #60a5fa;
+            --theme-primary-hover: #93c5fd;
+            --theme-text-primary: #f9fafb;
+            --theme-text-secondary: #9ca3af;
+            --theme-border: #374151;
+        }
+
+        body {
+            background-color: var(--theme-bg);
+            color: var(--theme-text-primary);
+        }
+        .bg-surface { background-color: var(--theme-surface); }
+        .bg-primary { background-color: var(--theme-primary); }
+        .hover\:bg-primary-hover:hover { background-color: var(--theme-primary-hover); }
+        .text-primary { color: var(--theme-primary); }
+        .text-secondary { color: var(--theme-text-secondary); }
+        .border-theme { border-color: var(--theme-border); }
+        .shadow-calm { box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05); }
+        .dark .shadow-calm { box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1); }
+        
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
 </head>
-<body>
 
-  <!-- ========== HEADER ========== -->
-  <header>
-    <div class="header-content">
-      <a href="/" class="logo">
-        <img src="assets/logos/logo-nwh.svg" alt="Nexus Web Hub">
-        Nexus Web Hub
-      </a>
+<body class="theme-calm">
 
-      <div class="stats" id="globalStats">
-        <div class="stat">
-          <span>📱</span>
-          <span><span class="stat-value" id="statWebapps">0</span> webapps</span>
-        </div>
-        <div class="stat">
-          <span>👥</span>
-          <span><span class="stat-value" id="statCreators">0</span> créateurs</span>
-        </div>
-        <div class="stat">
-          <span>⭐</span>
-          <span><span class="stat-value" id="statReviews">0</span> avis</span>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        <button class="btn btn-primary" onclick="openSubmitModal()">✨ Soumettre</button>
-        <button class="btn btn-secondary" id="authBtn" onclick="openAuthModal()">Connexion</button>
-        <button class="lang-toggle" onclick="toggleLanguage()">🇫🇷 FR</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- ========== HERO ========== -->
-  <section class="hero">
-    <h1>Découvrez le meilleur du Web</h1>
-    <p>Le store communautaire pour webapps, outils et jeux évalués par la communauté</p>
-    <div class="hero-cta">
-      <button class="btn btn-primary" onclick="scrollToCatalog()">Explorer le Catalogue</button>
-      <button class="btn btn-secondary" onclick="openSubmitModal()">Publier votre webapp</button>
-    </div>
-  </section>
-
-  <!-- ========== SEARCH & FILTERS ========== -->
-  <section class="search-section">
-    <div class="search-bar">
-      <span class="search-icon">🔍</span>
-      <input 
-        type="text" 
-        id="searchInput" 
-        placeholder="Rechercher webapp, tag, créateur..." 
-        oninput="handleSearch()"
-      >
-    </div>
-
-    <div class="filters">
-      <div class="filter-group">
-        <button class="filter-btn active" onclick="filterCategory('all')">Toutes</button>
-        <button class="filter-btn" onclick="filterCategory('productivity')">
-          <img src="assets/icons/icon-tools.svg" alt=""> Productivité
-        </button>
-        <button class="filter-btn" onclick="filterCategory('design')">
-          <img src="assets/icons/icon-ui-kits.svg" alt=""> Design
-        </button>
-        <button class="filter-btn" onclick="filterCategory('game')">
-          <img src="assets/icons/icon-games.svg" alt=""> Jeu
-        </button>
-        <button class="filter-btn" onclick="filterCategory('api')">
-          <img src="assets/icons/icon-apis.svg" alt=""> API
-        </button>
-        <button class="filter-btn" onclick="filterCategory('nocode')">
-          <img src="assets/icons/icon-websites.svg" alt=""> No-Code
-        </button>
-      </div>
-      <button class="btn btn-secondary" onclick="surpriseMe()">✨ Surprenez-moi</button>
-    </div>
-
-    <div class="tabs">
-      <button class="tab active" onclick="filterSort('all')">Toutes</button>
-      <button class="tab" onclick="filterSort('trending')">🔥 Trending</button>
-      <button class="tab" onclick="filterSort('new')">✨ Nouveautés</button>
-      <button class="tab" onclick="filterSort('top')">⭐ Top Rated</button>
-    </div>
-  </section>
-
-  <!-- ========== CATALOG ========== -->
-  <section class="catalog">
-    <div id="webappGrid" class="webapp-grid"></div>
-    <div id="loadingState" class="loading hidden">
-      <div class="loading-spinner"></div>
-      <p>Chargement des webapps...</p>
-    </div>
-    <div id="emptyState" class="empty-state hidden">
-      <div class="empty-state-icon">📭</div>
-      <h3>Aucune webapp trouvée</h3>
-      <p>Essayez de modifier vos filtres ou soyez le premier à soumettre une webapp !</p>
-      <button class="btn btn-primary" onclick="openSubmitModal()">Soumettre une webapp</button>
-    </div>
-  </section>
-
-  <!-- ========== MODAL AUTH ========== -->
-  <div id="authModal" class="modal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeAuthModal()">×</button>
-      <h2 class="modal-title">Connexion / Inscription</h2>
-
-      <div id="authError" class="error-message hidden"></div>
-      <div id="authSuccess" class="success-message hidden"></div>
-
-      <div class="tabs">
-        <button class="tab active" onclick="switchAuthTab('login')">Connexion</button>
-        <button class="tab" onclick="switchAuthTab('signup')">Inscription</button>
-      </div>
-
-      <!-- Login Form -->
-      <form id="loginForm" onsubmit="handleLogin(event)">
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="loginEmail" required>
-        </div>
-        <div class="form-group">
-          <label>Mot de passe</label>
-          <input type="password" id="loginPassword" required>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Se connecter</button>
-      </form>
-
-      <!-- Signup Form -->
-      <form id="signupForm" class="hidden" onsubmit="handleSignup(event)">
-        <div class="form-group">
-          <label>Nom complet</label>
-          <input type="text" id="signupName" required>
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="signupEmail" required>
-        </div>
-        <div class="form-group">
-          <label>Mot de passe</label>
-          <input type="password" id="signupPassword" required>
-          <div class="form-note">Au moins 6 caractères</div>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Créer mon compte</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ========== MODAL SUBMIT ========== -->
-  <div id="submitModal" class="modal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeSubmitModal()">×</button>
-      <h2 class="modal-title">Soumettre une webapp</h2>
-
-      <div id="submitError" class="error-message hidden"></div>
-      <div id="submitSuccess" class="success-message hidden"></div>
-
-      <form id="submitForm" onsubmit="handleSubmit(event)">
-        <div class="form-group">
-          <label>Nom du projet *</label>
-          <input type="text" id="submitName" required>
-        </div>
-
-        <div class="form-group">
-          <label>URL principale (HTTPS) *</label>
-          <input type="url" id="submitUrl" placeholder="https://..." required>
-        </div>
-
-        <div class="form-group">
-          <label>Description courte (200 char max) *</label>
-          <textarea id="submitDescShort" maxlength="200" required></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Description longue</label>
-          <textarea id="submitDescLong" maxlength="1000"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Catégorie *</label>
-          <select id="submitCategory" required>
-            <option value="">-- Choisir --</option>
-            <option value="productivity">⚡ Productivité</option>
-            <option value="design">🎨 Design</option>
-            <option value="game">🎮 Jeu</option>
-            <option value="api">🔧 API/Outils Dev</option>
-            <option value="nocode">🚀 No-Code</option>
-            <option value="other">📦 Autre</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Tags (séparés par des virgules)</label>
-          <input type="text" id="submitTags" placeholder="react, productivité, open-source">
-        </div>
-
-        <div class="form-group">
-          <label>URL GitHub (optionnel)</label>
-          <input type="url" id="submitGithub" placeholder="https://github.com/...">
-        </div>
-
-        <div class="form-group">
-          <label>URL Vidéo démo (optionnel)</label>
-          <input type="url" id="submitVideo" placeholder="https://youtube.com/...">
-        </div>
-
-        <div class="form-group">
-          <label>URL Image/Screenshot (optionnel)</label>
-          <input type="url" id="submitImage" placeholder="https://...">
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Soumettre</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ========== MODAL DETAILS ========== -->
-  <div id="detailsModal" class="modal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeDetailsModal()">×</button>
-      <div id="detailsContent"></div>
-    </div>
-  </div>
-
-  <!-- ========== FOOTER ========== -->
-  <footer>
-    <div class="footer-content">
-      <!-- Intro Animation SVG -->
-      <div style="margin-bottom: 2rem;">
-        <img src="assets/storyline/nexus-web-hub-intro.svg" alt="Nexus Web Hub Intro" style="max-width: 600px; width: 100%;">
-      </div>
-
-      <p style="margin-top: 2rem;">
-        🌌 Créé par <a href="https://github.com/Tryboy869" target="_blank">Daouda Abdoul Anzize</a> 
-        - <strong>Nexus Studio</strong>
-      </p>
-      <p style="margin-top: 1rem; font-size: 0.85rem;">
-        <a href="mailto:nexusstudio100@gmail.com">Contact</a> · 
-        <a href="https://github.com/Tryboy869/nexus-web-hub" target="_blank">GitHub</a> · 
-        NEXUS AXION 3.5
-      </p>
-    </div>
-  </footer>
-
-  <!-- ========== JAVASCRIPT ========== -->
-  <script>
-    // ========== CONSTANTS ==========
-    const BADGE_PATHS = {
-      'verified-creator': 'assets/badges/system/badge-verified-creator.svg',
-      'beginner-tester': 'assets/badges/system/badge-beginner-tester.svg',
-      'pro-tester': 'assets/badges/system/badge-pro-tester.svg',
-      'legendary-tester': 'assets/badges/system/badge-legendary-tester.svg',
-      'admin': 'assets/badges/system/badge-admin.svg',
-      'supporter': 'assets/badges/system/badge-supporter.svg',
-      'contributor': 'assets/badges/system/badge-contributor.svg',
-      'trending': 'assets/badges/system/badge-trending.svg',
-      'featured': 'assets/badges/system/badge-featured.svg',
-      'new': 'assets/badges/system/badge-new.svg'
-    };
-
-    const CATEGORY_ICONS = {
-      'productivity': 'assets/icons/icon-tools.svg',
-      'design': 'assets/icons/icon-ui-kits.svg',
-      'game': 'assets/icons/icon-games.svg',
-      'api': 'assets/icons/icon-apis.svg',
-      'nocode': 'assets/icons/icon-websites.svg',
-      'education': 'assets/icons/icon-tools.svg',
-      'social': 'assets/icons/icon-websites.svg',
-      'other': 'assets/icons/icon-other.svg'
-    };
-
-    // ========== STATE ==========
-    let currentUser = null;
-    let currentLang = 'fr';
-    let webapps = [];
-    let currentFilter = { category: 'all', sort: 'all', search: '' };
-
-    // ========== INIT ==========
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('🌌 NEXUS WEB HUB - Frontend initialized');
-      checkAuth();
-      loadStats();
-      loadWebapps();
-    });
-
-    // ========== AUTH ==========
-    async function checkAuth() {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      try {
-        const response = await fetch('/api/auth/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          currentUser = result.data;
-          updateAuthUI();
-        } else {
-          localStorage.removeItem('token');
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-      }
-    }
-
-    function updateAuthUI() {
-      const authBtn = document.getElementById('authBtn');
-      if (currentUser) {
-        // Afficher avatar ou initiales + dropdown
-        const initials = currentUser.name.substring(0, 2).toUpperCase();
-        authBtn.innerHTML = `
-          <span style="background: var(--accent-cyan); color: #000; padding: 0.5rem 1rem; border-radius: 50%; font-weight: 600;">
-            ${initials}
-          </span>
-        `;
-        authBtn.style.background = 'transparent';
-        authBtn.style.border = 'none';
-        authBtn.onclick = () => showUserMenu();
-      }
-    }
-
-    function showUserMenu() {
-      // Menu simple pour le moment
-      const menu = `
-Profil : ${currentUser.name}
-Email : ${currentUser.email}
-Badges : ${currentUser.badges.length}
-
-Options :
-- Mon Profil (Phase 2)
-- Mes Webapps (Phase 2)
-- Déconnexion
-      `;
-      
-      const action = prompt(menu + '\n\nTapez "deconnexion" pour vous déconnecter');
-      
-      if (action && action.toLowerCase() === 'deconnexion') {
-        logout();
-      }
-    }
-
-    function logout() {
-      localStorage.removeItem('token');
-      currentUser = null;
-      location.reload();
-    }
-
-    async function handleLogin(e) {
-      e.preventDefault();
-      
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-
-      try {
-        const response = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          localStorage.setItem('token', result.data.token);
-          currentUser = result.data.user;
-          showSuccess('authSuccess', result.message);
-          setTimeout(() => {
-            closeAuthModal();
-            updateAuthUI();
-            location.reload();
-          }, 1500);
-        } else {
-          showError('authError', result.message);
-        }
-      } catch (error) {
-        console.error('Login error:', error);
-        showError('authError', 'Erreur de connexion');
-      }
-    }
-
-    async function handleSignup(e) {
-      e.preventDefault();
-      
-      const name = document.getElementById('signupName').value;
-      const email = document.getElementById('signupEmail').value;
-      const password = document.getElementById('signupPassword').value;
-
-      try {
-        const response = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          localStorage.setItem('token', result.data.token);
-          currentUser = result.data.user;
-          showSuccess('authSuccess', result.message);
-          setTimeout(() => {
-            closeAuthModal();
-            updateAuthUI();
-            location.reload();
-          }, 1500);
-        } else {
-          showError('authError', result.message);
-        }
-      } catch (error) {
-        console.error('Signup error:', error);
-        showError('authError', 'Erreur lors de la création du compte');
-      }
-    }
-
-    // ========== WEBAPPS ==========
-    async function loadWebapps() {
-      showLoading();
-
-      try {
-        const params = new URLSearchParams();
-        if (currentFilter.category !== 'all') params.append('category', currentFilter.category);
-        if (currentFilter.sort !== 'all') params.append('sort', currentFilter.sort);
-        if (currentFilter.search) params.append('search', currentFilter.search);
-
-        const response = await fetch('/api/webapps?' + params.toString());
-        const result = await response.json();
-
-        if (result.success) {
-          webapps = result.data.webapps;
-          renderWebapps();
-        } else {
-          showEmpty();
-        }
-      } catch (error) {
-        console.error('Load webapps error:', error);
-        showEmpty();
-      }
-    }
-
-    function renderWebapps() {
-      const grid = document.getElementById('webappGrid');
-      hideLoading();
-
-      if (webapps.length === 0) {
-        showEmpty();
-        return;
-      }
-
-      hideEmpty();
-
-      grid.innerHTML = webapps.map(webapp => {
-        // Badges webapp
-        let badgesHTML = '';
-        if (webapp.is_trending) {
-          badgesHTML += `<img src="${BADGE_PATHS.trending}" alt="Trending" class="badge-icon" title="Trending">`;
-        }
-        if (webapp.is_featured) {
-          badgesHTML += `<img src="${BADGE_PATHS.featured}" alt="Featured" class="badge-icon" title="Featured">`;
-        }
-        if (webapp.is_new) {
-          badgesHTML += `<img src="${BADGE_PATHS.new}" alt="New" class="badge-icon" title="Nouveau">`;
-        }
-
-        // Image ou logo par défaut
-        const imageHTML = webapp.image_url 
-          ? `<img src="${webapp.image_url}" alt="${webapp.name}">`
-          : `<img src="assets/logos/logo-nwh.svg" alt="Nexus Web Hub" class="default-logo">`;
-
-        return `
-          <div class="webapp-card" onclick="showDetails('${webapp.id}')">
-            <div class="webapp-image">
-              ${imageHTML}
-            </div>
-            <div class="webapp-content">
-              <div class="webapp-header">
-                <div class="webapp-title">${webapp.name}</div>
-                <div class="webapp-badges">
-                  ${badgesHTML}
+    <!-- ÉCRAN D'ACCUEIL -->
+    <div id="auth-view" class="flex items-center justify-center min-h-screen p-4">
+        <div class="w-full max-w-md text-center">
+            <div class="bg-surface rounded-2xl shadow-calm p-8 md:p-12">
+                <div class="flex justify-center mb-6">
+                    <svg class="w-16 h-16 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                    </svg>
                 </div>
-              </div>
-              <div class="webapp-developer">par ${webapp.developer}</div>
-              <div class="webapp-rating">
-                <span class="stars">${renderStars(webapp.avg_rating)}</span>
-                <span>${webapp.avg_rating.toFixed(1)}</span>
-                <span style="color: var(--text-secondary)">(${webapp.reviews_count})</span>
-              </div>
-              <div class="webapp-description">${webapp.description_short}</div>
-              <div class="webapp-tags">
-                ${webapp.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')}
-              </div>
-              <div class="webapp-actions">
-                <button class="btn btn-primary btn-small" onclick="openWebapp(event, '${webapp.url}')">Ouvrir</button>
-                <button class="btn btn-secondary btn-small" onclick="showDetails(event, '${webapp.id}')">Détails</button>
-              </div>
+                
+                <h1 class="text-3xl font-bold text-primary mb-3">Confidence Book</h1>
+                <p class="text-secondary text-lg mb-8">Personne ne doit rester seul face à son histoire.</p>
+                
+                <button onclick="enterApp()" class="w-full bg-primary text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-primary-hover transition-all duration-300">
+                    Entrer anonymement
+                </button>
+                
+                <p class="text-secondary text-xs mt-6">En entrant, vous acceptez nos règles de bienveillance. Aucune donnée personnelle n'est requise.</p>
             </div>
-          </div>
-        `;
-      }).join('');
-    }
+        </div>
+    </div>
 
-    function renderStars(rating) {
-      const fullStars = Math.floor(rating);
-      const hasHalfStar = rating % 1 >= 0.5;
-      const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-      
-      return '⭐'.repeat(fullStars) + (hasHalfStar ? '✨' : '') + '☆'.repeat(emptyStars);
-    }
-
-    function openWebapp(event, url) {
-      event.stopPropagation();
-      window.open(url, '_blank');
-    }
-
-    async function showDetails(event, id) {
-      if (event) event.stopPropagation();
-
-      try {
-        const response = await fetch(`/api/webapps/${id}`);
-        const result = await response.json();
-
-        if (result.success) {
-          const { webapp, reviews } = result.data;
-          
-          // Badges webapp
-          let badgesHTML = '';
-          if (webapp.is_trending) {
-            badgesHTML += `<img src="${BADGE_PATHS.trending}" alt="Trending" style="width: 32px; height: 32px; margin-right: 0.5rem;">`;
-          }
-          if (webapp.is_featured) {
-            badgesHTML += `<img src="${BADGE_PATHS.featured}" alt="Featured" style="width: 32px; height: 32px; margin-right: 0.5rem;">`;
-          }
-          if (webapp.is_new) {
-            badgesHTML += `<img src="${BADGE_PATHS.new}" alt="New" style="width: 32px; height: 32px;">`;
-          }
-
-          const imageHTML = webapp.image_url 
-            ? `<img src="${webapp.image_url}" style="width: 100%; border-radius: 8px; margin-bottom: 1rem;">`
-            : '';
-          
-          document.getElementById('detailsContent').innerHTML = `
-            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-              <h2 class="modal-title" style="margin-bottom: 0;">${webapp.name}</h2>
-              ${badgesHTML}
+    <!-- ÉCRAN PRINCIPAL -->
+    <div id="app-view" class="hidden min-h-screen">
+        
+        <!-- Header Mobile -->
+        <header class="md:hidden bg-surface shadow-calm sticky top-0 z-20 flex items-center justify-between p-4 border-b border-theme">
+            <h1 class="text-xl font-bold text-primary">Confidence Book</h1>
+            <div class="flex items-center space-x-3">
+                <!-- Badge notifications -->
+                <button onclick="showModal('notifications-modal')" class="p-2 rounded-full relative text-secondary hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+                    <span id="notif-badge-mobile" class="hidden absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"></span>
+                </button>
+                <button onclick="showModal('post-modal')" class="p-2 rounded-full bg-primary text-white">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                    </svg>
+                </button>
+                <button onclick="showModal('settings-modal')" class="p-2 rounded-full text-secondary hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
             </div>
-            <div style="color: var(--text-secondary); margin-bottom: 1rem;">
-              par ${webapp.developer}
+        </header>
+        
+        <!-- Layout 3 colonnes -->
+        <div class="container mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-4 gap-6 p-4 md:py-8">
+
+            <!-- COLONNE GAUCHE : NAVIGATION -->
+            <nav class="hidden md:block col-span-1 space-y-6 sticky top-8 self-start">
+                <div class="bg-surface rounded-2xl shadow-calm p-5">
+                    <h2 class="text-sm font-semibold text-secondary uppercase tracking-wider mb-4">Chapitres Émotionnels</h2>
+                    <ul class="space-y-2" id="chapters-list">
+                        <!-- Rempli dynamiquement -->
+                    </ul>
+                </div>
+                
+                <div class="bg-surface rounded-2xl shadow-calm p-5">
+                    <h2 class="text-sm font-semibold text-secondary uppercase tracking-wider mb-4">Mon Espace</h2>
+                    <ul class="space-y-2">
+                        <li><button onclick="selectChapter('my-confidences'); return false;" class="flex items-center w-full space-x-3 p-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/50 group">
+                            <svg class="w-6 h-6 text-secondary group-hover:text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                            <span class="font-medium text-secondary group-hover:text-primary">Mes Confidences</span>
+                        </button></li>
+                    </ul>
+                </div>
+                
+                <div class="bg-surface rounded-2xl shadow-calm p-5">
+                    <h2 class="text-sm font-semibold text-secondary uppercase tracking-wider mb-4">Paramètres</h2>
+                    <ul class="space-y-2">
+                        <li><button onclick="requestNotificationPermission()" class="flex items-center w-full space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            <svg class="w-6 h-6 text-secondary group-hover:text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+                            <span class="font-medium text-secondary group-hover:text-primary">Activer Notifications</span>
+                        </button></li>
+                        <li><button onclick="showModal('settings-modal')" class="flex items-center w-full space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            <svg class="w-6 h-6 text-secondary group-hover:text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0M3.75 18H7.5m3-6h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0M3.75 12H7.5" /></svg>
+                            <span class="font-medium text-secondary group-hover:text-primary">Paramètres</span>
+                        </button></li>
+                        <li><button onclick="logout()" class="flex items-center w-full space-x-3 p-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/50 group">
+                            <svg class="w-6 h-6 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+                            <span class="font-medium text-red-500">Quitter</span>
+                        </button></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- COLONNE CENTRALE : FLUX -->
+            <main class="col-span-1 md:col-span-2 space-y-6">
+                
+                <!-- Boîte de publication -->
+                <div class="bg-surface rounded-2xl shadow-calm p-5">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 0a12.06 12.06 0 00-4.5 0m3.75 0a12.06 12.06 0 01-4.5 0m3.75 0a12.06 12.06 0 00-4.5 0" /></svg>
+                        </div>
+                        <button onclick="showModal('post-modal')" class="w-full text-left bg-gray-100 dark:bg-gray-700 rounded-full p-3 px-5 text-secondary hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                            Exprimez-vous en toute sécurité...
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Séparateur -->
+                <div class="flex items-center justify-center">
+                    <span class="text-sm font-medium text-secondary">Le Mur des Confidences</span>
+                </div>
+
+                <!-- Container des confidences -->
+                <div id="confidences-list">
+                    <div class="text-center text-secondary py-12">
+                        <p>Chargement des confidences...</p>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- COLONNE DROITE : PHILOSOPHIE -->
+            <aside class="hidden md:block col-span-1 sticky top-8 self-start">
+                <div class="bg-surface rounded-2xl shadow-calm p-6">
+                    <h2 class="text-lg font-semibold text-primary mb-3">Notre Philosophie</h2>
+                    <p class="text-secondary text-sm leading-relaxed">
+                        Ceci est un refuge, pas un réseau social. L'anonymat est un outil de libération.
+                    </p>
+                    <ul class="list-disc list-inside text-secondary text-sm space-y-2 mt-4">
+                        <li>Soyez bienveillant</li>
+                        <li>Ne jugez pas</li>
+                        <li>Écoutez et soutenez</li>
+                    </ul>
+                    <p class="text-xs text-gray-400 mt-6">
+                        Les messages haineux ou dangereux sont automatiquement filtrés pour préserver cet espace.
+                    </p>
+                </div>
+            </aside>
+
+        </div>
+    </div>
+
+    <!-- MODALE CRÉATION CONFIDENCE -->
+    <div id="post-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div onclick="hideModal('post-modal')" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        
+        <div class="bg-surface rounded-2xl shadow-calm w-full max-w-2xl z-10 p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-primary">Écrire une confidence</h2>
+                <button onclick="hideModal('post-modal')" class="p-2 rounded-full text-secondary hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
             
-            ${imageHTML}
-            
-            <div style="margin-bottom: 1.5rem;">
-              <div class="webapp-rating" style="font-size: 1.1rem;">
-                <span class="stars">${renderStars(webapp.avg_rating)}</span>
-                <span style="font-weight: 600;">${webapp.avg_rating.toFixed(1)}</span>
-                <span style="color: var(--text-secondary)">(${webapp.reviews_count} avis)</span>
-              </div>
-            </div>
-
-            <div style="margin-bottom: 1.5rem;">
-              ${webapp.description_long || webapp.description_short}
-            </div>
-
-            <div class="webapp-tags" style="margin-bottom: 1.5rem;">
-              ${webapp.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-            </div>
-
-            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
-              <button class="btn btn-primary" onclick="window.open('${webapp.url}', '_blank')">
-                🚀 Ouvrir la webapp
-              </button>
-              ${webapp.github_url ? `<button class="btn btn-secondary" onclick="window.open('${webapp.github_url}', '_blank')">📂 Code Source</button>` : ''}
-              ${webapp.video_url ? `<button class="btn btn-secondary" onclick="window.open('${webapp.video_url}', '_blank')">🎥 Vidéo</button>` : ''}
-            </div>
-
-            <h3 style="margin-bottom: 1rem;">Avis (${reviews.length})</h3>
-            ${reviews.length > 0 ? reviews.map(review => `
-              <div style="background: var(--bg-deep-space); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                  <div style="font-weight: 600;">${review.user_name}</div>
-                  <div class="stars">${renderStars(review.rating)}</div>
+            <div class="space-y-6">
+                <textarea id="confidence-text" rows="8" class="w-full p-4 rounded-lg border border-theme bg-surface text-secondary text-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Partagez votre histoire, votre peur, votre espoir..."></textarea>
+                
+                <div>
+                    <label class="text-sm font-medium text-secondary mb-2 block">Choisir la tonalité émotionnelle :</label>
+                    <div class="flex flex-wrap gap-2" id="emotion-buttons">
+                        <!-- Rempli dynamiquement -->
+                    </div>
                 </div>
-                <div style="color: var(--text-secondary);">${review.comment || 'Pas de commentaire'}</div>
-              </div>
-            `).join('') : '<p style="color: var(--text-secondary);">Aucun avis pour le moment. Soyez le premier !</p>'}
+                
+                <div id="moderation-message" class="hidden p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200">
+                    <!-- Message de modération si nécessaire -->
+                </div>
+                
+                <div class="flex justify-end items-center space-x-4">
+                    <button onclick="hideModal('post-modal')" class="font-medium text-secondary hover:underline">Annuler</button>
+                    <button onclick="publishConfidence()" class="bg-primary text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-primary-hover transition-all duration-300">
+                        Publier anonymement
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODALE PARAMÈTRES -->
+    <div id="settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div onclick="hideModal('settings-modal')" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        
+        <div class="bg-surface rounded-2xl shadow-calm w-full max-w-lg z-10 p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-primary">Paramètres</h2>
+                <button onclick="hideModal('settings-modal')" class="p-2 rounded-full text-secondary hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-sm font-semibold text-secondary uppercase tracking-wider mb-3">Apparence</h3>
+                    <div class="flex items-center justify-between bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+                        <span class="font-medium text-secondary">Mode Sombre</span>
+                        <button id="dark-mode-toggle" onclick="toggleDarkMode()" class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors bg-gray-300 dark:bg-primary">
+                            <span id="dark-mode-indicator" class="inline-block w-4 h-4 transform transition-transform bg-white rounded-full translate-x-1 dark:translate-x-6"></span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="border-t border-theme pt-6 flex justify-end">
+                    <button onclick="logout()" class="bg-red-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-red-600 transition-all duration-300">
+                        Quitter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            ${currentUser ? `
-              <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="openReviewForm('${webapp.id}')">
-                Laisser un avis
-              </button>
-            ` : ''}
-          `;
+    <!-- MODALE NOTIFICATIONS -->
+    <div id="notifications-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div onclick="hideModal('notifications-modal')" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        
+        <div class="bg-surface rounded-2xl shadow-calm w-full max-w-lg z-10 p-6 md:p-8 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6 sticky top-0 bg-surface pb-4">
+                <h2 class="text-2xl font-semibold text-primary">Notifications</h2>
+                <button onclick="hideModal('notifications-modal')" class="p-2 rounded-full text-secondary hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="notifications-list" class="space-y-4">
+                <!-- Rempli dynamiquement -->
+            </div>
+        </div>
+    </div>
 
-          document.getElementById('detailsModal').classList.add('active');
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ========== CONFIGURATION ==========
+        const API_BASE = '';
+        
+        let currentUserId = null;
+        let currentDeviceId = null;
+        let currentEmotion = null;
+        let currentChapter = 'all';
+        
+        const CHAPTERS = [
+            { id: 'ruptures', emoji: '💔', name: 'Ruptures & Relations', color: 'red' },
+            { id: 'isolement', emoji: '😔', name: 'Isolement & Tristesse', color: 'blue' },
+            { id: 'traumas', emoji: '🔥', name: 'Traumas & Expériences', color: 'orange' },
+            { id: 'stress', emoji: '🧠', name: 'Stress & Santé Mentale', color: 'purple' },
+            { id: 'spiritualite', emoji: '🪞', name: 'Spiritualité & Quête', color: 'indigo' },
+            { id: 'espoir', emoji: '🤝', name: 'Espoir & Reconstruction', color: 'teal' }
+        ];
+
+        const REACTIONS = [
+            { id: 'soutien', emoji: '🤝🏾', label: 'Je te soutiens', color: 'blue' },
+            { id: 'espoir', emoji: '🔥', label: 'Garde espoir', color: 'orange' },
+            { id: 'compatis', emoji: '🤜🏾🤛🏾', label: 'Je compatis', color: 'purple' },
+            { id: 'pas_seul', emoji: '🫂', label: 'T\'es pas seul', color: 'pink' },
+            { id: 'courage', emoji: '🙌🏾', label: 'Courage', color: 'green' },
+            { id: 'triste', emoji: '💔', label: 'Oh que c\'est triste', color: 'red' }
+        ];
+
+        // ========== DEVICE FINGERPRINT ==========
+        async function generateDeviceId() {
+            // Collecter des infos sur l'appareil
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('fingerprint', 2, 2);
+            const canvasData = canvas.toDataURL();
+            
+            const fingerprint = {
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                platform: navigator.platform,
+                screenResolution: `${screen.width}x${screen.height}`,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                canvas: canvasData.substring(0, 100)
+            };
+            
+            // Créer un hash simple
+            const fingerprintString = JSON.stringify(fingerprint);
+            let hash = 0;
+            for (let i = 0; i < fingerprintString.length; i++) {
+                const char = fingerprintString.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            
+            return 'device_' + Math.abs(hash).toString(36);
         }
-      } catch (error) {
-        console.error('Show details error:', error);
-        alert('Erreur lors du chargement des détails');
-      }
-    }
 
-    function openReviewForm(webappId) {
-      const rating = prompt('Note de 1 à 5 étoiles:');
-      if (!rating || rating < 1 || rating > 5) return;
-
-      const comment = prompt('Commentaire (optionnel):');
-
-      submitReview(webappId, parseInt(rating), comment);
-    }
-
-    async function submitReview(webappId, rating, comment) {
-      const token = localStorage.getItem('token');
-
-      try {
-        const response = await fetch(`/api/webapps/${webappId}/reviews`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ rating, comment })
+        // ========== INITIALISATION ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            initDarkMode();
+            renderChapters();
+            renderEmotionButtons();
+            
+            // Charger les notifications toutes les 30 secondes
+            setInterval(loadNotifications, 30000);
         });
 
-        const result = await response.json();
-
-        if (result.success) {
-          alert('Avis publié avec succès !');
-          showDetails(null, webappId);
-        } else {
-          alert(result.message);
+        // ========== NOTIFICATIONS ==========
+        async function loadNotifications() {
+            if (!currentUserId) return;
+            
+            try {
+                const response = await fetch('/api/notifications', {
+                    headers: {
+                        'X-User-Id': currentUserId
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderNotifications(result.data);
+                    updateNotificationBadge(result.data.filter(n => !n.read).length);
+                }
+            } catch (error) {
+                console.error('❌ Error loading notifications:', error);
+            }
         }
-      } catch (error) {
-        console.error('Submit review error:', error);
-        alert('Erreur lors de la publication de l\'avis');
-      }
-    }
 
-    // ========== SUBMIT WEBAPP ==========
-    async function handleSubmit(e) {
-      e.preventDefault();
-
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Vous devez être connecté pour soumettre une webapp');
-        openAuthModal();
-        return;
-      }
-
-      const data = {
-        name: document.getElementById('submitName').value,
-        url: document.getElementById('submitUrl').value,
-        description_short: document.getElementById('submitDescShort').value,
-        description_long: document.getElementById('submitDescLong').value,
-        category: document.getElementById('submitCategory').value,
-        tags: document.getElementById('submitTags').value.split(',').map(t => t.trim()).filter(t => t),
-        github_url: document.getElementById('submitGithub').value || null,
-        video_url: document.getElementById('submitVideo').value || null,
-        image_url: document.getElementById('submitImage').value || null
-      };
-
-      try {
-        const response = await fetch('/api/webapps', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          showSuccess('submitSuccess', result.message);
-          document.getElementById('submitForm').reset();
-          setTimeout(() => {
-            closeSubmitModal();
-            loadWebapps();
-          }, 1500);
-        } else {
-          showError('submitError', result.message);
+        function renderNotifications(notifications) {
+            const container = document.getElementById('notifications-list');
+            
+            if (notifications.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-secondary py-12">
+                        <p>Aucune notification pour le moment</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = notifications.map(notif => `
+                <div onclick="markAsRead('${notif.id}')" class="p-4 rounded-lg ${notif.read ? 'bg-gray-50 dark:bg-gray-800' : 'bg-blue-50 dark:bg-blue-900/50'} cursor-pointer hover:opacity-80 transition">
+                    <div class="flex items-start space-x-3">
+                        <div class="text-2xl">${notif.type === 'new_response' ? '💙' : '📢'}</div>
+                        <div class="flex-1">
+                            <p class="text-secondary font-medium">${notif.message}</p>
+                            ${notif.confidence_preview ? `<p class="text-xs text-gray-400 mt-1">"${notif.confidence_preview}"</p>` : ''}
+                            <p class="text-xs text-gray-400 mt-2">${new Date(notif.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</p>
+                        </div>
+                        ${!notif.read ? '<div class="w-2 h-2 rounded-full bg-blue-500"></div>' : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
         }
-      } catch (error) {
-        console.error('Submit error:', error);
-        showError('submitError', 'Erreur lors de la soumission');
-      }
-    }
 
-    // ========== FILTERS ==========
-    function filterCategory(category) {
-      currentFilter.category = category;
-      
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      event.target.classList.add('active');
-      
-      loadWebapps();
-    }
-
-    function filterSort(sort) {
-      currentFilter.sort = sort;
-      
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      event.target.classList.add('active');
-      
-      loadWebapps();
-    }
-
-    let searchTimeout;
-    function handleSearch() {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        currentFilter.search = document.getElementById('searchInput').value;
-        loadWebapps();
-      }, 300);
-    }
-
-    function surpriseMe() {
-      if (webapps.length === 0) {
-        alert('Aucune webapp disponible');
-        return;
-      }
-      const random = webapps[Math.floor(Math.random() * webapps.length)];
-      showDetails(null, random.id);
-    }
-
-    function scrollToCatalog() {
-      document.querySelector('.catalog').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // ========== STATS ==========
-    async function loadStats() {
-      try {
-        const response = await fetch('/api/stats');
-        const result = await response.json();
-
-        if (result.success) {
-          document.getElementById('statWebapps').textContent = result.data.webapps;
-          document.getElementById('statCreators').textContent = result.data.creators;
-          document.getElementById('statReviews').textContent = result.data.reviews;
+        function updateNotificationBadge(count) {
+            const badgeMobile = document.getElementById('notif-badge-mobile');
+            
+            if (count > 0) {
+                badgeMobile.textContent = count > 9 ? '9+' : count;
+                badgeMobile.classList.remove('hidden');
+            } else {
+                badgeMobile.classList.add('hidden');
+            }
         }
-      } catch (error) {
-        console.error('Load stats error:', error);
-      }
-    }
 
-    // ========== MODALS ==========
-    function openAuthModal() {
-      document.getElementById('authModal').classList.add('active');
-    }
-
-    function closeAuthModal() {
-      document.getElementById('authModal').classList.remove('active');
-      clearMessages();
-    }
-
-    function switchAuthTab(tab) {
-      document.querySelectorAll('#authModal .tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
-      
-      if (tab === 'login') {
-        document.getElementById('loginForm').classList.remove('hidden');
-        document.getElementById('signupForm').classList.add('hidden');
-      } else {
-        document.getElementById('loginForm').classList.add('hidden');
-        document.getElementById('signupForm').classList.remove('hidden');
-      }
-      clearMessages();
-    }
-
-    function openSubmitModal() {
-      if (!currentUser) {
-        alert('Vous devez être connecté pour soumettre une webapp');
-        openAuthModal();
-        return;
-      }
-      document.getElementById('submitModal').classList.add('active');
-    }
-
-    function closeSubmitModal() {
-      document.getElementById('submitModal').classList.remove('active');
-      clearMessages();
-    }
-
-    function closeDetailsModal() {
-      document.getElementById('detailsModal').classList.remove('active');
-    }
-
-    // ========== UI HELPERS ==========
-    function showLoading() {
-      document.getElementById('webappGrid').innerHTML = '';
-      document.getElementById('loadingState').classList.remove('hidden');
-      document.getElementById('emptyState').classList.add('hidden');
-    }
-
-    function hideLoading() {
-      document.getElementById('loadingState').classList.add('hidden');
-    }
-
-    function showEmpty() {
-      hideLoading();
-      document.getElementById('webappGrid').innerHTML = '';
-      document.getElementById('emptyState').classList.remove('hidden');
-    }
-
-    function hideEmpty() {
-      document.getElementById('emptyState').classList.add('hidden');
-    }
-
-    function showError(id, message) {
-      const el = document.getElementById(id);
-      el.textContent = message;
-      el.classList.remove('hidden');
-      document.getElementById(id.replace('Error', 'Success')).classList.add('hidden');
-    }
-
-    function showSuccess(id, message) {
-      const el = document.getElementById(id);
-      el.textContent = message;
-      el.classList.remove('hidden');
-      document.getElementById(id.replace('Success', 'Error')).classList.add('hidden');
-    }
-
-    function clearMessages() {
-      document.querySelectorAll('.error-message, .success-message').forEach(el => {
-        el.classList.add('hidden');
-        el.textContent = '';
-      });
-    }
-
-    // ========== LANGUAGE ==========
-    function toggleLanguage() {
-      currentLang = currentLang === 'fr' ? 'en' : 'fr';
-      alert('Traduction EN à implémenter (Phase 2)');
-    }
-
-    // ========== CLICK OUTSIDE MODAL ==========
-    document.querySelectorAll('.modal').forEach(modal => {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          modal.classList.remove('active');
+        async function markAsRead(notificationId) {
+            try {
+                await fetch(`/api/notifications/${notificationId}/read`, {
+                    method: 'PUT'
+                });
+                
+                await loadNotifications();
+            } catch (error) {
+                console.error('❌ Error marking notification as read:', error);
+            }
         }
-      });
-    });
-  </script>
+
+        // ========== DARK MODE ==========
+        function initDarkMode() {
+            const htmlElement = document.documentElement;
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                htmlElement.classList.add('dark');
+            }
+        }
+
+        function toggleDarkMode() {
+            const htmlElement = document.documentElement;
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // ========== NAVIGATION ==========
+        function showView(viewId) {
+            document.getElementById('auth-view').classList.add('hidden');
+            document.getElementById('app-view').classList.add('hidden');
+            
+            const viewToShow = document.getElementById(viewId);
+            if (viewToShow) {
+                viewToShow.classList.remove('hidden');
+            }
+        }
+
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function hideModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        async function enterApp() {
+            console.log('📡 Frontend → API: Entering app with device fingerprint');
+            
+            // Générer le device ID
+            currentDeviceId = await generateDeviceId();
+            console.log('🔐 Device ID:', currentDeviceId);
+            
+            try {
+                // Envoyer le device ID au backend
+                const response = await fetch('/api/auth/device', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ deviceId: currentDeviceId })
+                });
+                
+                const result = await response.json();
+                console.log('✅ API → Frontend:', result);
+                
+                if (result.success) {
+                    currentUserId = result.userId;
+                    console.log('✅ User ID from device:', currentUserId);
+                    
+                    showView('app-view');
+                    await loadConfidences();
+                } else {
+                    alert('Erreur lors de la connexion');
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('Erreur de connexion au serveur');
+            }
+        }
+
+        function logout() {
+            currentUserId = null;
+            currentDeviceId = null;
+            showView('auth-view');
+            hideModal('settings-modal');
+            console.log('🚪 User logged out');
+        }
+
+        // ========== RENDER CHAPITRES ==========
+        function renderChapters() {
+            const list = document.getElementById('chapters-list');
+            
+            const allChapterHTML = `
+                <li><a href="#" onclick="selectChapter('all'); return false;" class="flex items-center space-x-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/50 group border-l-4 border-primary">
+                    <span class="text-xl">🌐</span> 
+                    <span class="font-bold text-primary">Tous</span>
+                </a></li>
+            `;
+            
+            const chaptersHTML = CHAPTERS.map(ch => `
+                <li><a href="#" onclick="selectChapter('${ch.id}'); return false;" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/50 group">
+                    <span class="text-xl">${ch.emoji}</span> 
+                    <span class="font-medium text-secondary group-hover:text-primary">${ch.name}</span>
+                </a></li>
+            `).join('');
+            
+            list.innerHTML = allChapterHTML + chaptersHTML;
+        }
+
+        function renderEmotionButtons() {
+            const container = document.getElementById('emotion-buttons');
+            
+            const buttonsHTML = CHAPTERS.map(ch => `
+                <button onclick="selectEmotion('${ch.id}')" 
+                        data-emotion="${ch.id}"
+                        class="emotion-btn flex-auto text-sm border-2 border-gray-300 dark:border-gray-600 text-secondary rounded-full py-2 px-4 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition">
+                    ${ch.emoji} ${ch.name.split('&')[0].trim()}
+                </button>
+            `).join('');
+            
+            container.innerHTML = buttonsHTML;
+        }
+
+        function selectChapter(chapterId) {
+            currentChapter = chapterId;
+            loadConfidences();
+        }
+
+        function selectEmotion(emotionId) {
+            currentEmotion = emotionId;
+            
+            document.querySelectorAll('.emotion-btn').forEach(btn => {
+                if (btn.dataset.emotion === emotionId) {
+                    btn.classList.add('ring-2', 'ring-primary', 'border-primary');
+                } else {
+                    btn.classList.remove('ring-2', 'ring-primary', 'border-primary');
+                }
+            });
+        }
+
+        // ========== CHARGER CONFIDENCES ==========
+        async function loadConfidences() {
+            console.log(`📡 Frontend → API: Loading confidences (chapter: ${currentChapter})`);
+            
+            try {
+                const response = await fetch(`/api/confidences?chapter=${currentChapter}`);
+                const result = await response.json();
+                
+                console.log('✅ API → Frontend:', result);
+                
+                if (result.success) {
+                    renderConfidences(result.data);
+                } else {
+                    document.getElementById('confidences-list').innerHTML = `
+                        <div class="text-center text-secondary py-12">
+                            <p>Erreur lors du chargement des confidences</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                document.getElementById('confidences-list').innerHTML = `
+                    <div class="text-center text-secondary py-12">
+                        <p>Erreur de connexion</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderConfidences(confidences) {
+            const container = document.getElementById('confidences-list');
+            
+            if (confidences.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-secondary py-12">
+                        <p>Aucune confidence pour le moment. Soyez le premier à partager.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = confidences.map(conf => renderConfidence(conf)).join('');
+            container.innerHTML = html;
+        }
+
+        function renderConfidence(conf) {
+            const chapter = CHAPTERS.find(ch => ch.id === conf.emotion) || CHAPTERS[0];
+            
+            // Boutons d'action si c'est notre confidence
+            const isOwner = conf.user_id === currentUserId;
+            const ownerActions = isOwner ? `
+                <div class="flex gap-2 ml-auto">
+                    <button onclick="editConfidence('${conf.id}')" class="text-sm text-blue-500 hover:underline">✏️ Modifier</button>
+                    <button onclick="deleteConfidence('${conf.id}')" class="text-sm text-red-500 hover:underline">🗑️ Supprimer</button>
+                </div>
+            ` : '';
+            
+            const responsesHTML = conf.responses && conf.responses.length > 0 
+                ? conf.responses.map(resp => `
+                    <div class="flex flex-col space-y-2">
+                        <div class="flex space-x-3">
+                            <div class="w-9 h-9 rounded-full bg-purple-100 dark:bg-purple-800 flex items-center justify-center flex-shrink-0">
+                                <span class="text-lg">${resp.avatar}</span>
+                            </div>
+                            <div class="bg-surface rounded-xl p-3 flex-1">
+                                <p class="text-secondary leading-normal">${escapeHtml(resp.content)}</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 ml-12">
+                            ${REACTIONS.slice(0, 3).map(reaction => `
+                                <button onclick="reactToResponse('${resp.id}',' ${reaction.id}')" 
+                                        class="text-xs border border-theme text-secondary rounded-full py-1 px-3 hover:border-${reaction.color}-400 hover:bg-${reaction.color}-50 dark:hover:bg-${reaction.color}-900/30 transition">
+                                    ${reaction.emoji} <span class="ml-1 font-medium">${resp.reactions[reaction.id] || 0}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('')
+                : '<p class="text-secondary text-sm text-center py-4">Aucune réponse pour le moment. Soyez le premier à répondre.</p>';
+            
+            return `
+                <article class="bg-surface rounded-2xl shadow-calm overflow-hidden mb-6">
+                    <div class="p-5 flex items-center space-x-3 border-b border-theme">
+                        <div class="w-11 h-11 rounded-full bg-${chapter.color}-100 dark:bg-${chapter.color}-800 flex items-center justify-center flex-shrink-0">
+                            <span class="text-xl">${chapter.emoji}</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-secondary">Une confidence sur le thème :</p>
+                            <h3 class="font-semibold text-${chapter.color}-600 dark:text-${chapter.color}-400">${chapter.name}</h3>
+                        </div>
+                        ${ownerActions}
+                    </div>
+                    
+                    <div class="p-5">
+                        <p class="text-lg leading-relaxed" id="conf-content-${conf.id}">${escapeHtml(conf.content)}</p>
+                    </div>
+                    
+                    <div class="p-5 border-t border-theme flex flex-wrap gap-3">
+                        ${REACTIONS.map(reaction => `
+                            <button onclick="react('${conf.id}', '${reaction.id}')" 
+                                    class="text-sm border border-theme text-secondary rounded-full py-2 px-4 hover:border-${reaction.color}-500 hover:bg-${reaction.color}-50 dark:hover:bg-${reaction.color}-900/50 transition">
+                                ${reaction.emoji} ${reaction.label} <span class="ml-1 font-medium">${conf.reactions[reaction.id] || 0}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="p-5 bg-gray-50 dark:bg-gray-800 border-t border-theme">
+                        <button onclick="toggleComments('comments-${conf.id}')" class="text-sm font-semibold text-secondary hover:underline mb-4">
+                            Voir les ${conf.responses?.length || 0} réponse(s) bienveillante(s)
+                        </button>
+                        
+                        <div id="comments-${conf.id}" class="space-y-4 hidden">
+                            ${responsesHTML}
+                        </div>
+                        
+                        <div class="flex space-x-3 mt-4">
+                            <div class="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-600 flex-shrink-0"></div>
+                            <input type="text" 
+                                   id="response-input-${conf.id}" 
+                                   placeholder="Répondre avec bienveillance..." 
+                                   class="w-full bg-surface border border-theme rounded-full p-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                   onkeypress="if(event.key==='Enter') respondToConfidence('${conf.id}')">
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function toggleComments(commentsId) {
+            const section = document.getElementById(commentsId);
+            if (section) {
+                section.classList.toggle('hidden');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ========== RÉACTIONS ==========
+        async function react(confidenceId, reactionType) {
+            console.log(`📡 Frontend → API: Reacting to ${confidenceId} with ${reactionType}`);
+            
+            try {
+                const response = await fetch('/api/reactions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-Id': currentUserId
+                    },
+                    body: JSON.stringify({
+                        confidenceId,
+                        reactionType
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('✅ API → Frontend:', result);
+                
+                if (result.success) {
+                    await loadConfidences();
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+            }
+        }
+
+        // ========== RÉPONDRE À UNE CONFIDENCE ==========
+        async function respondToConfidence(confidenceId) {
+            const input = document.getElementById(`response-input-${confidenceId}`);
+            const content = input.value.trim();
+            
+            if (!content) return;
+            
+            console.log(`📡 Frontend → API: Responding to confidence ${confidenceId}`);
+            
+            try {
+                const response = await fetch('/api/responses', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-Id': currentUserId
+                    },
+                    body: JSON.stringify({
+                        confidenceId,
+                        content
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('✅ API → Frontend:', result);
+                
+                if (result.success) {
+                    input.value = '';
+                    await loadConfidences();
+                } else {
+                    alert(result.message || 'Erreur lors de l\'envoi de la réponse');
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('Erreur de connexion');
+            }
+        }
+
+        // ========== PUBLIER CONFIDENCE ==========
+        async function publishConfidence() {
+            const text = document.getElementById('confidence-text').value.trim();
+            
+            if (!text) {
+                alert('Veuillez écrire votre confidence');
+                return;
+            }
+            
+            if (!currentEmotion) {
+                alert('Veuillez choisir une tonalité émotionnelle');
+                return;
+            }
+            
+            console.log('📡 Frontend → API: Publishing confidence');
+            
+            try {
+                const response = await fetch('/api/confidences', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-Id': currentUserId
+                    },
+                    body: JSON.stringify({
+                        content: text,
+                        emotion: currentEmotion
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('✅ API → Frontend:', result);
+                
+                if (result.success) {
+                    if (result.moderated) {
+                        const msg = document.getElementById('moderation-message');
+                        msg.classList.remove('hidden');
+                        msg.innerHTML = `
+                            <p class="font-medium mb-2">⚠️ Votre confidence a été examinée</p>
+                            <p class="text-sm">${result.moderationMessage}</p>
+                        `;
+                        
+                        setTimeout(() => {
+                            msg.classList.add('hidden');
+                        }, 5000);
+                    }
+                    
+                    if (result.published) {
+                        document.getElementById('confidence-text').value = '';
+                        currentEmotion = null;
+                        document.querySelectorAll('.emotion-btn').forEach(btn => {
+                            btn.classList.remove('ring-2', 'ring-primary', 'border-primary');
+                        });
+                        
+                        hideModal('post-modal');
+                        await loadConfidences();
+                    }
+                } else {
+                    alert(result.message || 'Erreur lors de la publication');
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('Erreur de connexion');
+            }
+        }
+
+        // ========== SUPPRIMER CONFIDENCE ==========
+        async function deleteConfidence(confidenceId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer cette confidence ?')) {
+                return;
+            }
+            
+            console.log('📡 Frontend → API: Deleting confidence', confidenceId);
+            
+            try {
+                const response = await fetch(`/api/confidences/${confidenceId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-User-Id': currentUserId
+                    }
+                });
+                
+                const result = await response.json();
+                console.log('✅ API → Frontend:', result);
+                
+                if (result.success) {
+                    await loadConfidences();
+                } else {
+                    alert(result.message || 'Erreur lors de la suppression');
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('Erreur de connexion');
+            }
+        }
+
+        // ========== MODIFIER CONFIDENCE ==========
+        async function editConfidence(confidenceId) {
+            const contentEl = document.getElementById(`conf-content-${confidenceId}`);
+            const currentContent = contentEl.textContent;
+            
+            const newContent = prompt('Modifier votre confidence:', currentContent);
+            
+            if (!newContent || newContent === currentContent) {
+                return;
+            }
+            
+            console.log('📡 Frontend → API: Updating confidence', confidenceId);
+            
+            try {
+                const response = await fetch(`/api/confidences/${confidenceId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-Id': currentUserId
+                    },
+                    body: JSON.stringify({
+                        content: newContent
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('✅ API → Frontend:', result);
+                
+                if (result.success) {
+                    await loadConfidences();
+                } else {
+                    alert(result.message || 'Erreur lors de la modification');
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('Erreur de connexion');
+            }
+        }
+    </script>
+
 </body>
 </html>
