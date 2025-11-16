@@ -20,11 +20,16 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cors());
 
+// Trust proxy (requis pour Render/Heroku/etc.)
+app.set('trust proxy', 1);
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Max 100 requêtes par IP
-  message: { success: false, message: 'Trop de requêtes, veuillez réessayer plus tard' }
+  message: { success: false, message: 'Trop de requêtes, veuillez réessayer plus tard' },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 app.use('/api/', limiter);
