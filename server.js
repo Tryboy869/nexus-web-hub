@@ -40,6 +40,12 @@ export class BackendService {
 
       console.log('✅ [BACKEND] Database connected');
 
+      // RESET DATABASE si variable d'environnement activée
+      if (process.env.RESET_DB === 'true') {
+        console.log('🔥 [BACKEND] RESET_DB=true detected - Dropping all tables...');
+        await this.resetDatabase();
+      }
+
       // Créer les tables si elles n'existent pas
       await this.createTables();
       
@@ -48,6 +54,23 @@ export class BackendService {
       console.error('❌ [BACKEND] Initialization failed:', error);
       throw error;
     }
+  }
+
+  async resetDatabase() {
+    console.log('🗑️ [BACKEND] Resetting database...');
+    
+    const tables = ['reports', 'reviews', 'webapps', 'users'];
+    
+    for (const table of tables) {
+      try {
+        await this.db.execute(`DROP TABLE IF EXISTS ${table}`);
+        console.log(`   ✅ Dropped table: ${table}`);
+      } catch (error) {
+        console.log(`   ⚠️ Could not drop ${table}:`, error.message);
+      }
+    }
+    
+    console.log('✅ [BACKEND] Database reset complete');
   }
 
   async createTables() {
