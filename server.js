@@ -1,769 +1,868 @@
-// server.js - Backend Service (Pas de serveur HTTP !)
-// NEXUS WEB HUB - Nexus Studio
+// server.js - BACKEND SERVICE CONFIDENCE BOOK
+// Logique métier + Modération IA + Database
 
 import { createClient } from '@libsql/client';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import {
-  validateEmail,
-  validatePassword,
-  validateURL,
-  validateWebappName,
-  validateDescription,
-  generateId,
-  sanitizeInput,
-  calculateBadges,
-  calculateAverageRating,
-  ERRORS,
-  SUCCESS,
-  successResponse,
-  errorResponse
-} from './utils.js';
 
-export class BackendService {
+export class ConfidenceBookService {
   constructor() {
     this.db = null;
-    this.JWT_SECRET = process.env.JWT_SECRET || 'nexus-web-hub-secret-change-in-production';
+    this.aiEndpoint = 'https://api.groq.com/openai/v1/chat/completions';
+    this.aiApiKey = process.env.GROQ_API_KEY;
+    
+    // Fallback models (testés et validés via Colab)
+    this.groqModels = [
+      'llama-3.1-8b-instant',                              // ✅ Testé - Rapide
+      'llama-3.3-70b-versatile',                           // ✅ Testé - Puissant
+      'groq/compound',                                     // Groq propriétaire
+      'moonshotai/kimi-k2-instruct',                       // Moonshot AI
+      'qwen/qwen3-32b'                                     // Alibaba Qwen
+    ];
   }
-
-  // ========== INITIALIZATION ==========
 
   async init() {
-    console.log('✅ [BACKEND] Initializing...');
+    console.log('✅ [BACKEND] Initializing Confidence Book Service...');
     
-    try {
-      // Connexion Turso
-      this.db = createClient({
-        url: process.env.DATABASE_URL || 'file:local.db',
-        authToken: process.env.DATABASE_AUTH_TOKEN
-      });
+    // Connexion à Turso (LibSQL)
+    this.db = createClient({
+      url: process.env.DATABASE_URL || 'file:local.db',
+      authToken: process.env.DATABASE_AUTH_TOKEN
+    });
 
-      console.log('✅ [BACKEND] Database connected');
-
-      // RESET DATABASE si variable d'environnement activée
-      if (process.env.RESET_DB === 'true') {
-        console.log('🔥 [BACKEND] RESET_DB=true detected - Dropping all tables...');
-        await this.resetDatabase();
-      }
-
-      // Créer les tables si elles n'existent pas
-      await this.createTables();
-      
-      console.log('✅ [BACKEND] Backend ready');
-    } catch (error) {
-      console.error('❌ [BACKEND] Initialization failed:', error);
-      throw error;
-    }
-  }
-
-  async resetDatabase() {
-    console.log('🗑️ [BACKEND] Resetting database...');
+    // Créer tables si n'existent pas
+    await this.createTables();
     
-    const tables = ['reports', 'reviews', 'webapps', 'users'];
-    
-    for (const table of tables) {
-      try {
-        await this.db.execute(`DROP TABLE IF EXISTS ${table}`);
-        console.log(`   ✅ Dropped table: ${table}`);
-      } catch (error) {
-        console.log(`   ⚠️ Could not drop ${table}:`, error.message);
-      }
-    }
-    
-    console.log('✅ [BACKEND] Database reset complete');
+    console.log('✅ [BACKEND] Database connected');
   }
 
   async createTables() {
-    // Users
+    // Table des utilisateurs anonymes
     await this.db.execute(`
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
-        email TEXT UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL,
-        name TEXT NOT NULL,
-        username TEXT UNIQUE,
-        github_username TEXT,
-        avatar_url TEXT,
-        role TEXT DEFAULT 'user',
-        is_verified INTEGER DEFAULT 0,
-        badges TEXT DEFAULT '[]',
-        created_at INTEGER DEFAULT (strftime('%s', 'now'))
+        created_at INTEGER NOT NULL
       )
     `);
 
-    // Webapps
+    // Table des appareils (device fingerprints)
     await this.db.execute(`
-      CREATE TABLE IF NOT EXISTS webapps (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        developer TEXT NOT NULL,
-        creator_id TEXT NOT NULL,
-        description_short TEXT NOT NULL,
-        description_long TEXT,
-        url TEXT UNIQUE NOT NULL,
-        github_url TEXT,
-        video_url TEXT,
-        image_url TEXT,
-        category TEXT NOT NULL,
-        tags TEXT DEFAULT '[]',
-        avg_rating REAL DEFAULT 0,
-        reviews_count INTEGER DEFAULT 0,
-        views_count INTEGER DEFAULT 0,
-        is_trending INTEGER DEFAULT 0,
-        is_featured INTEGER DEFAULT 0,
-        is_new INTEGER DEFAULT 1,
-        status TEXT DEFAULT 'approved',
-        created_at INTEGER DEFAULT (strftime('%s', 'now')),
-        updated_at INTEGER DEFAULT (strftime('%s', 'now'))
-      )
-    `);
-
-    // Reviews
-    await this.db.execute(`
-      CREATE TABLE IF NOT EXISTS reviews (
-        id TEXT PRIMARY KEY,
-        webapp_id TEXT NOT NULL,
+      CREATE TABLE IF NOT EXISTS devices (
+        device_id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
-        rating INTEGER NOT NULL,
-        comment TEXT,
-        helpful_votes INTEGER DEFAULT 0,
-        is_flagged INTEGER DEFAULT 0,
-        created_at INTEGER DEFAULT (strftime('%s', 'now')),
-        FOREIGN KEY (webapp_id) REFERENCES webapps(id),
-        FOREIGN KEY (user_id) REFERENCES users(id),
-        UNIQUE(webapp_id, user_id)
+        last_seen INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id)
       )
     `);
 
-    // Reports
+    // Table des notifications
     await this.db.execute(`
-      CREATE TABLE IF NOT EXISTS reports (
+      CREATE TABLE IF NOT EXISTS notifications (
         id TEXT PRIMARY KEY,
-        reporter_id TEXT NOT NULL,
-        target_type TEXT NOT NULL,
-        target_id TEXT NOT NULL,
-        reason TEXT NOT NULL,
-        status TEXT DEFAULT 'pending',
-        admin_notes TEXT,
-        created_at INTEGER DEFAULT (strftime('%s', 'now')),
-        FOREIGN KEY (reporter_id) REFERENCES users(id)
+        user_id TEXT NOT NULL,
+        confidence_id TEXT,
+        type TEXT NOT NULL,
+        message TEXT NOT NULL,
+        read INTEGER DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (confidence_id) REFERENCES confidences(id)
+      )
+    `);
+
+    // Table des confidences
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS confidences (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        content TEXT NOT NULL,
+        emotion TEXT NOT NULL,
+        moderation_score REAL,
+        moderation_message TEXT,
+        created_at INTEGER NOT NULL,
+        expires_at INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+      )
+    `);
+
+    // Table des réactions
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS reactions (
+        id TEXT PRIMARY KEY,
+        confidence_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        type TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (confidence_id) REFERENCES confidences(id),
+        UNIQUE(confidence_id, user_id, type)
+      )
+    `);
+
+    // Table des réponses
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS responses (
+        id TEXT PRIMARY KEY,
+        confidence_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        content TEXT NOT NULL,
+        avatar TEXT NOT NULL,
+        moderation_score REAL,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (confidence_id) REFERENCES confidences(id)
+      )
+    `);
+
+    // Table des réactions sur les réponses
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS response_reactions (
+        id TEXT PRIMARY KEY,
+        response_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        type TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (response_id) REFERENCES responses(id),
+        UNIQUE(response_id, user_id, type)
       )
     `);
 
     console.log('✅ [BACKEND] Tables created/verified');
   }
 
-  // ========== AUTH ==========
-
-  async signup(body) {
-    console.log('[BACKEND] signup called');
-
-    const { email, password, name } = body;
-
-    // Validation
-    if (!validateEmail(email)) {
-      return errorResponse(ERRORS.INVALID_EMAIL);
-    }
-
-    if (!validatePassword(password)) {
-      return errorResponse(ERRORS.INVALID_PASSWORD);
-    }
-
-    if (!name || name.length < 2) {
-      return errorResponse('Le nom doit contenir au moins 2 caractères');
-    }
-
-    // Check if email exists
-    const existing = await this.db.execute({
-      sql: 'SELECT id FROM users WHERE email = ?',
-      args: [email]
-    });
-
-    if (existing.rows.length > 0) {
-      return errorResponse(ERRORS.EMAIL_ALREADY_EXISTS);
-    }
-
-    // Hash password
-    const password_hash = await bcrypt.hash(password, 10);
-
-    // Create user
-    const userId = generateId();
+  // ========== AUTHENTIFICATION ==========
+  
+  async authenticateDevice(deviceId) {
+    const now = Date.now();
     
-    await this.db.execute({
-      sql: `INSERT INTO users (id, email, password_hash, name) 
-            VALUES (?, ?, ?, ?)`,
-      args: [userId, email, password_hash, sanitizeInput(name)]
+    // Vérifier si ce device existe déjà
+    const deviceResult = await this.db.execute({
+      sql: 'SELECT user_id FROM devices WHERE device_id = ?',
+      args: [deviceId]
     });
-
-    // Generate JWT
-    const token = jwt.sign({ userId, email }, this.JWT_SECRET, { expiresIn: '30d' });
-
-    console.log('✅ [BACKEND] User created:', userId);
-
-    return successResponse({
-      token,
-      user: {
-        id: userId,
-        email,
-        name: sanitizeInput(name),
-        role: 'user',
-        badges: []
-      }
-    }, SUCCESS.ACCOUNT_CREATED);
-  }
-
-  async login(body) {
-    console.log('[BACKEND] login called');
-
-    const { email, password } = body;
-
-    // Validation
-    if (!validateEmail(email) || !password) {
-      return errorResponse(ERRORS.INVALID_CREDENTIALS);
-    }
-
-    // Get user
-    const result = await this.db.execute({
-      sql: 'SELECT * FROM users WHERE email = ?',
-      args: [email]
-    });
-
-    if (result.rows.length === 0) {
-      return errorResponse(ERRORS.INVALID_CREDENTIALS);
-    }
-
-    const user = result.rows[0];
-
-    // Check password
-    const valid = await bcrypt.compare(password, user.password_hash);
     
-    if (!valid) {
-      return errorResponse(ERRORS.INVALID_CREDENTIALS);
-    }
-
-    // Generate JWT
-    const token = jwt.sign({ userId: user.id, email: user.email }, this.JWT_SECRET, { expiresIn: '30d' });
-
-    console.log('✅ [BACKEND] Login successful:', user.id);
-
-    return successResponse({
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        username: user.username,
-        avatar_url: user.avatar_url,
-        role: user.role,
-        badges: JSON.parse(user.badges || '[]')
-      }
-    }, SUCCESS.LOGIN_SUCCESS);
-  }
-
-  async getMe(headers) {
-    console.log('[BACKEND] getMe called');
-
-    const userId = headers['x-user-id'];
-    
-    if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
-    }
-
-    const result = await this.db.execute({
-      sql: 'SELECT id, email, name, username, avatar_url, role, badges FROM users WHERE id = ?',
-      args: [userId]
-    });
-
-    if (result.rows.length === 0) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
-    }
-
-    const user = result.rows[0];
-
-    return successResponse({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      username: user.username,
-      avatar_url: user.avatar_url,
-      role: user.role,
-      badges: JSON.parse(user.badges || '[]')
-    });
-  }
-
-  // ========== WEBAPPS ==========
-
-  async getWebapps(query) {
-    console.log('[BACKEND] getWebapps called');
-
-    const { category, search, sort = 'recent', page = 1, limit = 12 } = query;
-
-    let sql = 'SELECT * FROM webapps WHERE status = ?';
-    let args = ['approved'];
-
-    // Category filter
-    if (category && category !== 'all') {
-      sql += ' AND category = ?';
-      args.push(category);
-    }
-
-    // Search filter
-    if (search) {
-      sql += ' AND (name LIKE ? OR description_short LIKE ? OR tags LIKE ?)';
-      const searchTerm = `%${search}%`;
-      args.push(searchTerm, searchTerm, searchTerm);
-    }
-
-    // Sort
-    switch (sort) {
-      case 'trending':
-        sql += ' ORDER BY is_trending DESC, views_count DESC';
-        break;
-      case 'top':
-        sql += ' ORDER BY avg_rating DESC, reviews_count DESC';
-        break;
-      case 'new':
-        sql += ' ORDER BY created_at DESC';
-        break;
-      default:
-        sql += ' ORDER BY created_at DESC';
-    }
-
-    // Pagination
-    const offset = (page - 1) * limit;
-    sql += ' LIMIT ? OFFSET ?';
-    args.push(limit, offset);
-
-    const result = await this.db.execute({ sql, args });
-
-    // Parse JSON fields
-    const webapps = result.rows.map(row => ({
-      ...row,
-      tags: JSON.parse(row.tags || '[]'),
-      is_trending: Boolean(row.is_trending),
-      is_featured: Boolean(row.is_featured),
-      is_new: Boolean(row.is_new)
-    }));
-
-    return successResponse({ webapps, total: result.rows.length });
-  }
-
-  async getWebapp(id) {
-    console.log('[BACKEND] getWebapp called:', id);
-
-    const result = await this.db.execute({
-      sql: 'SELECT * FROM webapps WHERE id = ?',
-      args: [id]
-    });
-
-    if (result.rows.length === 0) {
-      return errorResponse(ERRORS.WEBAPP_NOT_FOUND, 404);
-    }
-
-    const webapp = result.rows[0];
-
-    // Increment views
-    await this.db.execute({
-      sql: 'UPDATE webapps SET views_count = views_count + 1 WHERE id = ?',
-      args: [id]
-    });
-
-    // Get reviews
-    const reviewsResult = await this.db.execute({
-      sql: `SELECT r.*, u.name as user_name, u.avatar_url as user_avatar 
-            FROM reviews r 
-            JOIN users u ON r.user_id = u.id 
-            WHERE r.webapp_id = ? 
-            ORDER BY r.created_at DESC`,
-      args: [id]
-    });
-
-    return successResponse({
-      webapp: {
-        ...webapp,
-        tags: JSON.parse(webapp.tags || '[]'),
-        is_trending: Boolean(webapp.is_trending),
-        is_featured: Boolean(webapp.is_featured),
-        is_new: Boolean(webapp.is_new)
-      },
-      reviews: reviewsResult.rows
-    });
-  }
-
-  async createWebapp(body, headers) {
-    console.log('[BACKEND] createWebapp called');
-
-    const userId = headers['x-user-id'];
-    
-    if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
-    }
-
-    const { name, url, description_short, description_long, category, tags, github_url, video_url, image_url } = body;
-
-    // Validation
-    if (!validateWebappName(name)) {
-      return errorResponse(ERRORS.INVALID_NAME);
-    }
-
-    if (!validateURL(url)) {
-      return errorResponse(ERRORS.INVALID_URL);
-    }
-
-    if (!validateDescription(description_short, 200)) {
-      return errorResponse('La description courte doit contenir entre 1 et 200 caractères');
-    }
-
-    if (!category) {
-      return errorResponse(ERRORS.INVALID_CATEGORY);
-    }
-
-    // Check duplicate URL
-    const existing = await this.db.execute({
-      sql: 'SELECT id FROM webapps WHERE url = ?',
-      args: [url]
-    });
-
-    if (existing.rows.length > 0) {
-      return errorResponse(ERRORS.URL_ALREADY_EXISTS);
-    }
-
-    // Get user info
-    const userResult = await this.db.execute({
-      sql: 'SELECT name FROM users WHERE id = ?',
-      args: [userId]
-    });
-
-    const developer = userResult.rows[0].name;
-
-    // Create webapp
-    const webappId = generateId();
-    
-    await this.db.execute({
-      sql: `INSERT INTO webapps 
-            (id, name, developer, creator_id, description_short, description_long, 
-             url, category, tags, github_url, video_url, image_url, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      args: [
-        webappId,
-        sanitizeInput(name),
-        developer,
+    if (deviceResult.rows.length > 0) {
+      // Device existe, récupérer le user_id
+      const userId = deviceResult.rows[0].user_id;
+      
+      // Mettre à jour last_seen
+      await this.db.execute({
+        sql: 'UPDATE devices SET last_seen = ? WHERE device_id = ?',
+        args: [now, deviceId]
+      });
+      
+      console.log('[BACKEND] Existing device:', deviceId, '→ User:', userId);
+      
+      return {
+        success: true,
         userId,
-        sanitizeInput(description_short),
-        sanitizeInput(description_long || ''),
-        url,
-        category,
-        JSON.stringify(tags || []),
-        github_url || null,
-        video_url || null,
-        image_url || null,
-        'approved' // Auto-approved (pas de modération complexe pour MVP)
-      ]
-    });
-
-    console.log('✅ [BACKEND] Webapp created:', webappId);
-
-    // Check badges
-    await this.updateUserBadges(userId);
-
-    return successResponse({ id: webappId }, SUCCESS.WEBAPP_CREATED);
-  }
-
-  async updateWebapp(id, body, headers) {
-    console.log('[BACKEND] updateWebapp called:', id);
-
-    const userId = headers['x-user-id'];
+        isNew: false
+      };
+    }
     
-    if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
-    }
-
-    // Check ownership
-    const webappResult = await this.db.execute({
-      sql: 'SELECT creator_id FROM webapps WHERE id = ?',
-      args: [id]
-    });
-
-    if (webappResult.rows.length === 0) {
-      return errorResponse(ERRORS.WEBAPP_NOT_FOUND, 404);
-    }
-
-    if (webappResult.rows[0].creator_id !== userId) {
-      return errorResponse(ERRORS.NOT_OWNER, 403);
-    }
-
-    // Update
-    const { name, description_short, description_long, tags, github_url, video_url, image_url } = body;
-
-    await this.db.execute({
-      sql: `UPDATE webapps SET 
-            name = ?, description_short = ?, description_long = ?, 
-            tags = ?, github_url = ?, video_url = ?, image_url = ?,
-            updated_at = strftime('%s', 'now')
-            WHERE id = ?`,
-      args: [
-        sanitizeInput(name),
-        sanitizeInput(description_short),
-        sanitizeInput(description_long || ''),
-        JSON.stringify(tags || []),
-        github_url || null,
-        video_url || null,
-        image_url || null,
-        id
-      ]
-    });
-
-    console.log('✅ [BACKEND] Webapp updated:', id);
-
-    return successResponse({ id }, SUCCESS.WEBAPP_UPDATED);
-  }
-
-  async deleteWebapp(id, headers) {
-    console.log('[BACKEND] deleteWebapp called:', id);
-
-    const userId = headers['x-user-id'];
+    // Sinon, créer un nouveau user + device
+    const userId = 'user_' + Math.random().toString(36).substr(2, 9);
     
-    if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
-    }
-
-    // Check ownership
-    const webappResult = await this.db.execute({
-      sql: 'SELECT creator_id FROM webapps WHERE id = ?',
-      args: [id]
-    });
-
-    if (webappResult.rows.length === 0) {
-      return errorResponse(ERRORS.WEBAPP_NOT_FOUND, 404);
-    }
-
-    if (webappResult.rows[0].creator_id !== userId) {
-      return errorResponse(ERRORS.NOT_OWNER, 403);
-    }
-
-    // Delete
+    // Créer l'utilisateur
     await this.db.execute({
-      sql: 'DELETE FROM webapps WHERE id = ?',
-      args: [id]
+      sql: 'INSERT INTO users (id, created_at) VALUES (?, ?)',
+      args: [userId, now]
     });
-
-    // Delete associated reviews
-    await this.db.execute({
-      sql: 'DELETE FROM reviews WHERE webapp_id = ?',
-      args: [id]
-    });
-
-    console.log('✅ [BACKEND] Webapp deleted:', id);
-
-    return successResponse({ id }, SUCCESS.WEBAPP_DELETED);
-  }
-
-  // ========== REVIEWS ==========
-
-  async createReview(webappId, body, headers) {
-    console.log('[BACKEND] createReview called');
-
-    const userId = headers['x-user-id'];
     
-    if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
-    }
-
-    const { rating, comment } = body;
-
-    // Validation
-    if (!rating || rating < 1 || rating > 5) {
-      return errorResponse(ERRORS.INVALID_RATING);
-    }
-
-    // Check webapp exists
-    const webappResult = await this.db.execute({
-      sql: 'SELECT creator_id FROM webapps WHERE id = ?',
-      args: [webappId]
+    // Lier le device à l'utilisateur
+    await this.db.execute({
+      sql: 'INSERT INTO devices (device_id, user_id, last_seen) VALUES (?, ?, ?)',
+      args: [deviceId, userId, now]
     });
-
-    if (webappResult.rows.length === 0) {
-      return errorResponse(ERRORS.WEBAPP_NOT_FOUND, 404);
-    }
-
-    // Cannot review own webapp
-    if (webappResult.rows[0].creator_id === userId) {
-      return errorResponse(ERRORS.CANNOT_REVIEW_OWN);
-    }
-
-    // Check if already reviewed
-    const existingReview = await this.db.execute({
-      sql: 'SELECT id FROM reviews WHERE webapp_id = ? AND user_id = ?',
-      args: [webappId, userId]
-    });
-
-    if (existingReview.rows.length > 0) {
-      return errorResponse(ERRORS.ALREADY_REVIEWED);
-    }
-
-    // Create review
-    const reviewId = generateId();
     
-    await this.db.execute({
-      sql: `INSERT INTO reviews (id, webapp_id, user_id, rating, comment) 
-            VALUES (?, ?, ?, ?, ?)`,
-      args: [reviewId, webappId, userId, rating, sanitizeInput(comment || '')]
-    });
-
-    // Update webapp average rating
-    await this.updateWebappRating(webappId);
-
-    // Check badges
-    await this.updateUserBadges(userId);
-
-    console.log('✅ [BACKEND] Review created:', reviewId);
-
-    return successResponse({ id: reviewId }, SUCCESS.REVIEW_CREATED);
-  }
-
-  async updateWebappRating(webappId) {
-    const result = await this.db.execute({
-      sql: 'SELECT AVG(rating) as avg_rating, COUNT(*) as count FROM reviews WHERE webapp_id = ?',
-      args: [webappId]
-    });
-
-    const avgRating = result.rows[0].avg_rating || 0;
-    const count = result.rows[0].count || 0;
-
-    await this.db.execute({
-      sql: 'UPDATE webapps SET avg_rating = ?, reviews_count = ? WHERE id = ?',
-      args: [Math.round(avgRating * 10) / 10, count, webappId]
-    });
-  }
-
-  // ========== BADGES ==========
-
-  async updateUserBadges(userId) {
-    console.log('[BACKEND] updateUserBadges called:', userId);
-
-    // Get user stats
-    const webappsCount = await this.db.execute({
-      sql: 'SELECT COUNT(*) as count FROM webapps WHERE creator_id = ? AND status = ?',
-      args: [userId, 'approved']
-    });
-
-    const reviewsCount = await this.db.execute({
-      sql: 'SELECT COUNT(*) as count FROM reviews WHERE user_id = ?',
-      args: [userId]
-    });
-
-    const userResult = await this.db.execute({
-      sql: 'SELECT created_at FROM users WHERE id = ?',
-      args: [userId]
-    });
-
-    const accountAgeDays = Math.floor((Date.now() / 1000 - userResult.rows[0].created_at) / 86400);
-
-    const stats = {
-      webapps_count: webappsCount.rows[0].count,
-      reviews_count: reviewsCount.rows[0].count,
-      account_age_days: accountAgeDays,
-      helpful_percentage: 75, // TODO: Calculate real percentage
-      has_github_contribution: false // TODO: Check GitHub
+    console.log('[BACKEND] New device:', deviceId, '→ New user:', userId);
+    
+    return {
+      success: true,
+      userId,
+      isNew: true
     };
-
-    const badges = calculateBadges(stats);
-
-    // Update user badges
-    await this.db.execute({
-      sql: 'UPDATE users SET badges = ? WHERE id = ?',
-      args: [JSON.stringify(badges), userId]
-    });
-
-    console.log('✅ [BACKEND] Badges updated:', badges);
   }
 
-  // ========== REPORTS ==========
+  async createAnonymousUser() {
+    const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+    const now = Date.now();
+    
+    await this.db.execute({
+      sql: 'INSERT INTO users (id, created_at) VALUES (?, ?)',
+      args: [userId, now]
+    });
+    
+    console.log('[BACKEND] Created anonymous user:', userId);
+    
+    return {
+      success: true,
+      userId
+    };
+  }
 
-  async createReport(body, headers) {
-    console.log('[BACKEND] createReport called');
+  // ========== CONFIDENCES ==========
+  
+  async getConfidences(query) {
+    const chapter = query.chapter || 'all';
+    const userId = query.userId; // Pour filtrer "mes confidences"
+    const now = Date.now();
+    
+    let sql = `
+      SELECT 
+        c.*,
+        (SELECT COUNT(*) FROM reactions WHERE confidence_id = c.id AND type = 'soutien') as reactions_soutien,
+        (SELECT COUNT(*) FROM reactions WHERE confidence_id = c.id AND type = 'espoir') as reactions_espoir,
+        (SELECT COUNT(*) FROM reactions WHERE confidence_id = c.id AND type = 'compatis') as reactions_compatis,
+        (SELECT COUNT(*) FROM reactions WHERE confidence_id = c.id AND type = 'pas_seul') as reactions_pas_seul,
+        (SELECT COUNT(*) FROM reactions WHERE confidence_id = c.id AND type = 'courage') as reactions_courage,
+        (SELECT COUNT(*) FROM reactions WHERE confidence_id = c.id AND type = 'triste') as reactions_triste
+      FROM confidences c
+      WHERE c.expires_at > ?
+    `;
+    
+    const args = [now];
+    
+    // Filtrer par userId si demandé (mes confidences)
+    if (userId) {
+      sql += ' AND c.user_id = ?';
+      args.push(userId);
+    }
+    // Sinon filtrer par chapitre
+    else if (chapter !== 'all') {
+      sql += ' AND c.emotion = ?';
+      args.push(chapter);
+    }
+    
+    sql += ' ORDER BY c.created_at DESC LIMIT 50';
+    
+    const result = await this.db.execute({
+      sql,
+      args
+    });
+    
+    // Récupérer les réponses pour chaque confidence
+    const confidences = await Promise.all(result.rows.map(async (row) => {
+      const responsesResult = await this.db.execute({
+        sql: 'SELECT * FROM responses WHERE confidence_id = ? ORDER BY created_at ASC',
+        args: [row.id]
+      });
+      
+      // Pour chaque réponse, récupérer les réactions
+      const responsesWithReactions = await Promise.all(responsesResult.rows.map(async (resp) => {
+        const reactionsResult = await this.db.execute({
+          sql: `
+            SELECT 
+              (SELECT COUNT(*) FROM response_reactions WHERE response_id = ? AND type = 'soutien') as soutien,
+              (SELECT COUNT(*) FROM response_reactions WHERE response_id = ? AND type = 'espoir') as espoir,
+              (SELECT COUNT(*) FROM response_reactions WHERE response_id = ? AND type = 'compatis') as compatis,
+              (SELECT COUNT(*) FROM response_reactions WHERE response_id = ? AND type = 'pas_seul') as pas_seul,
+              (SELECT COUNT(*) FROM response_reactions WHERE response_id = ? AND type = 'courage') as courage,
+              (SELECT COUNT(*) FROM response_reactions WHERE response_id = ? AND type = 'triste') as triste
+          `,
+          args: [resp.id, resp.id, resp.id, resp.id, resp.id, resp.id]
+        });
+        
+        const reactionCounts = reactionsResult.rows[0];
+        
+        return {
+          id: resp.id,
+          content: resp.content,
+          avatar: resp.avatar,
+          created_at: resp.created_at,
+          reactions: {
+            soutien: Number(reactionCounts.soutien),
+            espoir: Number(reactionCounts.espoir),
+            compatis: Number(reactionCounts.compatis),
+            pas_seul: Number(reactionCounts.pas_seul),
+            courage: Number(reactionCounts.courage),
+            triste: Number(reactionCounts.triste)
+          }
+        };
+      }));
+      
+      return {
+        id: row.id,
+        user_id: row.user_id,
+        content: row.content,
+        emotion: row.emotion,
+        created_at: row.created_at,
+        reactions: {
+          soutien: Number(row.reactions_soutien),
+          espoir: Number(row.reactions_espoir),
+          compatis: Number(row.reactions_compatis),
+          pas_seul: Number(row.reactions_pas_seul),
+          courage: Number(row.reactions_courage),
+          triste: Number(row.reactions_triste)
+        },
+        responses: responsesWithReactions
+      };
+    }));
+    
+    console.log(`[BACKEND] Retrieved ${confidences.length} confidences`);
+    
+    return {
+      success: true,
+      data: confidences
+    };
+  }
 
+  async createConfidence(body, headers) {
     const userId = headers['x-user-id'];
+    const { content, emotion } = body;
     
     if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
+      return { success: false, message: 'User ID required' };
     }
-
-    const { target_type, target_id, reason } = body;
-
-    if (!reason || reason.length < 10) {
-      return errorResponse(ERRORS.INVALID_REASON);
+    
+    if (!content || content.trim().length < 10) {
+      return { success: false, message: 'La confidence doit contenir au moins 10 caractères' };
     }
-
-    // Check if already reported
-    const existing = await this.db.execute({
-      sql: 'SELECT id FROM reports WHERE reporter_id = ? AND target_type = ? AND target_id = ?',
-      args: [userId, target_type, target_id]
-    });
-
-    if (existing.rows.length > 0) {
-      return errorResponse(ERRORS.ALREADY_REPORTED);
+    
+    if (!emotion) {
+      return { success: false, message: 'Tonalité émotionnelle requise' };
     }
-
-    // Create report
-    const reportId = generateId();
+    
+    console.log('[BACKEND] Moderating confidence with AI...');
+    
+    // Modération par IA
+    const moderationResult = await this.moderateContent(content, 'confidence');
+    
+    if (!moderationResult.approved) {
+      console.log('[BACKEND] Confidence rejected by moderation');
+      return {
+        success: false,
+        moderated: true,
+        published: false,
+        moderationMessage: moderationResult.message
+      };
+    }
+    
+    // Créer la confidence
+    const confidenceId = 'conf_' + Math.random().toString(36).substr(2, 9);
+    const now = Date.now();
+    const expiresAt = now + (90 * 24 * 60 * 60 * 1000); // 3 mois
     
     await this.db.execute({
-      sql: `INSERT INTO reports (id, reporter_id, target_type, target_id, reason) 
-            VALUES (?, ?, ?, ?, ?)`,
-      args: [reportId, userId, target_type, target_id, sanitizeInput(reason)]
+      sql: `INSERT INTO confidences 
+            (id, user_id, content, emotion, moderation_score, moderation_message, created_at, expires_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [confidenceId, userId, content, emotion, moderationResult.score, moderationResult.message, now, expiresAt]
     });
-
-    console.log('✅ [BACKEND] Report created:', reportId);
-
-    return successResponse({ id: reportId }, SUCCESS.REPORT_CREATED);
+    
+    console.log('[BACKEND] Confidence created:', confidenceId);
+    
+    return {
+      success: true,
+      moderated: moderationResult.warning,
+      published: true,
+      moderationMessage: moderationResult.message,
+      confidenceId
+    };
   }
 
-  // ========== STATS ==========
-
-  async getStats() {
-    console.log('[BACKEND] getStats called');
-
-    try {
-      const webappsCount = await this.db.execute({
-        sql: 'SELECT COUNT(*) as count FROM webapps WHERE status = ?',
-        args: ['approved']
-      });
-
-      const usersCount = await this.db.execute({
-        sql: 'SELECT COUNT(*) as count FROM users',
-        args: []
-      });
-
-      const reviewsCount = await this.db.execute({
-        sql: 'SELECT COUNT(*) as count FROM reviews',
-        args: []
-      });
-
-      return successResponse({
-        webapps: webappsCount.rows[0].count || 0,
-        creators: usersCount.rows[0].count || 0,
-        reviews: reviewsCount.rows[0].count || 0
-      });
-    } catch (error) {
-      console.error('[BACKEND] getStats error:', error);
-      return successResponse({
-        webapps: 0,
-        creators: 0,
-        reviews: 0
-      });
+  async deleteConfidence(confidenceId, headers) {
+    const userId = headers['x-user-id'];
+    
+    if (!userId || !confidenceId) {
+      return { success: false, message: 'Missing required fields' };
     }
+    
+    // Vérifier que l'utilisateur est bien l'auteur
+    const confidence = await this.db.execute({
+      sql: 'SELECT user_id FROM confidences WHERE id = ?',
+      args: [confidenceId]
+    });
+    
+    if (confidence.rows.length === 0) {
+      return { success: false, message: 'Confidence not found' };
+    }
+    
+    if (confidence.rows[0].user_id !== userId) {
+      return { success: false, message: 'Unauthorized' };
+    }
+    
+    // Supprimer les réactions et réponses associées
+    await this.db.execute({
+      sql: 'DELETE FROM reactions WHERE confidence_id = ?',
+      args: [confidenceId]
+    });
+    
+    await this.db.execute({
+      sql: 'DELETE FROM responses WHERE confidence_id = ?',
+      args: [confidenceId]
+    });
+    
+    // Supprimer la confidence
+    await this.db.execute({
+      sql: 'DELETE FROM confidences WHERE id = ?',
+      args: [confidenceId]
+    });
+    
+    console.log('[BACKEND] Confidence deleted:', confidenceId);
+    
+    return { success: true };
+  }
+
+  // ========== RÉACTIONS SUR RÉPONSES ==========
+  
+  async addResponseReaction(body, headers) {
+    const userId = headers['x-user-id'];
+    const { responseId, reactionType } = body;
+    
+    if (!userId || !responseId || !reactionType) {
+      return { success: false, message: 'Missing required fields' };
+    }
+    
+    try {
+      // Vérifier si l'utilisateur a déjà cette réaction exacte
+      const existing = await this.db.execute({
+        sql: 'SELECT * FROM response_reactions WHERE response_id = ? AND user_id = ? AND type = ?',
+        args: [responseId, userId, reactionType]
+      });
+      
+      if (existing.rows.length > 0) {
+        // Toggle OFF : supprimer la réaction
+        await this.db.execute({
+          sql: 'DELETE FROM response_reactions WHERE response_id = ? AND user_id = ? AND type = ?',
+          args: [responseId, userId, reactionType]
+        });
+        
+        console.log('[BACKEND] Response reaction removed (toggle):', reactionType);
+        return { success: true, action: 'removed' };
+      }
+      
+      // Supprimer toutes les autres réactions de cet utilisateur sur cette réponse
+      await this.db.execute({
+        sql: 'DELETE FROM response_reactions WHERE response_id = ? AND user_id = ?',
+        args: [responseId, userId]
+      });
+      
+      // Ajouter la nouvelle réaction
+      const reactionId = 'resp_react_' + Math.random().toString(36).substr(2, 9);
+      const now = Date.now();
+      
+      await this.db.execute({
+        sql: 'INSERT INTO response_reactions (id, response_id, user_id, type, created_at) VALUES (?, ?, ?, ?, ?)',
+        args: [reactionId, responseId, userId, reactionType, now]
+      });
+      
+      console.log('[BACKEND] Response reaction added:', reactionType);
+      
+      return { success: true, action: 'added' };
+      
+    } catch (error) {
+      console.error('[BACKEND] Response reaction error:', error);
+      return { success: false, message: 'Database error' };
+    }
+  }
+
+  // ========== NOTIFICATIONS ==========
+  
+  async createNotification(userId, confidenceId, type, message) {
+    const notificationId = 'notif_' + Math.random().toString(36).substr(2, 9);
+    const now = Date.now();
+    
+    await this.db.execute({
+      sql: 'INSERT INTO notifications (id, user_id, confidence_id, type, message, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+      args: [notificationId, userId, confidenceId, type, message, now]
+    });
+    
+    console.log('[BACKEND] Notification created:', notificationId);
+  }
+
+  async getNotifications(userId) {
+    const result = await this.db.execute({
+      sql: `
+        SELECT n.*, c.content as confidence_preview 
+        FROM notifications n
+        LEFT JOIN confidences c ON n.confidence_id = c.id
+        WHERE n.user_id = ?
+        ORDER BY n.created_at DESC
+        LIMIT 50
+      `,
+      args: [userId]
+    });
+    
+    console.log(`[BACKEND] Retrieved ${result.rows.length} notifications for user ${userId}`);
+    
+    return {
+      success: true,
+      data: result.rows.map(row => ({
+        id: row.id,
+        type: row.type,
+        message: row.message,
+        read: row.read === 1,
+        created_at: row.created_at,
+        confidence_preview: row.confidence_preview ? row.confidence_preview.substring(0, 50) + '...' : null
+      }))
+    };
+  }
+
+  async markNotificationAsRead(notificationId) {
+    await this.db.execute({
+      sql: 'UPDATE notifications SET read = 1 WHERE id = ?',
+      args: [notificationId]
+    });
+    
+    return { success: true };
+  }
+
+  async getUnreadCount(userId) {
+    const result = await this.db.execute({
+      sql: 'SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND read = 0',
+      args: [userId]
+    });
+    
+    return {
+      success: true,
+      count: result.rows[0].count
+    };
+  }
+
+  async updateConfidence(confidenceId, body, headers) {
+    const userId = headers['x-user-id'];
+    const { content } = body;
+    
+    if (!userId || !confidenceId || !content) {
+      return { success: false, message: 'Missing required fields' };
+    }
+    
+    // Vérifier que l'utilisateur est bien l'auteur
+    const confidence = await this.db.execute({
+      sql: 'SELECT user_id FROM confidences WHERE id = ?',
+      args: [confidenceId]
+    });
+    
+    if (confidence.rows.length === 0) {
+      return { success: false, message: 'Confidence not found' };
+    }
+    
+    if (confidence.rows[0].user_id !== userId) {
+      return { success: false, message: 'Unauthorized' };
+    }
+    
+    // Re-modérer le nouveau contenu
+    console.log('[BACKEND] Moderating updated confidence...');
+    const moderationResult = await this.moderateContent(content, 'confidence');
+    
+    if (!moderationResult.approved) {
+      return {
+        success: false,
+        message: moderationResult.message
+      };
+    }
+    
+    // Mettre à jour
+    await this.db.execute({
+      sql: 'UPDATE confidences SET content = ?, moderation_score = ?, moderation_message = ? WHERE id = ?',
+      args: [content, moderationResult.score, moderationResult.message, confidenceId]
+    });
+    
+    console.log('[BACKEND] Confidence updated:', confidenceId);
+    
+    return { success: true };
+  }
+
+  // ========== RÉACTIONS ==========
+  
+  async addReaction(body, headers) {
+    const userId = headers['x-user-id'];
+    const { confidenceId, reactionType } = body;
+    
+    if (!userId || !confidenceId || !reactionType) {
+      return { success: false, message: 'Missing required fields' };
+    }
+    
+    try {
+      // Vérifier si l'utilisateur a déjà cette réaction exacte
+      const existing = await this.db.execute({
+        sql: 'SELECT * FROM reactions WHERE confidence_id = ? AND user_id = ? AND type = ?',
+        args: [confidenceId, userId, reactionType]
+      });
+      
+      if (existing.rows.length > 0) {
+        // Toggle OFF : supprimer la réaction
+        await this.db.execute({
+          sql: 'DELETE FROM reactions WHERE confidence_id = ? AND user_id = ? AND type = ?',
+          args: [confidenceId, userId, reactionType]
+        });
+        
+        console.log('[BACKEND] Reaction removed (toggle):', reactionType);
+        return { success: true, action: 'removed' };
+      }
+      
+      // Supprimer toutes les autres réactions de cet utilisateur sur cette confidence
+      await this.db.execute({
+        sql: 'DELETE FROM reactions WHERE confidence_id = ? AND user_id = ?',
+        args: [confidenceId, userId]
+      });
+      
+      // Ajouter la nouvelle réaction
+      const reactionId = 'react_' + Math.random().toString(36).substr(2, 9);
+      const now = Date.now();
+      
+      await this.db.execute({
+        sql: 'INSERT INTO reactions (id, confidence_id, user_id, type, created_at) VALUES (?, ?, ?, ?, ?)',
+        args: [reactionId, confidenceId, userId, reactionType, now]
+      });
+      
+      console.log('[BACKEND] Reaction added:', reactionType);
+      
+      return { success: true, action: 'added' };
+      
+    } catch (error) {
+      console.error('[BACKEND] Reaction error:', error);
+      return { success: false, message: 'Database error' };
+    }
+  }
+
+  // ========== RÉPONSES ==========
+  
+  async addResponse(body, headers) {
+    const userId = headers['x-user-id'];
+    const { confidenceId, content } = body;
+    
+    if (!userId || !confidenceId || !content) {
+      return { success: false, message: 'Missing required fields' };
+    }
+    
+    if (content.trim().length < 5) {
+      return { success: false, message: 'La réponse doit contenir au moins 5 caractères' };
+    }
+    
+    console.log('[BACKEND] Moderating response with AI...');
+    
+    // Modération par IA
+    const moderationResult = await this.moderateContent(content, 'response');
+    
+    if (!moderationResult.approved) {
+      console.log('[BACKEND] Response rejected by moderation');
+      return {
+        success: false,
+        message: moderationResult.message
+      };
+    }
+    
+    // Générer avatar aléatoire
+    const avatars = ['🌙', '☀️', '🌿', '🧘', '🌸', '🦋', '🌊', '🍃', '⭐', '💫'];
+    const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+    
+    const responseId = 'resp_' + Math.random().toString(36).substr(2, 9);
+    const now = Date.now();
+    
+    await this.db.execute({
+      sql: `INSERT INTO responses 
+            (id, confidence_id, user_id, content, avatar, moderation_score, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      args: [responseId, confidenceId, userId, content, avatar, moderationResult.score, now]
+    });
+    
+    console.log('[BACKEND] Response created:', responseId);
+    
+    // Créer une notification pour l'auteur de la confidence
+    const confidenceResult = await this.db.execute({
+      sql: 'SELECT user_id FROM confidences WHERE id = ?',
+      args: [confidenceId]
+    });
+    
+    if (confidenceResult.rows.length > 0) {
+      const authorId = confidenceResult.rows[0].user_id;
+      
+      // Ne pas notifier si c'est l'auteur lui-même qui répond
+      if (authorId !== userId) {
+        await this.createNotification(
+          authorId,
+          confidenceId,
+          'new_response',
+          'Quelqu\'un a répondu à votre confidence avec bienveillance 💙'
+        );
+        console.log('[BACKEND] Notification sent to author:', authorId);
+      }
+    }
+    
+    return {
+      success: true,
+      responseId
+    };
+  }
+
+  // ========== MODÉRATION IA ==========
+  
+  async moderateContent(content, type) {
+    // Si pas de clé API, approuver par défaut (mode dev)
+    if (!this.aiApiKey) {
+      console.log('[BACKEND] No AI key, skipping moderation (dev mode)');
+      return {
+        approved: true,
+        score: 0.9,
+        warning: false,
+        message: 'Moderation skipped (dev mode)'
+      };
+    }
+    
+    const prompt = type === 'confidence' 
+      ? this.getModerationPromptConfidence(content)
+      : this.getModerationPromptResponse(content);
+    
+    // Essayer chaque modèle dans l'ordre jusqu'à ce qu'un fonctionne
+    for (let i = 0; i < this.groqModels.length; i++) {
+      const model = this.groqModels[i];
+      
+      try {
+        console.log(`[BACKEND] Calling Groq API (model: ${model})...`);
+        
+        const response = await fetch(this.aiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.aiApiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              { 
+                role: 'system', 
+                content: 'Tu es un modérateur bienveillant pour Confidence Book. Réponds UNIQUEMENT par APPROVED ou REJECTED: raison.' 
+              },
+              { 
+                role: 'user', 
+                content: prompt 
+              }
+            ],
+            temperature: 0.2,
+            max_tokens: 200,
+            top_p: 1,
+            stream: false
+          })
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`[BACKEND] Model ${model} failed:`, response.status, errorText);
+          
+          // Si c'est le dernier modèle, fail-open
+          if (i === this.groqModels.length - 1) {
+            console.log('[BACKEND] All models failed, approving by default (fail-open)');
+            return {
+              approved: true,
+              score: 0.7,
+              warning: false,
+              message: 'Moderation service unavailable'
+            };
+          }
+          
+          // Sinon essayer le prochain modèle
+          continue;
+        }
+        
+        const data = await response.json();
+        const aiResponse = data.choices[0].message.content.trim();
+        
+        console.log(`[BACKEND] AI Response (${model}):`, aiResponse);
+        
+        // Parser la réponse IA
+        if (aiResponse.startsWith('APPROVED')) {
+          const warningMatch = aiResponse.match(/WARNING: (.+)/);
+          return {
+            approved: true,
+            score: 0.8,
+            warning: !!warningMatch,
+            message: warningMatch ? warningMatch[1] : 'Contenu validé'
+          };
+        } else if (aiResponse.startsWith('REJECTED')) {
+          const reason = aiResponse.replace('REJECTED:', '').trim();
+          return {
+            approved: false,
+            score: 0.2,
+            warning: false,
+            message: reason || 'Contenu non conforme aux règles de bienveillance'
+          };
+        }
+        
+        // Si format inattendu mais modèle fonctionne, approuver
+        return {
+          approved: true,
+          score: 0.7,
+          warning: false,
+          message: 'Moderation completed'
+        };
+        
+      } catch (error) {
+        console.error(`[BACKEND] Model ${model} error:`, error.message);
+        
+        // Si c'est le dernier modèle, fail-open
+        if (i === this.groqModels.length - 1) {
+          console.log('[BACKEND] All models failed, approving by default (fail-open)');
+          return {
+            approved: true,
+            score: 0.7,
+            warning: false,
+            message: 'Moderation error, content approved by default'
+          };
+        }
+        
+        // Sinon essayer le prochain
+        continue;
+      }
+    }
+    
+    // Fallback final (ne devrait jamais arriver ici)
+    return {
+      approved: true,
+      score: 0.7,
+      warning: false,
+      message: 'Moderation completed with fallback'
+    };
+  }
+
+  getModerationPromptConfidence(content) {
+    return `Analyse cette confidence et détermine si elle respecte les règles de Confidence Book:
+
+RÈGLES:
+- ✅ ACCEPTER: Expressions de tristesse, peur, colère, espoir, vulnérabilité, trauma personnel
+- ✅ ACCEPTER: Mentions de pensées suicidaires (c'est un appel à l'aide légitime)
+- ❌ REJETER: Incitations à la violence envers autrui
+- ❌ REJETER: Discours de haine, racisme, homophobie, sexisme
+- ❌ REJETER: Spam, publicité, arnaque
+- ❌ REJETER: Contenu sexuel explicite
+
+CONFIDENCE:
+"${content}"
+
+Réponds UNIQUEMENT par:
+- "APPROVED" si le contenu respecte les règles
+- "APPROVED WARNING: [message]" si le contenu est acceptable mais sensible
+- "REJECTED: [raison courte]" si le contenu viole les règles
+
+Réponse:`;
+  }
+
+  getModerationPromptResponse(content) {
+    return `Analyse cette réponse à une confidence et détermine si elle est bienveillante:
+
+RÈGLES:
+- ✅ ACCEPTER: Empathie, soutien, conseils constructifs, partage d'expérience
+- ❌ REJETER: Jugement, critique dure, minimisation de la douleur
+- ❌ REJETER: Conseils dangereux
+- ❌ REJETER: Spam, publicité, prosélytisme
+
+RÉPONSE:
+"${content}"
+
+Réponds UNIQUEMENT par:
+- "APPROVED" si la réponse est bienveillante
+- "REJECTED: [raison]" si la réponse n'est pas appropriée
+
+Réponse:`;
   }
 
   // ========== HEALTH CHECK ==========
-
+  
   async healthCheck() {
     const checks = {
       timestamp: new Date().toISOString(),
       status: 'ok',
       services: {}
     };
-
+    
+    // Check database
     try {
       await this.db.execute('SELECT 1');
       checks.services.database = 'connected';
@@ -771,7 +870,10 @@ export class BackendService {
       checks.services.database = 'offline';
       checks.status = 'degraded';
     }
-
+    
+    // Check AI
+    checks.services.ai = this.aiApiKey ? 'configured' : 'dev-mode';
+    
     return checks;
   }
 }
