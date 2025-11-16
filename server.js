@@ -91,8 +91,7 @@ export class BackendService {
         is_new INTEGER DEFAULT 1,
         status TEXT DEFAULT 'approved',
         created_at INTEGER DEFAULT (strftime('%s', 'now')),
-        updated_at INTEGER DEFAULT (strftime('%s', 'now')),
-        FOREIGN KEY (creator_id) REFERENCES users(id)
+        updated_at INTEGER DEFAULT (strftime('%s', 'now'))
       )
     `);
 
@@ -702,24 +701,35 @@ export class BackendService {
   async getStats() {
     console.log('[BACKEND] getStats called');
 
-    const webappsCount = await this.db.execute({
-      sql: 'SELECT COUNT(*) as count FROM webapps WHERE status = ?',
-      args: ['approved']
-    });
+    try {
+      const webappsCount = await this.db.execute({
+        sql: 'SELECT COUNT(*) as count FROM webapps WHERE status = ?',
+        args: ['approved']
+      });
 
-    const usersCount = await this.db.execute({
-      sql: 'SELECT COUNT(*) as count FROM users'
-    });
+      const usersCount = await this.db.execute({
+        sql: 'SELECT COUNT(*) as count FROM users',
+        args: []
+      });
 
-    const reviewsCount = await this.db.execute({
-      sql: 'SELECT COUNT(*) as count FROM reviews'
-    });
+      const reviewsCount = await this.db.execute({
+        sql: 'SELECT COUNT(*) as count FROM reviews',
+        args: []
+      });
 
-    return successResponse({
-      webapps: webappsCount.rows[0].count,
-      creators: usersCount.rows[0].count,
-      reviews: reviewsCount.rows[0].count
-    });
+      return successResponse({
+        webapps: webappsCount.rows[0].count || 0,
+        creators: usersCount.rows[0].count || 0,
+        reviews: reviewsCount.rows[0].count || 0
+      });
+    } catch (error) {
+      console.error('[BACKEND] getStats error:', error);
+      return successResponse({
+        webapps: 0,
+        creators: 0,
+        reviews: 0
+      });
+    }
   }
 
   // ========== HEALTH CHECK ==========
