@@ -1,390 +1,455 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confidence Book</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .theme-calm {
-            --bg: #f8f9fa; --surface: #fff; --primary: #3b82f6; --text: #1f2937; --text-sec: #6b7280; --border: #e5e7eb;
-        }
-        .dark .theme-calm {
-            --bg: #111827; --surface: #1f2937; --primary: #60a5fa; --text: #f9fafb; --text-sec: #9ca3af; --border: #374151;
-        }
-        body { background: var(--bg); color: var(--text); }
-        .bg-surface { background: var(--surface); }
-        .text-primary { color: var(--primary); }
-        .text-secondary { color: var(--text-sec); }
-        .border-theme { border-color: var(--border); }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Web Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    :root {
+      --bg: #0a0e27;
+      --card: #1a1f3a;
+      --text: #E0E6ED;
+      --text-dim: #a0aec0;
+      --cyan: #00d9ff;
+      --purple: #8b5cf6;
+      --green: #10b981;
+      --gold: #fbbf24;
+      --red: #ef4444;
+      --glow: rgba(0, 217, 255, 0.1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+    .hidden { display: none !important; }
+    .page { display: none; min-height: 100vh; padding-top: 80px; }
+    .page.active { display: block; }
+    
+    /* Header */
+    header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--card); border-bottom: 1px solid var(--glow); padding: 1rem 2rem; }
+    .header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .logo { display: flex; align-items: center; gap: 0.75rem; font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 700; color: var(--cyan); cursor: pointer; }
+    .logo img { width: 40px; height: 40px; }
+    .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.3s; }
+    .btn-primary { background: var(--cyan); color: #000; }
+    .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--glow); }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--cyan); color: #000; display: flex; align-items: center; justify-content: center; font-weight: 600; cursor: pointer; }
+    
+    /* Cards */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; padding: 2rem; max-width: 1400px; margin: 0 auto; }
+    .card { background: var(--card); border: 1px solid var(--glow); border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.3s; }
+    .card:hover { transform: translateY(-4px); border-color: var(--cyan); box-shadow: 0 8px 24px rgba(0, 217, 255, 0.2); }
+    .card-img { width: 100%; height: 200px; background: linear-gradient(135deg, var(--purple), var(--cyan)); display: flex; align-items: center; justify-content: center; }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .card-body { padding: 1.5rem; }
+    .card-title { font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .card-text { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1rem; }
+    .tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag { padding: 0.25rem 0.75rem; background: rgba(0, 217, 255, 0.1); border-radius: 4px; font-size: 0.85rem; color: var(--cyan); }
+    
+    /* Detail Page */
+    .detail { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    .detail-hero { background: var(--card); border-radius: 16px; padding: 3rem; margin-bottom: 2rem; }
+    .detail-title { font-family: 'Space Grotesk'; font-size: 2.5rem; margin-bottom: 1rem; }
+    .detail-video { width: 100%; height: 500px; border-radius: 12px; margin: 2rem 0; }
+    .detail-video iframe { width: 100%; height: 100%; border: none; border-radius: 12px; }
+    
+    /* Profile */
+    .profile-header { background: var(--card); border-radius: 16px; padding: 3rem; margin: 2rem auto; max-width: 1200px; display: flex; gap: 3rem; }
+    .profile-avatar { width: 120px; height: 120px; border-radius: 50%; background: var(--cyan); color: #000; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; }
+    .profile-name { font-family: 'Space Grotesk'; font-size: 2rem; margin-bottom: 0.5rem; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem; }
+    .stat { background: var(--bg); padding: 1.5rem; border-radius: 12px; text-align: center; }
+    .stat-value { font-size: 2rem; font-weight: 700; color: var(--cyan); }
+    
+    /* Modal */
+    dialog { border: none; border-radius: 16px; padding: 2rem; background: var(--card); color: var(--text); max-width: 500px; }
+    dialog::backdrop { background: rgba(0, 0, 0, 0.8); }
+    form { display: flex; flex-direction: column; gap: 1rem; }
+    input, textarea, select { padding: 0.75rem; background: var(--bg); border: 1px solid var(--glow); border-radius: 8px; color: var(--text); font-family: inherit; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--cyan); }
+    
+    /* Responsive */
+    @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .profile-header { flex-direction: column; } }
+  </style>
 </head>
-<body class="theme-calm">
+<body>
 
-<!-- AUTH VIEW -->
-<div id="auth-view" class="flex items-center justify-center min-h-screen p-4">
-    <div class="w-full max-w-md text-center bg-surface rounded-2xl shadow-lg p-12">
-        <div class="text-6xl mb-6">🌌</div>
-        <h1 class="text-3xl font-bold text-primary mb-3">Confidence Book</h1>
-        <p class="text-secondary text-lg mb-8">Personne ne doit rester seul face à son histoire.</p>
-        <button onclick="enterApp()" class="w-full bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-600 transition">
-            Entrer anonymement
-        </button>
+<!-- Header -->
+<header>
+  <div class="header-content">
+    <div class="logo" data-nav="home">
+      <img src="assets/logos/logo-nwh.svg" alt="Logo">
+      Nexus Web Hub
     </div>
-</div>
-
-<!-- APP VIEW -->
-<div id="app-view" class="hidden min-h-screen">
-    <!-- Header Mobile -->
-    <header class="md:hidden bg-surface shadow sticky top-0 z-20 flex items-center justify-between p-4 border-b border-theme">
-        <h1 class="text-xl font-bold text-primary">Confidence Book</h1>
-        <div class="flex gap-3">
-            <button onclick="showModal('notif-modal')" class="p-2 rounded-full relative">
-                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
-                <span id="badge" class="hidden absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"></span>
-            </button>
-            <button onclick="showModal('post-modal')" class="p-2 rounded-full bg-blue-500 text-white">
-                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
-            </button>
-        </div>
-    </header>
-
-    <!-- Main -->
-    <main class="max-w-2xl mx-auto p-4">
-        <!-- Publish Box -->
-        <div class="bg-surface rounded-xl shadow p-4 mb-6">
-            <button onclick="showModal('post-modal')" class="w-full text-left bg-gray-100 dark:bg-gray-700 rounded-full p-3 px-5 text-secondary hover:bg-gray-200 transition">
-                Exprimez-vous en toute sécurité...
-            </button>
-        </div>
-
-        <!-- Confidences List -->
-        <div id="list"></div>
-    </main>
-</div>
-
-<!-- POST MODAL -->
-<div id="post-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div onclick="hideModal('post-modal')" class="absolute inset-0 bg-black/50"></div>
-    <div class="bg-surface rounded-xl shadow-lg w-full max-w-2xl z-10 p-6">
-        <h2 id="modal-title" class="text-2xl font-bold text-primary mb-4">Écrire une confidence</h2>
-        <textarea id="text" rows="8" class="w-full p-4 rounded-lg border border-theme bg-surface text-secondary" placeholder="Votre histoire..."></textarea>
-        <div class="mt-4">
-            <p class="text-sm text-secondary mb-2">Tonalité :</p>
-            <div id="emotions" class="flex flex-wrap gap-2"></div>
-        </div>
-        <div class="flex justify-end gap-4 mt-6">
-            <button onclick="hideModal('post-modal')" class="text-secondary">Annuler</button>
-            <button id="submit-btn" onclick="publish()" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">Publier</button>
-        </div>
+    <div style="display: flex; gap: 1rem;">
+      <button class="btn btn-primary" data-modal="submit">✨ Soumettre</button>
+      <button class="btn btn-secondary" data-modal="auth" id="authBtn">Connexion</button>
     </div>
-</div>
+  </div>
+</header>
 
-<!-- NOTIF MODAL -->
-<div id="notif-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div onclick="hideModal('notif-modal')" class="absolute inset-0 bg-black/50"></div>
-    <div class="bg-surface rounded-xl shadow-lg w-full max-w-lg z-10 p-6 max-h-[80vh] overflow-y-auto">
-        <h2 class="text-2xl font-bold text-primary mb-4">Notifications</h2>
-        <div id="notif-list"></div>
-    </div>
-</div>
+<!-- Page: Home -->
+<main id="home" class="page active">
+  <section style="text-align: center; padding: 4rem 2rem; max-width: 900px; margin: 0 auto;">
+    <h1 style="font-family: 'Space Grotesk'; font-size: 3.5rem; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      Découvrez le meilleur du Web
+    </h1>
+    <p style="font-size: 1.25rem; color: var(--text-dim); margin: 1rem 0 2rem;">
+      Le store communautaire pour webapps évalués par la communauté
+    </p>
+    <button class="btn btn-primary">Explorer le Catalogue</button>
+  </section>
 
-<script>
-let userId = null;
-let deviceId = null;
-let emotion = null;
-let editingId = null;
-
-const CHAPTERS = [
-    { id: 'ruptures', emoji: '💔', name: 'Ruptures', color: 'red' },
-    { id: 'isolement', emoji: '😔', name: 'Isolement', color: 'blue' },
-    { id: 'traumas', emoji: '🔥', name: 'Traumas', color: 'orange' },
-    { id: 'stress', emoji: '🧠', name: 'Stress', color: 'purple' },
-    { id: 'spiritualite', emoji: '🪞', name: 'Spiritualité', color: 'indigo' },
-    { id: 'espoir', emoji: '🤝', name: 'Espoir', color: 'teal' }
-];
-
-const REACTIONS = [
-    { id: 'soutien', emoji: '🤝🏾', label: 'Je te soutiens' },
-    { id: 'espoir', emoji: '🔥', label: 'Garde espoir' },
-    { id: 'compatis', emoji: '🤜🏾🤛🏾', label: 'Je compatis' },
-    { id: 'pas_seul', emoji: '🫂', label: 'T\'es pas seul' },
-    { id: 'courage', emoji: '🙌🏾', label: 'Courage' },
-    { id: 'triste', emoji: '💔', label: 'Oh que c\'est triste' }
-];
-
-// Device ID
-async function generateDeviceId() {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.textBaseline = 'top';
-    ctx.font = '14px Arial';
-    ctx.fillText('fp', 2, 2);
+  <section style="padding: 2rem; max-width: 1400px; margin: 0 auto;">
+    <input type="search" placeholder="🔍 Rechercher..." style="width: 100%; padding: 1rem; background: var(--card); border: 1px solid var(--glow); border-radius: 12px; color: var(--text); margin-bottom: 2rem;">
     
-    const fp = {
-        ua: navigator.userAgent,
-        lang: navigator.language,
-        screen: `${screen.width}x${screen.height}`,
-        canvas: canvas.toDataURL().substring(0, 100)
-    };
+    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+      <button class="btn btn-secondary" data-filter="all">Toutes</button>
+      <button class="btn btn-secondary" data-filter="productivity">⚡ Productivité</button>
+      <button class="btn btn-secondary" data-filter="design">🎨 Design</button>
+      <button class="btn btn-secondary" data-filter="game">🎮 Jeu</button>
+    </div>
+  </section>
+
+  <div id="catalog" class="grid"></div>
+</main>
+
+<!-- Page: Detail -->
+<main id="detail" class="page">
+  <div class="detail">
+    <button class="btn btn-secondary" data-nav="home">← Retour</button>
+    <div id="detailContent"></div>
+  </div>
+</main>
+
+<!-- Page: Profile -->
+<main id="profile" class="page">
+  <div id="profileContent"></div>
+</main>
+
+<!-- Modal: Auth -->
+<dialog id="authModal">
+  <h2>Connexion</h2>
+  <form data-form="login">
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Mot de passe" required>
+    <button type="submit" class="btn btn-primary">Se connecter</button>
+  </form>
+  <p style="text-align: center; margin-top: 1rem;">
+    <a href="#" data-toggle="signup" style="color: var(--cyan);">Créer un compte</a>
+  </p>
+</dialog>
+
+<!-- Modal: Submit -->
+<dialog id="submitModal">
+  <h2>Soumettre une webapp</h2>
+  <form data-form="submit">
+    <input type="text" name="name" placeholder="Nom du projet" required>
+    <input type="url" name="url" placeholder="https://..." required>
+    <textarea name="description_short" placeholder="Description courte" maxlength="200" required></textarea>
+    <select name="category" required>
+      <option value="">Catégorie</option>
+      <option value="productivity">Productivité</option>
+      <option value="design">Design</option>
+      <option value="game">Jeu</option>
+      <option value="api">API</option>
+    </select>
+    <input type="text" name="tags" placeholder="Tags (séparés par virgules)">
+    <input type="url" name="video_url" placeholder="URL YouTube (optionnel)">
+    <button type="submit" class="btn btn-primary">Soumettre</button>
+  </form>
+</dialog>
+
+<!-- Modal: Rating -->
+<dialog id="ratingModal">
+  <h2>Laisser un avis</h2>
+  <div style="display: flex; gap: 0.5rem; justify-content: center; font-size: 3rem; margin: 2rem 0;">
+    <span data-star="1" style="cursor: pointer;">☆</span>
+    <span data-star="2" style="cursor: pointer;">☆</span>
+    <span data-star="3" style="cursor: pointer;">☆</span>
+    <span data-star="4" style="cursor: pointer;">☆</span>
+    <span data-star="5" style="cursor: pointer;">☆</span>
+  </div>
+  <form data-form="rating">
+    <textarea name="comment" placeholder="Votre avis..." rows="5"></textarea>
+    <button type="submit" class="btn btn-primary">Publier</button>
+  </form>
+</dialog>
+
+<script type="module">
+// ========== STATE ==========
+const state = {
+  user: null,
+  webapps: [],
+  currentWebapp: null,
+  selectedRating: 0
+};
+
+// ========== API ==========
+const api = {
+  async call(endpoint, options = {}) {
+    const token = localStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
     
-    let hash = 0;
-    const str = JSON.stringify(fp);
-    for (let i = 0; i < str.length; i++) {
-        hash = ((hash << 5) - hash) + str.charCodeAt(i);
-        hash = hash & hash;
+    const response = await fetch(`/api${endpoint}`, {
+      ...options,
+      headers: { ...headers, ...options.headers }
+    });
+    return response.json();
+  },
+  
+  login: (data) => api.call('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
+  signup: (data) => api.call('/auth/signup', { method: 'POST', body: JSON.stringify(data) }),
+  getWebapps: (params) => api.call('/webapps?' + new URLSearchParams(params)),
+  getWebapp: (id) => api.call(`/webapps/${id}`),
+  createWebapp: (data) => api.call('/webapps', { method: 'POST', body: JSON.stringify(data) }),
+  createReview: (id, data) => api.call(`/webapps/${id}/reviews`, { method: 'POST', body: JSON.stringify(data) }),
+  deleteWebapp: (id) => api.call(`/webapps/${id}`, { method: 'DELETE' })
+};
+
+// ========== NAVIGATION ==========
+document.querySelectorAll('[data-nav]').forEach(el => {
+  el.addEventListener('click', () => {
+    const page = el.dataset.nav;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(page).classList.add('active');
+    if (page === 'profile') renderProfile();
+  });
+});
+
+// ========== MODALS ==========
+document.querySelectorAll('[data-modal]').forEach(el => {
+  el.addEventListener('click', () => {
+    const modal = el.dataset.modal + 'Modal';
+    document.getElementById(modal).showModal();
+  });
+});
+
+// ========== FORMS ==========
+document.querySelectorAll('[data-form]').forEach(form => {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    const action = form.dataset.form;
+    
+    if (action === 'login') {
+      const result = await api.login(data);
+      if (result.success) {
+        localStorage.setItem('token', result.data.token);
+        state.user = result.data.user;
+        document.getElementById('authModal').close();
+        location.reload();
+      }
+    } else if (action === 'submit') {
+      data.tags = data.tags.split(',').map(t => t.trim());
+      const result = await api.createWebapp(data);
+      if (result.success) {
+        document.getElementById('submitModal').close();
+        loadWebapps();
+      }
+    } else if (action === 'rating') {
+      const result = await api.createReview(state.currentWebapp, {
+        rating: state.selectedRating,
+        comment: data.comment
+      });
+      if (result.success) {
+        document.getElementById('ratingModal').close();
+        showDetail(state.currentWebapp);
+      }
+    }
+  });
+});
+
+// ========== RATING STARS ==========
+document.querySelectorAll('[data-star]').forEach(star => {
+  star.addEventListener('click', () => {
+    const rating = parseInt(star.dataset.star);
+    state.selectedRating = rating;
+    document.querySelectorAll('[data-star]').forEach((s, i) => {
+      s.textContent = i < rating ? '★' : '☆';
+      s.style.color = i < rating ? 'var(--gold)' : '';
+    });
+  });
+});
+
+// ========== FILTERS ==========
+document.querySelectorAll('[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const filter = btn.dataset.filter;
+    loadWebapps(filter === 'all' ? {} : { category: filter });
+  });
+});
+
+// ========== LOAD WEBAPPS ==========
+async function loadWebapps(params = {}) {
+  const result = await api.getWebapps(params);
+  if (result.success) {
+    state.webapps = result.data.webapps;
+    renderWebapps();
+  }
+}
+
+function renderWebapps() {
+  const catalog = document.getElementById('catalog');
+  catalog.innerHTML = state.webapps.map(w => `
+    <div class="card" data-webapp="${w.id}">
+      <div class="card-img">
+        ${w.image_url ? `<img src="${w.image_url}">` : `<img src="assets/logos/logo-nwh.svg" style="width: 100px;">`}
+      </div>
+      <div class="card-body">
+        <div class="card-title">${w.name}</div>
+        <div style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 0.5rem;">par ${w.developer}</div>
+        <div style="color: var(--gold); margin-bottom: 1rem;">${'⭐'.repeat(Math.floor(w.avg_rating))} ${w.avg_rating.toFixed(1)}</div>
+        <div class="card-text">${w.description_short}</div>
+        <div class="tags">${w.tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      </div>
+    </div>
+  `).join('');
+  
+  document.querySelectorAll('[data-webapp]').forEach(card => {
+    card.addEventListener('click', () => showDetail(card.dataset.webapp));
+  });
+}
+
+// ========== SHOW DETAIL ==========
+async function showDetail(id) {
+  state.currentWebapp = id;
+  const result = await api.getWebapp(id);
+  if (result.success) {
+    const { webapp, reviews } = result.data;
+    
+    let videoEmbed = '';
+    if (webapp.video_url) {
+      const match = webapp.video_url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+      if (match) {
+        videoEmbed = `<div class="detail-video"><iframe src="https://www.youtube.com/embed/${match[1]}" allowfullscreen></iframe></div>`;
+      }
     }
     
-    return 'device_' + Math.abs(hash).toString(36);
-}
-
-// Auth
-async function enterApp() {
-    deviceId = await generateDeviceId();
-    
-    const r = await fetch('/api/auth/device', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ deviceId })
-    });
-    
-    const data = await r.json();
-    userId = data.userId;
-    
-    document.getElementById('auth-view').classList.add('hidden');
-    document.getElementById('app-view').classList.remove('hidden');
-    
-    renderEmotions();
-    loadConfidences();
-    loadNotifications();
-    setInterval(loadNotifications, 30000);
-}
-
-// Emotions
-function renderEmotions() {
-    const html = CHAPTERS.map(ch => `
-        <button onclick="selectEmotion('${ch.id}')" data-id="${ch.id}" class="emotion-btn border-2 border-gray-300 text-sm rounded-full py-2 px-4 hover:border-blue-500">
-            ${ch.emoji} ${ch.name}
-        </button>
-    `).join('');
-    document.getElementById('emotions').innerHTML = html;
-}
-
-function selectEmotion(id) {
-    emotion = id;
-    document.querySelectorAll('.emotion-btn').forEach(btn => {
-        btn.classList.toggle('border-blue-500', btn.dataset.id === id);
-        btn.classList.toggle('border-gray-300', btn.dataset.id !== id);
-    });
-}
-
-// Publish
-async function publish() {
-    const text = document.getElementById('text').value.trim();
-    
-    if (!text) return alert('Écrivez votre confidence');
-    if (!emotion && !editingId) return alert('Choisissez une tonalité');
-    
-    const url = editingId ? `/api/confidences/${editingId}` : '/api/confidences';
-    const method = editingId ? 'PUT' : 'POST';
-    
-    const r = await fetch(url, {
-        method,
-        headers: {
-            'Content-Type': 'application/json',
-            'X-User-Id': userId
-        },
-        body: JSON.stringify({ content: text, emotion })
-    });
-    
-    const data = await r.json();
-    
-    if (data.success) {
-        document.getElementById('text').value = '';
-        emotion = null;
-        editingId = null;
-        hideModal('post-modal');
-        loadConfidences();
-    } else {
-        alert(data.message);
-    }
-}
-
-// Edit
-function edit(id, content) {
-    editingId = id;
-    document.getElementById('text').value = content;
-    document.getElementById('modal-title').textContent = 'Modifier';
-    document.getElementById('submit-btn').textContent = 'Enregistrer';
-    showModal('post-modal');
-}
-
-// Delete
-async function del(id) {
-    if (!confirm('Supprimer ?')) return;
-    
-    await fetch(`/api/confidences/${id}`, {
-        method: 'DELETE',
-        headers: { 'X-User-Id': userId }
-    });
-    
-    loadConfidences();
-}
-
-// Load
-async function loadConfidences() {
-    const r = await fetch('/api/confidences');
-    const data = await r.json();
-    
-    const html = data.data.map(c => {
-        const ch = CHAPTERS.find(x => x.id === c.emotion) || CHAPTERS[0];
-        const owner = c.user_id === userId;
-        
-        return `
-            <div class="bg-surface rounded-xl shadow p-5 mb-4">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-${ch.color}-100 flex items-center justify-center">
-                            ${ch.emoji}
-                        </div>
-                        <div>
-                            <p class="text-xs text-secondary">${ch.name}</p>
-                        </div>
-                    </div>
-                    ${owner ? `<div class="flex gap-2">
-                        <button onclick="edit('${c.id}', \`${c.content.replace(/`/g, '\\`')}\`)" class="text-xs text-blue-500">✏️ Modifier</button>
-                        <button onclick="del('${c.id}')" class="text-xs text-red-500">🗑️</button>
-                    </div>` : ''}
-                </div>
-                <p class="text-lg mb-4">${c.content}</p>
-                <div class="flex flex-wrap gap-2 border-t border-theme pt-4">
-                    ${REACTIONS.map(r => `
-                        <button onclick="react('${c.id}', '${r.id}')" class="text-xs border border-theme rounded-full py-1 px-3 hover:border-blue-500">
-                            ${r.emoji} ${c.reactions[r.id] || 0}
-                        </button>
-                    `).join('')}
-                </div>
-                <div class="mt-4 space-y-3">
-                    ${c.responses.map(resp => `
-                        <div class="flex gap-3">
-                            <div class="text-2xl">${resp.avatar}</div>
-                            <div class="flex-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-3">
-                                <p class="text-sm">${resp.content}</p>
-                                <div class="flex gap-2 mt-2">
-                                    <button onclick="reactResp('${resp.id}', 'soutien')" class="text-xs">🤝🏾 ${resp.reactions.soutien || 0}</button>
-                                    <button onclick="reactResp('${resp.id}', 'espoir')" class="text-xs">🔥 ${resp.reactions.espoir || 0}</button>
-                                    <button onclick="reactResp('${resp.id}', 'compatis')" class="text-xs">🤜🏾🤛🏾 ${resp.reactions.compatis || 0}</button>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                    <input id="resp-${c.id}" placeholder="Répondre..." class="w-full bg-gray-100 dark:bg-gray-800 rounded-full p-2 px-4 text-sm" onkeypress="if(event.key==='Enter') respond('${c.id}')">
-                </div>
+    document.getElementById('detailContent').innerHTML = `
+      <div class="detail-hero">
+        <h1 class="detail-title">${webapp.name}</h1>
+        <p style="color: var(--text-dim); font-size: 1.1rem; margin-bottom: 2rem;">par ${webapp.developer}</p>
+        <div style="color: var(--gold); font-size: 1.5rem; margin-bottom: 2rem;">
+          ${'⭐'.repeat(Math.floor(webapp.avg_rating))} ${webapp.avg_rating.toFixed(1)} (${webapp.reviews_count} avis)
+        </div>
+        ${videoEmbed}
+        <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 2rem;">${webapp.description_long || webapp.description_short}</p>
+        <div class="tags" style="margin-bottom: 2rem;">${webapp.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <button class="btn btn-primary" onclick="window.open('${webapp.url}', '_blank')">🚀 Ouvrir la webapp</button>
+        <button class="btn btn-secondary" data-modal="rating">⭐ Laisser un avis</button>
+      </div>
+      <div style="background: var(--card); border-radius: 16px; padding: 2rem; margin-top: 2rem;">
+        <h3 style="font-size: 1.5rem; margin-bottom: 2rem;">Avis (${reviews.length})</h3>
+        ${reviews.map(r => `
+          <div style="background: var(--bg); padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <strong>${r.user_name}</strong>
+              <span style="color: var(--gold);">${'⭐'.repeat(r.rating)}</span>
             </div>
-        `;
-    }).join('');
+            <p style="color: var(--text-dim);">${r.comment || 'Pas de commentaire'}</p>
+          </div>
+        `).join('') || '<p style="text-align: center; color: var(--text-dim);">Aucun avis</p>'}
+      </div>
+    `;
     
-    document.getElementById('list').innerHTML = html || '<p class="text-center text-secondary py-12">Aucune confidence</p>';
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('detail').classList.add('active');
+    
+    document.querySelectorAll('[data-modal]').forEach(el => {
+      el.addEventListener('click', () => {
+        document.getElementById(el.dataset.modal + 'Modal').showModal();
+      });
+    });
+  }
 }
 
-// Reactions
-async function react(confId, type) {
-    await fetch('/api/reactions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-User-Id': userId
-        },
-        body: JSON.stringify({ confidenceId: confId, reactionType: type })
-    });
-    loadConfidences();
-}
-
-async function reactResp(respId, type) {
-    await fetch('/api/response-reactions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-User-Id': userId
-        },
-        body: JSON.stringify({ responseId: respId, reactionType: type })
-    });
-    loadConfidences();
-}
-
-// Respond
-async function respond(confId) {
-    const input = document.getElementById(`resp-${confId}`);
-    const text = input.value.trim();
-    if (!text) return;
-    
-    await fetch('/api/responses', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-User-Id': userId
-        },
-        body: JSON.stringify({ confidenceId: confId, content: text })
-    });
-    
-    input.value = '';
-    loadConfidences();
-}
-
-// Notifications
-async function loadNotifications() {
-    const r = await fetch('/api/notifications', {
-        headers: { 'X-User-Id': userId }
-    });
-    const data = await r.json();
-    
-    const unread = data.data.filter(n => !n.read).length;
-    const badge = document.getElementById('badge');
-    
-    if (unread > 0) {
-        badge.textContent = unread > 9 ? '9+' : unread;
-        badge.classList.remove('hidden');
-    } else {
-        badge.classList.add('hidden');
-    }
-    
-    const html = data.data.map(n => `
-        <div onclick="markRead('${n.id}')" class="p-4 rounded-lg ${n.read ? 'bg-gray-100' : 'bg-blue-50'} mb-2 cursor-pointer">
-            <p class="text-sm">${n.message}</p>
-            <p class="text-xs text-gray-400 mt-1">${new Date(n.created_at).toLocaleDateString('fr-FR')}</p>
+// ========== PROFILE ==========
+async function renderProfile() {
+  if (!state.user) return;
+  
+  const initials = state.user.name.substring(0, 2).toUpperCase();
+  const userWebapps = state.webapps.filter(w => w.creator_id === state.user.id);
+  
+  document.getElementById('profileContent').innerHTML = `
+    <div class="profile-header">
+      <div class="profile-avatar">${initials}</div>
+      <div style="flex: 1;">
+        <h1 class="profile-name">${state.user.name}</h1>
+        <p style="color: var(--text-dim); margin-bottom: 2rem;">${state.user.email}</p>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-value">${userWebapps.length}</div>
+            <div style="color: var(--text-dim);">Webapps</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">${state.user.badges?.length || 0}</div>
+            <div style="color: var(--text-dim);">Badges</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">0</div>
+            <div style="color: var(--text-dim);">Avis</div>
+          </div>
         </div>
-    `).join('');
-    
-    document.getElementById('notif-list').innerHTML = html || '<p class="text-center text-secondary py-6">Aucune notification</p>';
+      </div>
+    </div>
+    <div style="max-width: 1200px; margin: 2rem auto; padding: 2rem; background: var(--card); border-radius: 16px;">
+      <h3 style="font-size: 1.5rem; margin-bottom: 2rem;">Mes Webapps</h3>
+      ${userWebapps.map(w => `
+        <div style="display: flex; gap: 1.5rem; padding: 1.5rem; background: var(--bg); border-radius: 12px; margin-bottom: 1rem;">
+          <div style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden;">
+            <img src="${w.image_url || 'assets/logos/logo-nwh.svg'}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div style="flex: 1;">
+            <h4>${w.name}</h4>
+            <p style="color: var(--text-dim);">${w.description_short}</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary" data-webapp="${w.id}">👁️</button>
+            <button class="btn btn-secondary" data-delete="${w.id}">🗑️</button>
+          </div>
+        </div>
+      `).join('') || '<p style="text-align: center; color: var(--text-dim);">Aucune webapp</p>'}
+    </div>
+    <button class="btn btn-primary" onclick="localStorage.clear(); location.reload();" style="position: fixed; bottom: 2rem; right: 2rem;">🚪 Déconnexion</button>
+  `;
+  
+  document.querySelectorAll('[data-webapp]').forEach(btn => {
+    btn.addEventListener('click', () => showDetail(btn.dataset.webapp));
+  });
+  
+  document.querySelectorAll('[data-delete]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (confirm('Supprimer cette webapp ?')) {
+        await api.deleteWebapp(btn.dataset.delete);
+        renderProfile();
+      }
+    });
+  });
 }
 
-async function markRead(id) {
-    await fetch(`/api/notifications/${id}/read`, { method: 'PUT' });
-    loadNotifications();
-}
-
-// Modals
-function showModal(id) {
-    document.getElementById(id).classList.remove('hidden');
-}
-
-function hideModal(id) {
-    document.getElementById(id).classList.add('hidden');
-    if (id === 'post-modal') {
-        document.getElementById('text').value = '';
-        editingId = null;
-        emotion = null;
-        document.getElementById('modal-title').textContent = 'Écrire une confidence';
-        document.getElementById('submit-btn').textContent = 'Publier';
+// ========== INIT ==========
+async function init() {
+  const token = localStorage.getItem('token');
+  if (token) {
+    const result = await api.call('/auth/me');
+    if (result.success) {
+      state.user = result.data;
+      document.getElementById('authBtn').outerHTML = `<div class="user-avatar" data-nav="profile">${state.user.name.substring(0,2).toUpperCase()}</div>`;
+      document.querySelector('[data-nav="profile"]').addEventListener('click', () => {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('profile').classList.add('active');
+        renderProfile();
+      });
     }
+  }
+  loadWebapps();
 }
 
-// Dark mode
-if (localStorage.getItem('theme') === 'dark') {
-    document.documentElement.classList.add('dark');
-}
+init();
 </script>
 
 </body>
