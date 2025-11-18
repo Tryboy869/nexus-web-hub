@@ -1502,6 +1502,8 @@
       const email = document.getElementById('signupEmail').value;
       const password = document.getElementById('signupPassword').value;
 
+      console.log('📝 Frontend: Attempting signup...', { name, email });
+
       try {
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
@@ -1509,7 +1511,10 @@
           body: JSON.stringify({ name, email, password })
         });
 
+        console.log('📡 Frontend: Response status:', response.status);
+
         const result = await response.json();
+        console.log('📡 Frontend: Response data:', result);
 
         if (result.success) {
           localStorage.setItem('token', result.data.token);
@@ -1521,11 +1526,11 @@
             showNotificationPopup();
           }, 1500);
         } else {
-          showError('authError', result.message);
+          showError('authError', result.message || 'Erreur lors de la création du compte');
         }
       } catch (error) {
-        console.error('Signup error:', error);
-        showError('authError', 'Erreur lors de la création du compte');
+        console.error('❌ Frontend: Signup error:', error);
+        showError('authError', 'Erreur de connexion au serveur. Vérifiez votre connexion internet.');
       }
     }
 
