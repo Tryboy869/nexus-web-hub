@@ -131,13 +131,21 @@
 <!-- Modal: Auth -->
 <dialog id="authModal">
   <h2>Connexion</h2>
-  <form data-form="login">
+  <form data-form="login" style="display: flex;">
     <input type="email" name="email" placeholder="Email" required>
     <input type="password" name="password" placeholder="Mot de passe" required>
     <button type="submit" class="btn btn-primary">Se connecter</button>
   </form>
+  
+  <form data-form="signup" style="display: none;">
+    <input type="text" name="name" placeholder="Nom complet" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Mot de passe (min 6 caractères)" required minlength="6">
+    <button type="submit" class="btn btn-primary">Créer mon compte</button>
+  </form>
+  
   <p style="text-align: center; margin-top: 1rem;">
-    <a href="#" data-toggle="signup" style="color: var(--cyan);">Créer un compte</a>
+    <a href="#" data-toggle="signup" style="color: var(--cyan); cursor: pointer;">Créer un compte</a>
   </p>
 </dialog>
 
@@ -147,16 +155,21 @@
   <form data-form="submit">
     <input type="text" name="name" placeholder="Nom du projet" required>
     <input type="url" name="url" placeholder="https://..." required>
-    <textarea name="description_short" placeholder="Description courte" maxlength="200" required></textarea>
+    <textarea name="description_short" placeholder="Description courte (200 caractères max)" maxlength="200" required></textarea>
+    <textarea name="description_long" placeholder="Description longue (optionnel)" maxlength="1000"></textarea>
     <select name="category" required>
-      <option value="">Catégorie</option>
-      <option value="productivity">Productivité</option>
-      <option value="design">Design</option>
-      <option value="game">Jeu</option>
-      <option value="api">API</option>
+      <option value="">-- Choisir une catégorie --</option>
+      <option value="productivity">⚡ Productivité</option>
+      <option value="design">🎨 Design</option>
+      <option value="game">🎮 Jeu</option>
+      <option value="api">🔧 API/Outils Dev</option>
+      <option value="nocode">🚀 No-Code</option>
+      <option value="other">📦 Autre</option>
     </select>
-    <input type="text" name="tags" placeholder="Tags (séparés par virgules)">
+    <input type="text" name="tags" placeholder="Tags (séparés par des virgules)">
+    <input type="url" name="github_url" placeholder="URL GitHub (optionnel)">
     <input type="url" name="video_url" placeholder="URL YouTube (optionnel)">
+    <input type="url" name="image_url" placeholder="URL Image/Screenshot (optionnel)">
     <button type="submit" class="btn btn-primary">Soumettre</button>
   </form>
 </dialog>
