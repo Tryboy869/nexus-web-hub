@@ -1280,12 +1280,14 @@
   <div id="submitModal" class="modal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeSubmitModal()">×</button>
-      <h2 class="modal-title">Soumettre une webapp</h2>
+      <h2 class="modal-title" id="submitModalTitle">Soumettre une webapp</h2>
 
       <div id="submitError" class="error-message hidden"></div>
       <div id="submitSuccess" class="success-message hidden"></div>
 
       <form id="submitForm" onsubmit="handleSubmit(event)">
+        <input type="hidden" id="submitId" value="">
+        
         <div class="form-group">
           <label>Nom du projet *</label>
           <input type="text" id="submitName" required>
@@ -1340,7 +1342,7 @@
           <input type="url" id="submitImage" placeholder="https://...">
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Soumettre</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%;" id="submitBtn">Soumettre</button>
       </form>
     </div>
   </div>
@@ -1908,11 +1910,101 @@
       `;
     }
 
-    function editWebapp(id) {
-      alert('Fonction d\'édition à implémenter (Phase 2)');
+    async function editWebapp(id) {
+      try {
+        // Charger les données de la webapp
+        const response = await fetch(`/api/webapps/${id}`);
+        const result = await response.json();
+
+        if (result.success) {
+          const webapp = result.data.webapp;
+
+          // Pré-remplir le formulaire
+          document.getElementById('submitId').value = webapp.id;
+          document.getElementById('submitName').value = webapp.name;
+          document.getElementById('submitUrl').value = webapp.url;
+          document.getElementById('submitDescShort').value = webapp.description_short;
+          document.getElementById('submitDescLong').value = webapp.description_long || '';
+          document.getElementById('submitCategory').value = webapp.category;
+          document.getElementById('submitTags').value = webapp.tags.join(', ');
+          document.getElementById('submitGithub').value = webapp.github_url || '';
+          document.getElementById('submitVideo').value = webapp.video_url || '';
+          document.getElementById('submitImage').value = webapp.image_url || '';
+
+          // Changer le titre et le bouton
+          document.getElementById('submitModalTitle').textContent = 'Modifier la webapp';
+          document.getElementById('submitBtn').textContent = 'Mettre à jour';
+
+          // Ouvrir le modal
+          document.getElementById('submitModal').classList.add('active');
+        }
+      } catch (error) {
+        console.error('Edit webapp error:', error);
+        alert('Erreur lors du chargement de la webapp');
+      }
     }
 
-    async function deleteWebapp(id) {
+    // ========== SUBMIT WEBAPP ==========
+    async function handleSubmit(e) {
+      e.preventDefault();
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Vous devez être connecté pour soumettre une webapp');
+        openAuthModal();
+        return;
+      }
+
+      const webappId = document.getElementById('submitId').value;
+      const isEdit = webappId !== '';
+
+      const data = {
+        name: document.getElementById('submitName').value,
+        url: document.getElementById('submitUrl').value,
+        description_short: document.getElementById('submitDescShort').value,
+        description_long: document.getElementById('submitDescLong').value,
+        category: document.getElementById('submitCategory').value,
+        tags: document.getElementById('submitTags').value.split(',').map(t => t.trim()).filter(t => t),
+        github_url: document.getElementById('submitGithub').value || null,
+        video_url: document.getElementById('submitVideo').value || null,
+        image_url: document.getElementById('submitImage').value || null
+      };
+
+      try {
+        const url = isEdit ? `/api/webapps/${webappId}` : '/api/webapps';
+        const method = isEdit ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showSuccess('submitSuccess', isEdit ? 'Webapp mise à jour avec succès !' : result.message);
+          document.getElementById('submitForm').reset();
+          document.getElementById('submitId').value = '';
+          setTimeout(() => {
+            closeSubmitModal();
+            if (isEdit) {
+              loadProfilePage(); // Recharger le profil si édition
+            } else {
+              loadWebapps(); // Recharger le catalogue si nouvelle webapp
+            }
+          }, 1500);
+        } else {
+          showError('submitError', result.message);
+        }
+      } catch (error) {
+        console.error('Submit error:', error);
+        showError('submitError', 'Erreur lors de la soumission');
+      }
+    }
       const password = prompt('⚠️ ATTENTION : Cette action est irréversible.\n\nPour confirmer la suppression, entrez votre mot de passe :');
       
       if (!password) return;
@@ -2148,11 +2240,22 @@
         openAuthModal();
         return;
       }
+
+      // Réinitialiser le formulaire pour création
+      document.getElementById('submitForm').reset();
+      document.getElementById('submitId').value = '';
+      document.getElementById('submitModalTitle').textContent = 'Soumettre une webapp';
+      document.getElementById('submitBtn').textContent = 'Soumettre';
+
       document.getElementById('submitModal').classList.add('active');
     }
 
     function closeSubmitModal() {
       document.getElementById('submitModal').classList.remove('active');
+      document.getElementById('submitForm').reset();
+      document.getElementById('submitId').value = '';
+      document.getElementById('submitModalTitle').textContent = 'Soumettre une webapp';
+      document.getElementById('submitBtn').textContent = 'Soumettre';
       clearMessages();
     }
 
