@@ -702,15 +702,15 @@
     }
 
     .profile-avatar-large {
-      width: 120px;
-      height: 120px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       background: var(--accent-cyan);
       color: #000;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 3rem;
+      font-size: 2rem;
       font-weight: 700;
     }
 
@@ -721,13 +721,14 @@
 
     .profile-name {
       font-family: var(--font-heading);
-      font-size: 2rem;
+      font-size: 1.5rem;
       margin-bottom: 0.5rem;
     }
 
     .profile-email {
       color: var(--text-secondary);
       margin-bottom: 1rem;
+      font-size: 0.9rem;
     }
 
     .profile-badges {
@@ -738,39 +739,39 @@
     }
 
     .profile-badge {
-      width: 40px;
-      height: 40px;
+      width: 32px;
+      height: 32px;
     }
 
     .profile-stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
       gap: 1rem;
       margin-top: 2rem;
     }
 
     .profile-stat {
       text-align: center;
-      padding: 1rem;
+      padding: 0.75rem;
       background: var(--bg-deep-space);
       border-radius: 8px;
     }
 
     .profile-stat-value {
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: 700;
       color: var(--accent-cyan);
     }
 
     .profile-stat-label {
       color: var(--text-secondary);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     .notification-toggle {
       position: absolute;
-      top: 2rem;
-      right: 2rem;
+      top: 1rem;
+      right: 1rem;
     }
 
     .logout-btn {
@@ -796,23 +797,24 @@
 
     .section-title {
       font-family: var(--font-heading);
-      font-size: 1.8rem;
+      font-size: 1.5rem;
     }
 
     .webapp-manage-card {
       background: var(--bg-deep-space);
-      padding: 1.5rem;
+      padding: 1rem;
       border-radius: 8px;
       margin-bottom: 1rem;
       display: flex;
-      gap: 1.5rem;
+      gap: 1rem;
       align-items: center;
       transition: all 0.3s ease;
+      flex-wrap: wrap;
     }
 
     .webapp-manage-thumb {
-      width: 100px;
-      height: 100px;
+      width: 80px;
+      height: 80px;
       border-radius: 8px;
       overflow: hidden;
       background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
@@ -827,11 +829,12 @@
 
     .webapp-manage-info {
       flex: 1;
+      min-width: 200px;
     }
 
     .webapp-manage-title {
       font-weight: 600;
-      font-size: 1.1rem;
+      font-size: 1rem;
       margin-bottom: 0.5rem;
     }
 
@@ -839,7 +842,8 @@
       display: flex;
       gap: 1rem;
       color: var(--text-secondary);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      flex-wrap: wrap;
     }
 
     .webapp-manage-actions {
