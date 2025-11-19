@@ -161,73 +161,55 @@ export class BackendService {
     const { email, password, name } = body;
 
     // Validation
-    if (!email) {
-      return errorResponse('Email requis', 400);
-    }
-
     if (!validateEmail(email)) {
-      return errorResponse(ERRORS.INVALID_EMAIL, 400);
-    }
-
-    if (!password) {
-      return errorResponse('Mot de passe requis', 400);
+      return errorResponse(ERRORS.INVALID_EMAIL);
     }
 
     if (!validatePassword(password)) {
-      return errorResponse(ERRORS.INVALID_PASSWORD, 400);
+      return errorResponse(ERRORS.INVALID_PASSWORD);
     }
 
     if (!name || name.length < 2) {
-      return errorResponse('Le nom doit contenir au moins 2 caractères', 400);
+      return errorResponse('Le nom doit contenir au moins 2 caractères');
     }
 
     // Check if email exists
-    try {
-      const existing = await this.db.execute({
-        sql: 'SELECT id FROM users WHERE email = ?',
-        args: [email]
-      });
+    const existing = await this.db.execute({
+      sql: 'SELECT id FROM users WHERE email = ?',
+      args: [email]
+    });
 
-      if (existing.rows.length > 0) {
-        return errorResponse(ERRORS.EMAIL_ALREADY_EXISTS, 400);
-      }
-    } catch (error) {
-      console.error('[BACKEND] Error checking existing email:', error);
-      return errorResponse('Erreur lors de la vérification de l\'email', 500);
+    if (existing.rows.length > 0) {
+      return errorResponse(ERRORS.EMAIL_ALREADY_EXISTS);
     }
 
     // Hash password
-    try {
-      const password_hash = await bcrypt.hash(password, 10);
+    const password_hash = await bcrypt.hash(password, 10);
 
-      // Create user
-      const userId = generateId();
-      
-      await this.db.execute({
-        sql: `INSERT INTO users (id, email, password_hash, name) 
-              VALUES (?, ?, ?, ?)`,
-        args: [userId, email, password_hash, sanitizeInput(name)]
-      });
+    // Create user
+    const userId = generateId();
+    
+    await this.db.execute({
+      sql: `INSERT INTO users (id, email, password_hash, name) 
+            VALUES (?, ?, ?, ?)`,
+      args: [userId, email, password_hash, sanitizeInput(name)]
+    });
 
-      // Generate JWT
-      const token = jwt.sign({ userId, email }, this.JWT_SECRET, { expiresIn: '30d' });
+    // Generate JWT
+    const token = jwt.sign({ userId, email }, this.JWT_SECRET, { expiresIn: '30d' });
 
-      console.log('✅ [BACKEND] User created:', userId);
+    console.log('✅ [BACKEND] User created:', userId);
 
-      return successResponse({
-        token,
-        user: {
-          id: userId,
-          email,
-          name: sanitizeInput(name),
-          role: 'user',
-          badges: []
-        }
-      }, SUCCESS.ACCOUNT_CREATED);
-    } catch (error) {
-      console.error('[BACKEND] Signup error:', error);
-      return errorResponse('Erreur lors de la création du compte: ' + error.message, 500);
-    }
+    return successResponse({
+      token,
+      user: {
+        id: userId,
+        email,
+        name: sanitizeInput(name),
+        role: 'user',
+        badges: []
+      }
+    }, SUCCESS.ACCOUNT_CREATED);
   }
 
   async login(body) {
@@ -236,63 +218,46 @@ export class BackendService {
     const { email, password } = body;
 
     // Validation
-    if (!email) {
-      return errorResponse('Email requis', 400);
+    if (!validateEmail(email) || !password) {
+      return errorResponse(ERRORS.INVALID_CREDENTIALS);
     }
 
-    if (!password) {
-      return errorResponse('Mot de passe requis', 400);
+    // Get user
+    const result = await this.db.execute({
+      sql: 'SELECT * FROM users WHERE email = ?',
+      args: [email]
+    });
+
+    if (result.rows.length === 0) {
+      return errorResponse(ERRORS.INVALID_CREDENTIALS);
     }
 
-    if (!validateEmail(email)) {
-      return errorResponse(ERRORS.INVALID_CREDENTIALS, 401);
+    const user = result.rows[0];
+
+    // Check password
+    const valid = await bcrypt.compare(password, user.password_hash);
+    
+    if (!valid) {
+      return errorResponse(ERRORS.INVALID_CREDENTIALS);
     }
 
-    if (!password) {
-      return errorResponse(ERRORS.INVALID_CREDENTIALS, 401);
-    }
+    // Generate JWT
+    const token = jwt.sign({ userId: user.id, email: user.email }, this.JWT_SECRET, { expiresIn: '30d' });
 
-    try {
-      // Get user
-      const result = await this.db.execute({
-        sql: 'SELECT * FROM users WHERE email = ?',
-        args: [email]
-      });
+    console.log('✅ [BACKEND] Login successful:', user.id);
 
-      if (result.rows.length === 0) {
-        return errorResponse(ERRORS.INVALID_CREDENTIALS, 401);
+    return successResponse({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        username: user.username,
+        avatar_url: user.avatar_url,
+        role: user.role,
+        badges: JSON.parse(user.badges || '[]')
       }
-
-      const user = result.rows[0];
-
-      // Check password
-      const valid = await bcrypt.compare(password, user.password_hash);
-      
-      if (!valid) {
-        return errorResponse(ERRORS.INVALID_CREDENTIALS, 401);
-      }
-
-      // Generate JWT
-      const token = jwt.sign({ userId: user.id, email: user.email }, this.JWT_SECRET, { expiresIn: '30d' });
-
-      console.log('✅ [BACKEND] Login successful:', user.id);
-
-      return successResponse({
-        token,
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          username: user.username,
-          avatar_url: user.avatar_url,
-          role: user.role,
-          badges: JSON.parse(user.badges || '[]')
-        }
-      }, SUCCESS.LOGIN_SUCCESS);
-    } catch (error) {
-      console.error('[BACKEND] Login error:', error);
-      return errorResponse('Erreur lors de la connexion: ' + error.message, 500);
-    }
+    }, SUCCESS.LOGIN_SUCCESS);
   }
 
   async getMe(headers) {
@@ -333,6 +298,7 @@ export class BackendService {
 
     const { category, search, sort = 'recent', page = 1, limit = 12 } = query;
 
+    // IMPORTANT: Toujours afficher les webapps approved (connecté ou non)
     let sql = 'SELECT * FROM webapps WHERE status = ?';
     let args = ['approved'];
 
@@ -367,7 +333,10 @@ export class BackendService {
     // Pagination
     const offset = (page - 1) * limit;
     sql += ' LIMIT ? OFFSET ?';
-    args.push(limit, offset);
+    args.push(parseInt(limit), parseInt(offset));
+
+    console.log('[BACKEND] SQL:', sql);
+    console.log('[BACKEND] Args:', args);
 
     const result = await this.db.execute({ sql, args });
 
@@ -380,10 +349,12 @@ export class BackendService {
       is_new: Boolean(row.is_new)
     }));
 
+    console.log(`[BACKEND] Returning ${webapps.length} webapps`);
+
     return successResponse({ webapps, total: result.rows.length });
   }
 
-  async getWebapp(id) {
+  async getWebapp(id, headers) {
     console.log('[BACKEND] getWebapp called:', id);
 
     const result = await this.db.execute({
@@ -397,11 +368,17 @@ export class BackendService {
 
     const webapp = result.rows[0];
 
-    // Increment views
-    await this.db.execute({
-      sql: 'UPDATE webapps SET views_count = views_count + 1 WHERE id = ?',
-      args: [id]
-    });
+    // Increment views ONLY if user is authenticated
+    const userId = headers['x-user-id'];
+    if (userId) {
+      await this.db.execute({
+        sql: 'UPDATE webapps SET views_count = views_count + 1 WHERE id = ?',
+        args: [id]
+      });
+      console.log(`[BACKEND] View counted for user: ${userId}`);
+    } else {
+      console.log('[BACKEND] View not counted (anonymous user)');
+    }
 
     // Get reviews
     const reviewsResult = await this.db.execute({
@@ -759,24 +736,35 @@ export class BackendService {
   async getStats() {
     console.log('[BACKEND] getStats called');
 
-    const webappsCount = await this.db.execute({
-      sql: 'SELECT COUNT(*) as count FROM webapps WHERE status = ?',
-      args: ['approved']
-    });
+    try {
+      const webappsCount = await this.db.execute({
+        sql: 'SELECT COUNT(*) as count FROM webapps WHERE status = ?',
+        args: ['approved']
+      });
 
-    const usersCount = await this.db.execute({
-      sql: 'SELECT COUNT(*) as count FROM users'
-    });
+      const usersCount = await this.db.execute({
+        sql: 'SELECT COUNT(*) as count FROM users',
+        args: []
+      });
 
-    const reviewsCount = await this.db.execute({
-      sql: 'SELECT COUNT(*) as count FROM reviews'
-    });
+      const reviewsCount = await this.db.execute({
+        sql: 'SELECT COUNT(*) as count FROM reviews',
+        args: []
+      });
 
-    return successResponse({
-      webapps: webappsCount.rows[0].count,
-      creators: usersCount.rows[0].count,
-      reviews: reviewsCount.rows[0].count
-    });
+      return successResponse({
+        webapps: webappsCount.rows[0].count || 0,
+        creators: usersCount.rows[0].count || 0,
+        reviews: reviewsCount.rows[0].count || 0
+      });
+    } catch (error) {
+      console.error('[BACKEND] getStats error:', error);
+      return successResponse({
+        webapps: 0,
+        creators: 0,
+        reviews: 0
+      });
+    }
   }
 
   // ========== HEALTH CHECK ==========
