@@ -293,25 +293,31 @@
       border-color: var(--accent-cyan);
     }
 
-    /* ========== TABS ========== */
+    /* ========== TABS (FIX: Better spacing and centering) ========== */
     .tabs {
       display: flex;
       gap: 0.5rem;
       margin-bottom: 2rem;
       border-bottom: 1px solid var(--border-glow);
+      overflow-x: auto; /* Allow horizontal scroll on small screens */
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px; /* Prevent border cut-off */
     }
 
     .tab {
-      padding: 1rem 1.5rem;
+      padding: 1rem 1.25rem; /* Slightly reduced padding for better fit */
       background: transparent;
       border: none;
       color: var(--text-secondary);
       cursor: pointer;
       font-family: var(--font-body);
-      font-size: 0.95rem;
+      font-size: 0.9rem; /* Slightly smaller font */
       font-weight: 500;
       border-bottom: 2px solid transparent;
       transition: all 0.3s;
+      white-space: nowrap; /* Prevent text wrapping */
+      flex-shrink: 0; /* Prevent tabs from shrinking */
+      min-width: fit-content; /* Ensure tabs fit their content */
     }
 
     .tab:hover {
@@ -321,6 +327,19 @@
     .tab.active {
       color: var(--accent-cyan);
       border-bottom-color: var(--accent-cyan);
+    }
+
+    /* Better mobile behavior for tabs */
+    @media (max-width: 768px) {
+      .tabs {
+        justify-content: flex-start; /* Align to start on mobile */
+        padding-right: 1rem; /* Add padding for scroll indicator */
+      }
+      
+      .tab {
+        padding: 0.875rem 1rem; /* Smaller padding on mobile */
+        font-size: 0.85rem;
+      }
     }
 
     /* ========== CATALOG (Mini Cards) ========== */
@@ -619,7 +638,7 @@
       line-height: 1.6;
     }
 
-    /* ========== REVIEW FORM (Mini Overlay) ========== */
+    /* ========== REVIEW OVERLAY (Mini Form) ========== */
     .review-overlay {
       display: none;
       position: fixed;
@@ -1026,10 +1045,10 @@
       margin-bottom: 2rem;
     }
 
-    /* ========== FOOTER ========== */
+    /* ========== FOOTER (FIX: Larger touch targets) ========== */
     footer {
       border-top: 1px solid var(--border-glow);
-      padding: 3rem 2rem;
+      padding: 4rem 2rem; /* Increased from 3rem */
       margin-top: 4rem;
       text-align: center;
       color: var(--text-secondary);
@@ -1040,13 +1059,33 @@
       margin: 0 auto;
     }
 
+    /* Larger clickable areas in footer */
     footer a {
       color: var(--accent-cyan);
       text-decoration: none;
+      padding: 0.5rem; /* Added padding for larger touch target */
+      display: inline-block;
+      font-size: 1rem; /* Slightly larger font */
+      margin: 0 0.25rem; /* Spacing between links */
+      border-radius: 4px;
+      transition: all 0.3s;
     }
 
     footer a:hover {
+      background: rgba(0, 217, 255, 0.1);
       text-decoration: underline;
+    }
+
+    footer p {
+      font-size: 1rem; /* Increased from 0.85rem */
+      line-height: 2; /* More spacing between lines */
+      margin: 1rem 0; /* More vertical spacing */
+    }
+
+    .footer-intro-image {
+      max-width: 600px;
+      width: 100%;
+      margin-bottom: 2.5rem; /* Increased spacing */
     }
 
     /* ========== RESPONSIVE ========== */
@@ -1089,6 +1128,17 @@
       .notification-toggle {
         position: static;
         margin-top: 1rem;
+      }
+
+      /* Better footer on mobile */
+      footer {
+        padding: 3rem 1.5rem;
+      }
+
+      footer a {
+        display: block; /* Stack links vertically on mobile */
+        margin: 0.5rem auto;
+        max-width: fit-content;
       }
     }
 
@@ -1207,14 +1257,14 @@
     <!-- Footer -->
     <footer>
       <div class="footer-content">
-        <div style="margin-bottom: 2rem;">
-          <img src="assets/storyline/nexus-web-hub-intro.svg" alt="Nexus Web Hub Intro" style="max-width: 600px; width: 100%;">
+        <div style="margin-bottom: 2.5rem;">
+          <img src="assets/storyline/nexus-web-hub-intro.svg" alt="Nexus Web Hub Intro" class="footer-intro-image">
         </div>
-        <p>🌌 Créé par <a href="https://github.com/Tryboy869" target="_blank">Daouda Abdoul Anzize</a> - <strong>Nexus Studio</strong></p>
-        <p style="margin-top: 1rem; font-size: 0.85rem;">
+        <p style="font-size: 1.1rem; font-weight: 500;">🌌 Créé par <a href="https://github.com/Tryboy869" target="_blank">Daouda Abdoul Anzize</a> - <strong>Nexus Studio</strong></p>
+        <p style="margin-top: 1.5rem;">
           <a href="mailto:nexusstudio100@gmail.com">Contact</a> · 
           <a href="https://github.com/Tryboy869/nexus-web-hub" target="_blank">GitHub</a> · 
-          NEXUS AXION 3.5
+          <span style="color: var(--text-secondary);">NEXUS AXION 3.5</span>
         </p>
       </div>
     </footer>
@@ -1909,11 +1959,9 @@
     }
 
     function editWebapp(id) {
-      // Récupérer les infos de la webapp
       const webapp = webapps.find(w => w.id === id);
       
       if (!webapp) {
-        // Si pas dans le cache, recharger depuis l'API
         fetch(`/api/webapps/${id}`)
           .then(res => res.json())
           .then(result => {
@@ -1927,7 +1975,6 @@
     }
 
     function openEditModal(webapp) {
-      // Remplir le formulaire avec les données existantes
       document.getElementById('submitName').value = webapp.name;
       document.getElementById('submitUrl').value = webapp.url;
       document.getElementById('submitDescShort').value = webapp.description_short;
@@ -1938,21 +1985,17 @@
       document.getElementById('submitVideo').value = webapp.video_url || '';
       document.getElementById('submitImage').value = webapp.image_url || '';
 
-      // Changer le titre du modal
       document.querySelector('#submitModal .modal-title').textContent = 'Modifier la webapp';
 
-      // Changer le comportement du formulaire
       const form = document.getElementById('submitForm');
       form.onsubmit = async (e) => {
         e.preventDefault();
         await handleEdit(webapp.id);
       };
 
-      // Changer le texte du bouton
       const submitBtn = form.querySelector('button[type="submit"]');
       submitBtn.textContent = 'Mettre à jour';
 
-      // Ouvrir le modal
       document.getElementById('submitModal').classList.add('active');
     }
 
@@ -2000,7 +2043,6 @@
     }
 
     function resetSubmitForm() {
-      // Réinitialiser le formulaire pour création
       document.querySelector('#submitModal .modal-title').textContent = 'Soumettre une webapp';
       
       const form = document.getElementById('submitForm');
@@ -2020,7 +2062,6 @@
       const token = localStorage.getItem('token');
       
       try {
-        // Verify password by attempting login
         const verifyResponse = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2034,7 +2075,6 @@
           return;
         }
 
-        // Password correct, proceed with deletion
         const response = await fetch(`/api/webapps/${id}`, {
           method: 'DELETE',
           headers: {
@@ -2045,14 +2085,12 @@
         const result = await response.json();
 
         if (result.success) {
-          // Mise à jour immédiate de l'UI
           const cardElement = event.target.closest('.webapp-manage-card');
           if (cardElement) {
             cardElement.style.opacity = '0';
             cardElement.style.transform = 'translateX(-100%)';
             setTimeout(() => {
               cardElement.remove();
-              // Si plus de webapps, afficher message
               const remainingCards = document.querySelectorAll('.webapp-manage-card');
               if (remainingCards.length === 0) {
                 loadProfilePage();
@@ -2061,8 +2099,6 @@
           }
           
           alert('✅ Webapp supprimée avec succès');
-          
-          // Recharger les webapps dans le catalogue
           loadWebapps();
         } else {
           alert('❌ Erreur : ' + result.message);
