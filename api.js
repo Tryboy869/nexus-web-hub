@@ -80,7 +80,7 @@ const routeMap = {
   
   // Webapps
   'GET:/api/webapps': (req) => backend.getWebapps(req.query),
-  'GET:/api/webapps/:id': (req) => backend.getWebapp(req.params.id),
+  'GET:/api/webapps/:id': (req) => backend.getWebapp(req.params.id, req.headers),
   'POST:/api/webapps': (req) => backend.createWebapp(req.body, req.headers),
   'PUT:/api/webapps/:id': (req) => backend.updateWebapp(req.params.id, req.body, req.headers),
   'DELETE:/api/webapps/:id': (req) => backend.deleteWebapp(req.params.id, req.headers),
