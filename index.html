@@ -1944,6 +1944,51 @@
       }
     }
 
+    async function deleteWebapp(id) {
+      const password = prompt('⚠️ ATTENTION : Cette action est irréversible.\n\nPour confirmer la suppression, entrez votre mot de passe :');
+      
+      if (!password) return;
+
+      // Verify password first
+      const token = localStorage.getItem('token');
+      
+      try {
+        // Verify password by attempting login
+        const verifyResponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentUser.email, password })
+        });
+
+        const verifyResult = await verifyResponse.json();
+
+        if (!verifyResult.success) {
+          alert('❌ Mot de passe incorrect. Suppression annulée.');
+          return;
+        }
+
+        // Password correct, proceed with deletion
+        const response = await fetch(`/api/webapps/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert('✅ Webapp supprimée avec succès');
+          loadProfilePage();
+        } else {
+          alert('❌ Erreur : ' + result.message);
+        }
+      } catch (error) {
+        console.error('Delete webapp error:', error);
+        alert('❌ Erreur lors de la suppression');
+      }
+    }
+
     // ========== SUBMIT WEBAPP ==========
     async function handleSubmit(e) {
       e.preventDefault();
