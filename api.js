@@ -127,45 +127,23 @@ app.get('/', (req, res) => {
 
 app.post('/api/auth/signup', async (req, res) => {
   try {
-    console.log('📝 [API GATEWAY] Signup request received');
-    console.log('   Body:', { email: req.body.email, name: req.body.name });
-    
+    console.log('📝 [API GATEWAY] POST /api/auth/signup');
     const result = await routeRequest('POST', '/api/auth/signup', req);
-    
-    console.log('   Response success:', result.success);
-    if (!result.success) {
-      console.log('   Error:', result.message);
-    }
-    
     res.json(result);
   } catch (error) {
-    console.error('❌ [API GATEWAY] Signup error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Erreur serveur: ' + error.message 
-    });
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
 app.post('/api/auth/login', async (req, res) => {
   try {
-    console.log('🔑 [API GATEWAY] Login request received');
-    console.log('   Email:', req.body.email);
-    
+    console.log('📝 [API GATEWAY] POST /api/auth/login');
     const result = await routeRequest('POST', '/api/auth/login', req);
-    
-    console.log('   Response success:', result.success);
-    if (!result.success) {
-      console.log('   Error:', result.message);
-    }
-    
     res.json(result);
   } catch (error) {
-    console.error('❌ [API GATEWAY] Login error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Erreur serveur: ' + error.message 
-    });
+    console.error('❌ [API GATEWAY] Error:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
