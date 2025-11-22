@@ -11,9 +11,9 @@
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+
     :root {
-      --bg-deep: #0a0e27;
+      --bg-deep-space: #0a0e27;
       --bg-card: #1a1f3a;
       --bg-card-hover: #252b4a;
       --text-primary: #E0E6ED;
@@ -23,56 +23,56 @@
       --accent-green: #10b981;
       --accent-gold: #fbbf24;
       --accent-red: #ef4444;
-      --border: rgba(0, 217, 255, 0.15);
-      --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      --border-glow: rgba(0, 217, 255, 0.15);
       --font-body: 'Inter', sans-serif;
       --font-heading: 'Space Grotesk', sans-serif;
     }
 
     @media (prefers-color-scheme: light) {
       :root {
-        --bg-deep: #f0f4f8;
+        --bg-deep-space: #f5f7fa;
         --bg-card: #ffffff;
-        --bg-card-hover: #f8fafc;
+        --bg-card-hover: #f0f4f8;
         --text-primary: #1a202c;
         --text-secondary: #4a5568;
-        --border: rgba(0, 0, 0, 0.1);
-        --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        --border-glow: rgba(0, 0, 0, 0.1);
       }
     }
 
     body {
       font-family: var(--font-body);
-      background: var(--bg-deep);
+      background: var(--bg-deep-space);
       color: var(--text-primary);
-      min-height: 100vh;
       line-height: 1.6;
+      min-height: 100vh;
     }
+
+    a { color: inherit; text-decoration: none; }
 
     /* ========== HEADER ========== */
     header {
       position: sticky;
       top: 0;
-      z-index: 100;
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border);
+      z-index: 1000;
+      background: rgba(26, 31, 58, 0.95);
       backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-glow);
+      padding: 1rem 2rem;
     }
 
-    .header-inner {
+    .header-content {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 2rem;
     }
 
     .logo {
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      text-decoration: none;
       font-family: var(--font-heading);
       font-size: 1.4rem;
       font-weight: 700;
@@ -81,59 +81,43 @@
 
     .logo img { width: 36px; height: 36px; }
 
-    .nav-stats {
+    .stats {
       display: flex;
       gap: 2rem;
-    }
-
-    .stat {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--text-secondary);
     }
 
-    .stat strong {
-      color: var(--text-primary);
-      font-weight: 600;
-    }
+    .stat { display: flex; align-items: center; gap: 0.4rem; }
+    .stat-value { font-weight: 600; color: var(--text-primary); }
 
-    .header-actions {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
+    .header-actions { display: flex; gap: 1rem; align-items: center; }
 
     .btn {
-      padding: 0.6rem 1.2rem;
+      padding: 0.7rem 1.4rem;
       border: none;
       border-radius: 8px;
       font-weight: 500;
       cursor: pointer;
+      transition: all 0.3s;
       font-family: var(--font-body);
       font-size: 0.9rem;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: all 0.2s;
     }
 
     .btn-primary {
-      background: var(--accent-cyan);
-      color: #000;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: #fff;
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
+      box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
     }
 
     .btn-secondary {
       background: transparent;
       color: var(--text-primary);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-glow);
     }
 
     .btn-secondary:hover {
@@ -145,32 +129,33 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: var(--accent-cyan);
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      color: #000;
+      font-size: 0.9rem;
+      color: #fff;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: all 0.3s;
     }
 
     .user-avatar:hover {
       transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
     }
 
     /* ========== HERO ========== */
     .hero {
       text-align: center;
       padding: 5rem 2rem 3rem;
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
     }
 
     .hero h1 {
       font-family: var(--font-heading);
       font-size: 3.5rem;
-      font-weight: 700;
       margin-bottom: 1rem;
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       -webkit-background-clip: text;
@@ -184,71 +169,67 @@
       margin-bottom: 2rem;
     }
 
-    .hero-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+    .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
     /* ========== SEARCH & FILTERS ========== */
     .search-section {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 2rem;
+      padding: 0 2rem 2rem;
     }
 
-    .search-box {
+    .search-bar {
       position: relative;
       margin-bottom: 1.5rem;
     }
 
-    .search-box input {
+    .search-bar input {
       width: 100%;
       padding: 1rem 1rem 1rem 3.5rem;
       background: var(--bg-card);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-glow);
       border-radius: 12px;
       color: var(--text-primary);
       font-size: 1rem;
       font-family: var(--font-body);
-      transition: border-color 0.2s;
+      transition: all 0.3s;
     }
 
-    .search-box input:focus {
+    .search-bar input:focus {
       outline: none;
       border-color: var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
     }
 
-    .search-box::before {
-      content: '🔍';
+    .search-icon {
       position: absolute;
       left: 1.2rem;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 1.1rem;
+      font-size: 1.2rem;
     }
 
     .filters {
       display: flex;
       gap: 0.75rem;
       flex-wrap: wrap;
+      align-items: center;
       margin-bottom: 1.5rem;
     }
 
     .filter-btn {
       padding: 0.5rem 1rem;
       background: var(--bg-card);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-glow);
       border-radius: 8px;
       color: var(--text-primary);
       cursor: pointer;
+      transition: all 0.3s;
       font-family: var(--font-body);
       font-size: 0.85rem;
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      transition: all 0.2s;
     }
 
     .filter-btn img { width: 18px; height: 18px; }
@@ -261,13 +242,12 @@
 
     .tabs {
       display: flex;
-      gap: 0.25rem;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 2rem;
+      gap: 0;
+      border-bottom: 1px solid var(--border-glow);
     }
 
     .tab {
-      padding: 0.75rem 1.25rem;
+      padding: 1rem 1.5rem;
       background: transparent;
       border: none;
       color: var(--text-secondary);
@@ -276,17 +256,19 @@
       font-size: 0.9rem;
       font-weight: 500;
       border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      transition: all 0.2s;
+      transition: all 0.3s;
     }
 
     .tab:hover { color: var(--text-primary); }
-    .tab.active {
-      color: var(--accent-cyan);
-      border-bottom-color: var(--accent-cyan);
+    .tab.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
+
+    /* ========== CATALOG ========== */
+    .catalog {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
     }
 
-    /* ========== WEBAPP GRID ========== */
     .webapp-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -295,23 +277,21 @@
 
     .webapp-card {
       background: var(--bg-card);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-glow);
       border-radius: 16px;
       overflow: hidden;
       transition: all 0.3s;
       cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-      display: block;
     }
 
     .webapp-card:hover {
       transform: translateY(-6px);
       border-color: var(--accent-cyan);
-      box-shadow: 0 12px 40px rgba(0, 217, 255, 0.15);
+      box-shadow: 0 12px 40px rgba(0, 217, 255, 0.2);
     }
 
-    .webapp-thumb {
+    .webapp-image {
+      width: 100%;
       height: 180px;
       background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
       display: flex;
@@ -320,17 +300,8 @@
       position: relative;
     }
 
-    .webapp-thumb img.screenshot {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .webapp-thumb .default-logo {
-      width: 80px;
-      height: 80px;
-      opacity: 0.8;
-    }
+    .webapp-image img { width: 100%; height: 100%; object-fit: cover; }
+    .webapp-image .default-logo { width: 80px; height: 80px; opacity: 0.8; }
 
     .webapp-badges {
       position: absolute;
@@ -340,14 +311,9 @@
       gap: 0.25rem;
     }
 
-    .webapp-badges img {
-      width: 28px;
-      height: 28px;
-    }
+    .badge-icon { width: 28px; height: 28px; }
 
-    .webapp-info {
-      padding: 1.25rem;
-    }
+    .webapp-content { padding: 1.25rem; }
 
     .webapp-title {
       font-weight: 600;
@@ -355,7 +321,7 @@
       margin-bottom: 0.25rem;
     }
 
-    .webapp-dev {
+    .webapp-developer {
       font-size: 0.85rem;
       color: var(--text-secondary);
       margin-bottom: 0.75rem;
@@ -365,25 +331,25 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.9rem;
       margin-bottom: 0.75rem;
+      font-size: 0.9rem;
     }
 
     .stars { color: var(--accent-gold); }
 
-    .webapp-desc {
-      font-size: 0.9rem;
+    .webapp-description {
       color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      margin-bottom: 1rem;
     }
 
     .webapp-tags {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.4rem;
       flex-wrap: wrap;
     }
 
@@ -391,21 +357,21 @@
       padding: 0.2rem 0.6rem;
       background: rgba(0, 217, 255, 0.1);
       border-radius: 4px;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--accent-cyan);
     }
 
-    /* ========== EMPTY & LOADING ========== */
+    /* ========== LOADING & EMPTY ========== */
     .loading, .empty-state {
       text-align: center;
       padding: 4rem 2rem;
       color: var(--text-secondary);
     }
 
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--border);
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid var(--border-glow);
       border-top-color: var(--accent-cyan);
       border-radius: 50%;
       animation: spin 1s linear infinite;
@@ -414,37 +380,28 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    .empty-state-icon { font-size: 4rem; margin-bottom: 1rem; }
+
     /* ========== FOOTER ========== */
     footer {
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--border-glow);
       padding: 3rem 2rem;
-      text-align: center;
       margin-top: 4rem;
+      text-align: center;
     }
 
-    .footer-intro {
-      max-width: 500px;
-      margin: 0 auto 2rem;
-    }
+    .footer-intro { max-width: 500px; margin: 0 auto 2rem; }
+    .footer-intro img { width: 100%; height: auto; }
 
-    .footer-intro img { width: 100%; }
-
-    footer p {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-
-    footer a {
-      color: var(--accent-cyan);
-      text-decoration: none;
-    }
+    footer p { color: var(--text-secondary); font-size: 0.9rem; }
+    footer a { color: var(--accent-cyan); }
+    footer a:hover { text-decoration: underline; }
 
     /* ========== RESPONSIVE ========== */
     @media (max-width: 768px) {
-      .nav-stats { display: none; }
+      .stats { display: none; }
       .hero h1 { font-size: 2.2rem; }
-      .header-inner { padding: 0.75rem 1rem; }
-      .search-section { padding: 1rem; }
+      .hero p { font-size: 1rem; }
       .webapp-grid { grid-template-columns: 1fr; }
     }
 
@@ -455,26 +412,21 @@
 
   <!-- HEADER -->
   <header>
-    <div class="header-inner">
-      <a href="index.html" class="logo">
+    <div class="header-content">
+      <a href="/" class="logo">
         <img src="assets/logos/logo-nwh.svg" alt="NWH">
         Nexus Web Hub
       </a>
 
-      <div class="nav-stats">
-        <div class="stat">📱 <strong id="statWebapps">0</strong> webapps</div>
-        <div class="stat">👥 <strong id="statCreators">0</strong> créateurs</div>
-        <div class="stat">⭐ <strong id="statReviews">0</strong> avis</div>
+      <div class="stats">
+        <div class="stat">📱 <span class="stat-value" id="statWebapps">0</span> webapps</div>
+        <div class="stat">👥 <span class="stat-value" id="statCreators">0</span> créateurs</div>
+        <div class="stat">⭐ <span class="stat-value" id="statReviews">0</span> avis</div>
       </div>
 
       <div class="header-actions">
-        <a href="auth.html" class="btn btn-primary" id="submitBtn" onclick="return checkAuthForSubmit()">✨ Soumettre</a>
-        
-        <!-- Non connecté -->
-        <a href="auth.html" class="btn btn-secondary" id="loginBtn">Connexion</a>
-        
-        <!-- Connecté (caché par défaut) -->
-        <div class="user-avatar hidden" id="userAvatar" onclick="goToProfile()"></div>
+        <a href="submit.html" class="btn btn-primary">✨ Soumettre</a>
+        <div id="authArea"></div>
       </div>
     </div>
   </header>
@@ -483,59 +435,59 @@
   <section class="hero">
     <h1>Découvrez le meilleur du Web</h1>
     <p>Le store communautaire pour webapps, outils et jeux évalués par la communauté</p>
-    <div class="hero-buttons">
+    <div class="hero-cta">
       <button class="btn btn-primary" onclick="scrollToCatalog()">Explorer le Catalogue</button>
-      <a href="auth.html?redirect=submit" class="btn btn-secondary">Publier votre webapp</a>
+      <a href="submit.html" class="btn btn-secondary">Publier votre webapp</a>
     </div>
   </section>
 
   <!-- SEARCH & FILTERS -->
-  <section class="search-section" id="catalog">
-    <div class="search-box">
+  <section class="search-section">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
       <input type="text" id="searchInput" placeholder="Rechercher webapp, tag, créateur..." oninput="handleSearch()">
     </div>
 
     <div class="filters">
-      <button class="filter-btn active" onclick="filterCategory('all', this)">Toutes</button>
-      <button class="filter-btn" onclick="filterCategory('productivity', this)">
+      <button class="filter-btn active" data-category="all" onclick="filterCategory('all')">Toutes</button>
+      <button class="filter-btn" data-category="productivity" onclick="filterCategory('productivity')">
         <img src="assets/icons/icon-tools.svg" alt=""> Productivité
       </button>
-      <button class="filter-btn" onclick="filterCategory('design', this)">
+      <button class="filter-btn" data-category="design" onclick="filterCategory('design')">
         <img src="assets/icons/icon-ui-kits.svg" alt=""> Design
       </button>
-      <button class="filter-btn" onclick="filterCategory('game', this)">
+      <button class="filter-btn" data-category="game" onclick="filterCategory('game')">
         <img src="assets/icons/icon-games.svg" alt=""> Jeux
       </button>
-      <button class="filter-btn" onclick="filterCategory('api', this)">
+      <button class="filter-btn" data-category="api" onclick="filterCategory('api')">
         <img src="assets/icons/icon-apis.svg" alt=""> API
       </button>
-      <button class="filter-btn" onclick="filterCategory('nocode', this)">
+      <button class="filter-btn" data-category="nocode" onclick="filterCategory('nocode')">
         <img src="assets/icons/icon-websites.svg" alt=""> No-Code
       </button>
-      <button class="btn btn-secondary" onclick="surpriseMe()" style="margin-left: auto;">✨ Surprenez-moi</button>
+      <button class="btn btn-secondary" onclick="surpriseMe()">🎲 Surprenez-moi</button>
     </div>
 
     <div class="tabs">
-      <button class="tab active" onclick="filterSort('recent', this)">Toutes</button>
-      <button class="tab" onclick="filterSort('trending', this)">🔥 Trending</button>
-      <button class="tab" onclick="filterSort('new', this)">✨ Nouveautés</button>
-      <button class="tab" onclick="filterSort('top', this)">⭐ Top Rated</button>
+      <button class="tab active" data-sort="all" onclick="filterSort('all')">Toutes</button>
+      <button class="tab" data-sort="trending" onclick="filterSort('trending')">🔥 Trending</button>
+      <button class="tab" data-sort="new" onclick="filterSort('new')">✨ Nouveautés</button>
+      <button class="tab" data-sort="top" onclick="filterSort('top')">⭐ Top Rated</button>
     </div>
+  </section>
 
-    <!-- GRID -->
+  <!-- CATALOG -->
+  <section class="catalog">
     <div id="webappGrid" class="webapp-grid"></div>
-    
-    <!-- Loading -->
-    <div id="loadingState" class="loading hidden">
-      <div class="spinner"></div>
+    <div id="loadingState" class="loading">
+      <div class="loading-spinner"></div>
       <p>Chargement des webapps...</p>
     </div>
-    
-    <!-- Empty -->
     <div id="emptyState" class="empty-state hidden">
-      <p style="font-size: 3rem; margin-bottom: 1rem;">📭</p>
-      <h3 style="margin-bottom: 0.5rem;">Aucune webapp trouvée</h3>
-      <p>Modifiez vos filtres ou soyez le premier à publier !</p>
+      <div class="empty-state-icon">📭</div>
+      <h3>Aucune webapp trouvée</h3>
+      <p>Essayez de modifier vos filtres ou soyez le premier à soumettre !</p>
+      <a href="submit.html" class="btn btn-primary">Soumettre une webapp</a>
     </div>
   </section>
 
@@ -544,73 +496,51 @@
     <div class="footer-intro">
       <img src="assets/storyline/nexus-web-hub-intro.svg" alt="Nexus Web Hub">
     </div>
-    <p>
-      🌌 Créé par <a href="https://github.com/Tryboy869" target="_blank">Daouda Abdoul Anzize</a> - <strong>Nexus Studio</strong>
-    </p>
-    <p style="margin-top: 0.5rem;">
-      <a href="mailto:nexusstudio100@gmail.com">Contact</a> · 
-      <a href="https://github.com/Tryboy869/nexus-web-hub" target="_blank">GitHub</a> · 
-      NEXUS AXION 3.5
-    </p>
+    <p>🌌 Créé par <a href="https://github.com/Tryboy869">Daouda Abdoul Anzize</a> - <strong>Nexus Studio</strong></p>
+    <p style="margin-top: 0.5rem;"><a href="mailto:nexusstudio100@gmail.com">Contact</a> · <a href="https://github.com/Tryboy869/nexus-web-hub">GitHub</a> · NEXUS AXION 3.5</p>
   </footer>
 
   <script>
     // ========== STATE ==========
     let currentUser = null;
     let webapps = [];
-    let filters = { category: 'all', sort: 'recent', search: '' };
+    let filters = { category: 'all', sort: 'all', search: '' };
+
+    // ========== BADGE PATHS ==========
+    const BADGES = {
+      'trending': 'assets/badges/system/badge-trending.svg',
+      'featured': 'assets/badges/system/badge-featured.svg',
+      'new': 'assets/badges/system/badge-new.svg'
+    };
 
     // ========== INIT ==========
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('🌌 Nexus Web Hub - Initializing...');
       checkAuth();
       loadStats();
       loadWebapps();
     });
 
     // ========== AUTH ==========
-    async function checkAuth() {
+    function checkAuth() {
       const token = localStorage.getItem('token');
-      if (!token) return;
-
-      try {
-        const res = await fetch('/api/auth/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success) {
-            currentUser = data.data;
-            updateUI();
-          }
-        } else {
-          localStorage.removeItem('token');
-        }
-      } catch (e) {
-        console.error('Auth check failed:', e);
+      const userData = localStorage.getItem('user');
+      
+      if (token && userData) {
+        currentUser = JSON.parse(userData);
+        renderAuthUI(true);
+      } else {
+        renderAuthUI(false);
       }
     }
 
-    function updateUI() {
-      if (currentUser) {
-        document.getElementById('loginBtn').classList.add('hidden');
-        const avatar = document.getElementById('userAvatar');
-        avatar.classList.remove('hidden');
-        avatar.textContent = currentUser.name.substring(0, 2).toUpperCase();
+    function renderAuthUI(loggedIn) {
+      const area = document.getElementById('authArea');
+      if (loggedIn) {
+        const initials = currentUser.name.substring(0, 2).toUpperCase();
+        area.innerHTML = `<a href="profile.html" class="user-avatar" title="Mon Profil">${initials}</a>`;
+      } else {
+        area.innerHTML = `<a href="auth.html" class="btn btn-secondary">Connexion</a>`;
       }
-    }
-
-    function checkAuthForSubmit() {
-      if (!currentUser) {
-        window.location.href = 'auth.html?redirect=submit';
-        return false;
-      }
-      window.location.href = 'profile.html#submit';
-      return false;
-    }
-
-    function goToProfile() {
-      window.location.href = 'profile.html';
     }
 
     // ========== STATS ==========
@@ -623,93 +553,93 @@
           document.getElementById('statCreators').textContent = data.data.creators;
           document.getElementById('statReviews').textContent = data.data.reviews;
         }
-      } catch (e) {
-        console.error('Stats error:', e);
-      }
+      } catch (e) { console.error('Stats error:', e); }
     }
 
     // ========== WEBAPPS ==========
     async function loadWebapps() {
-      showLoading();
+      document.getElementById('loadingState').classList.remove('hidden');
+      document.getElementById('emptyState').classList.add('hidden');
+      document.getElementById('webappGrid').innerHTML = '';
 
       try {
         const params = new URLSearchParams();
         if (filters.category !== 'all') params.append('category', filters.category);
-        if (filters.sort !== 'recent') params.append('sort', filters.sort);
+        if (filters.sort !== 'all') params.append('sort', filters.sort);
         if (filters.search) params.append('search', filters.search);
 
         const res = await fetch('/api/webapps?' + params.toString());
         const data = await res.json();
 
+        document.getElementById('loadingState').classList.add('hidden');
+
         if (data.success && data.data.webapps.length > 0) {
           webapps = data.data.webapps;
           renderWebapps();
         } else {
-          showEmpty();
+          document.getElementById('emptyState').classList.remove('hidden');
         }
       } catch (e) {
-        console.error('Load webapps error:', e);
-        showEmpty();
+        console.error('Load error:', e);
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('emptyState').classList.remove('hidden');
       }
     }
 
     function renderWebapps() {
-      hideLoading();
-      hideEmpty();
-
       const grid = document.getElementById('webappGrid');
       grid.innerHTML = webapps.map(w => {
-        const badges = [];
-        if (w.is_trending) badges.push('<img src="assets/badges/system/badge-trending.svg" alt="Trending">');
-        if (w.is_featured) badges.push('<img src="assets/badges/system/badge-featured.svg" alt="Featured">');
-        if (w.is_new) badges.push('<img src="assets/badges/system/badge-new.svg" alt="New">');
+        let badges = '';
+        if (w.is_trending) badges += `<img src="${BADGES.trending}" class="badge-icon" title="Trending">`;
+        if (w.is_featured) badges += `<img src="${BADGES.featured}" class="badge-icon" title="Featured">`;
+        if (w.is_new) badges += `<img src="${BADGES.new}" class="badge-icon" title="Nouveau">`;
 
-        const thumb = w.image_url 
-          ? `<img src="${w.image_url}" class="screenshot" alt="${w.name}">`
+        const image = w.image_url 
+          ? `<img src="${w.image_url}" alt="${w.name}">`
           : `<img src="assets/logos/logo-nwh.svg" class="default-logo" alt="NWH">`;
 
         const tags = (w.tags || []).slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('');
 
         return `
-          <a href="webapp.html?id=${w.id}" class="webapp-card">
-            <div class="webapp-thumb">
-              ${thumb}
-              <div class="webapp-badges">${badges.join('')}</div>
+          <article class="webapp-card" onclick="window.location.href='webapp.html?id=${w.id}'">
+            <div class="webapp-image">
+              ${image}
+              <div class="webapp-badges">${badges}</div>
             </div>
-            <div class="webapp-info">
-              <div class="webapp-title">${w.name}</div>
-              <div class="webapp-dev">par ${w.developer}</div>
+            <div class="webapp-content">
+              <h3 class="webapp-title">${w.name}</h3>
+              <p class="webapp-developer">par ${w.developer}</p>
               <div class="webapp-rating">
                 <span class="stars">${renderStars(w.avg_rating)}</span>
-                <span>${w.avg_rating.toFixed(1)}</span>
-                <span style="color: var(--text-secondary)">(${w.reviews_count})</span>
+                <span>${(w.avg_rating || 0).toFixed(1)}</span>
+                <span style="color:var(--text-secondary)">(${w.reviews_count || 0})</span>
               </div>
-              <div class="webapp-desc">${w.description_short}</div>
+              <p class="webapp-description">${w.description_short}</p>
               <div class="webapp-tags">${tags}</div>
             </div>
-          </a>
+          </article>
         `;
       }).join('');
     }
 
     function renderStars(r) {
-      const full = Math.floor(r);
-      const half = r % 1 >= 0.5;
-      return '⭐'.repeat(full) + (half ? '✨' : '') + '☆'.repeat(5 - full - (half ? 1 : 0));
+      const full = Math.floor(r || 0);
+      const half = (r % 1 >= 0.5) ? 1 : 0;
+      return '⭐'.repeat(full) + (half ? '✨' : '') + '☆'.repeat(5 - full - half);
     }
 
     // ========== FILTERS ==========
-    function filterCategory(cat, btn) {
+    function filterCategory(cat) {
       filters.category = cat;
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      document.querySelector(`[data-category="${cat}"]`).classList.add('active');
       loadWebapps();
     }
 
-    function filterSort(sort, btn) {
+    function filterSort(sort) {
       filters.sort = sort;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
+      document.querySelector(`[data-sort="${sort}"]`).classList.add('active');
       loadWebapps();
     }
 
@@ -723,34 +653,13 @@
     }
 
     function surpriseMe() {
-      if (webapps.length === 0) return alert('Aucune webapp disponible');
-      const random = webapps[Math.floor(Math.random() * webapps.length)];
-      window.location.href = `webapp.html?id=${random.id}`;
+      if (webapps.length === 0) return alert('Aucune webapp');
+      const r = webapps[Math.floor(Math.random() * webapps.length)];
+      window.location.href = `webapp.html?id=${r.id}`;
     }
 
     function scrollToCatalog() {
-      document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // ========== UI HELPERS ==========
-    function showLoading() {
-      document.getElementById('webappGrid').innerHTML = '';
-      document.getElementById('loadingState').classList.remove('hidden');
-      document.getElementById('emptyState').classList.add('hidden');
-    }
-
-    function hideLoading() {
-      document.getElementById('loadingState').classList.add('hidden');
-    }
-
-    function showEmpty() {
-      hideLoading();
-      document.getElementById('webappGrid').innerHTML = '';
-      document.getElementById('emptyState').classList.remove('hidden');
-    }
-
-    function hideEmpty() {
-      document.getElementById('emptyState').classList.add('hidden');
+      document.querySelector('.catalog').scrollIntoView({ behavior: 'smooth' });
     }
   </script>
 </body>
