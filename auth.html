@@ -9,9 +9,9 @@
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+
     :root {
-      --bg-deep: #0a0e27;
+      --bg-deep-space: #0a0e27;
       --bg-card: #1a1f3a;
       --text-primary: #E0E6ED;
       --text-secondary: #a0aec0;
@@ -19,29 +19,21 @@
       --accent-purple: #8b5cf6;
       --accent-green: #10b981;
       --accent-red: #ef4444;
-      --border: rgba(0, 217, 255, 0.15);
+      --border-glow: rgba(0, 217, 255, 0.15);
       --font-body: 'Inter', sans-serif;
       --font-heading: 'Space Grotesk', sans-serif;
     }
 
-    @media (prefers-color-scheme: light) {
-      :root {
-        --bg-deep: #f0f4f8;
-        --bg-card: #ffffff;
-        --text-primary: #1a202c;
-        --text-secondary: #4a5568;
-        --border: rgba(0, 0, 0, 0.1);
-      }
-    }
-
     body {
       font-family: var(--font-body);
-      background: var(--bg-deep);
+      background: var(--bg-deep-space);
       color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
+
+    a { color: inherit; text-decoration: none; }
 
     /* HEADER */
     header {
@@ -53,7 +45,6 @@
       display: inline-flex;
       align-items: center;
       gap: 0.75rem;
-      text-decoration: none;
       font-family: var(--font-heading);
       font-size: 1.5rem;
       font-weight: 700;
@@ -73,21 +64,20 @@
 
     .auth-container {
       width: 100%;
-      max-width: 440px;
+      max-width: 420px;
     }
 
     .auth-card {
       background: var(--bg-card);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-glow);
       border-radius: 20px;
       padding: 2.5rem;
-      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
 
     .auth-title {
       font-family: var(--font-heading);
       font-size: 1.8rem;
-      font-weight: 700;
       text-align: center;
       margin-bottom: 2rem;
     }
@@ -95,25 +85,23 @@
     /* TABS */
     .auth-tabs {
       display: flex;
-      gap: 0.5rem;
       margin-bottom: 2rem;
-      background: var(--bg-deep);
       border-radius: 10px;
-      padding: 0.25rem;
+      overflow: hidden;
+      background: var(--bg-deep-space);
     }
 
     .auth-tab {
       flex: 1;
-      padding: 0.75rem;
-      border: none;
+      padding: 0.9rem;
       background: transparent;
+      border: none;
       color: var(--text-secondary);
-      cursor: pointer;
       font-family: var(--font-body);
       font-size: 0.95rem;
       font-weight: 500;
-      border-radius: 8px;
-      transition: all 0.2s;
+      cursor: pointer;
+      transition: all 0.3s;
     }
 
     .auth-tab.active {
@@ -121,38 +109,45 @@
       color: #000;
     }
 
-    /* FORM */
-    .auth-form { display: flex; flex-direction: column; gap: 1.25rem; }
+    /* FORMS */
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
 
-    .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .form-group { margin-bottom: 1.5rem; }
 
     .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
       font-weight: 500;
       font-size: 0.9rem;
     }
 
     .form-group input {
+      width: 100%;
       padding: 0.9rem 1rem;
-      background: var(--bg-deep);
-      border: 1px solid var(--border);
+      background: var(--bg-deep-space);
+      border: 1px solid var(--border-glow);
       border-radius: 10px;
       color: var(--text-primary);
       font-family: var(--font-body);
       font-size: 1rem;
-      transition: border-color 0.2s;
+      transition: all 0.3s;
     }
 
     .form-group input:focus {
       outline: none;
       border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(0, 217, 255, 0.2);
     }
 
-    .form-note {
+    .form-hint {
       font-size: 0.8rem;
       color: var(--text-secondary);
+      margin-top: 0.35rem;
     }
 
     .btn {
+      width: 100%;
       padding: 1rem;
       border: none;
       border-radius: 10px;
@@ -160,21 +155,18 @@
       cursor: pointer;
       font-family: var(--font-body);
       font-size: 1rem;
-      transition: all 0.2s;
+      transition: all 0.3s;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: #fff;
     }
 
-    .btn-primary {
-      background: var(--accent-cyan);
-      color: #000;
-    }
-
-    .btn-primary:hover {
+    .btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
+      box-shadow: 0 8px 25px rgba(0, 217, 255, 0.4);
     }
 
-    .btn-primary:disabled {
-      opacity: 0.6;
+    .btn:disabled {
+      opacity: 0.5;
       cursor: not-allowed;
       transform: none;
     }
@@ -182,8 +174,9 @@
     /* MESSAGES */
     .message {
       padding: 1rem;
-      border-radius: 10px;
-      margin-bottom: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      text-align: center;
       font-size: 0.9rem;
     }
 
@@ -199,29 +192,42 @@
       color: var(--accent-green);
     }
 
-    /* BACK LINK */
-    .back-link {
+    /* FOOTER LINK */
+    .auth-footer {
       text-align: center;
-      margin-top: 1.5rem;
+      margin-top: 2rem;
     }
 
-    .back-link a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: color 0.2s;
+    .auth-footer a {
+      color: var(--accent-cyan);
     }
 
-    .back-link a:hover { color: var(--accent-cyan); }
+    .auth-footer a:hover { text-decoration: underline; }
+
+    /* DECORATIONS */
+    .decoration {
+      position: fixed;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-cyan), transparent);
+      opacity: 0.05;
+      pointer-events: none;
+    }
+
+    .decoration.top-left { top: -100px; left: -100px; }
+    .decoration.bottom-right { bottom: -100px; right: -100px; background: radial-gradient(circle, var(--accent-purple), transparent); }
 
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
+  <div class="decoration top-left"></div>
+  <div class="decoration bottom-right"></div>
 
   <!-- HEADER -->
   <header>
-    <a href="index.html" class="logo">
+    <a href="/" class="logo">
       <img src="assets/logos/logo-nwh.svg" alt="NWH">
       Nexus Web Hub
     </a>
@@ -231,7 +237,7 @@
   <main>
     <div class="auth-container">
       <div class="auth-card">
-        <h1 class="auth-title">Bienvenue 👋</h1>
+        <h1 class="auth-title">Bienvenue</h1>
 
         <!-- TABS -->
         <div class="auth-tabs">
@@ -240,42 +246,43 @@
         </div>
 
         <!-- MESSAGES -->
-        <div class="message error hidden" id="errorMsg"></div>
-        <div class="message success hidden" id="successMsg"></div>
+        <div id="errorMessage" class="message error hidden"></div>
+        <div id="successMessage" class="message success hidden"></div>
 
         <!-- LOGIN FORM -->
-        <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+        <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
           <div class="form-group">
             <label>Email</label>
-            <input type="email" id="loginEmail" required placeholder="votre@email.com">
+            <input type="email" id="loginEmail" required placeholder="vous@exemple.com">
           </div>
           <div class="form-group">
             <label>Mot de passe</label>
             <input type="password" id="loginPassword" required placeholder="••••••••">
           </div>
-          <button type="submit" class="btn btn-primary" id="loginBtn">Se connecter</button>
+          <button type="submit" class="btn" id="loginBtn">Se connecter</button>
         </form>
 
         <!-- SIGNUP FORM -->
-        <form class="auth-form hidden" id="signupForm" onsubmit="handleSignup(event)">
+        <form class="auth-form" id="signupForm" onsubmit="handleSignup(event)">
           <div class="form-group">
             <label>Nom complet</label>
             <input type="text" id="signupName" required placeholder="Votre nom">
           </div>
           <div class="form-group">
             <label>Email</label>
-            <input type="email" id="signupEmail" required placeholder="votre@email.com">
+            <input type="email" id="signupEmail" required placeholder="vous@exemple.com">
           </div>
           <div class="form-group">
             <label>Mot de passe</label>
-            <input type="password" id="signupPassword" required placeholder="••••••••" minlength="6">
-            <span class="form-note">Minimum 6 caractères</span>
+            <input type="password" id="signupPassword" required placeholder="••••••••">
+            <div class="form-hint">Au moins 6 caractères</div>
           </div>
-          <button type="submit" class="btn btn-primary" id="signupBtn">Créer mon compte</button>
+          <button type="submit" class="btn" id="signupBtn">Créer mon compte</button>
         </form>
 
-        <div class="back-link">
-          <a href="index.html">← Retour à l'accueil</a>
+        <!-- FOOTER -->
+        <div class="auth-footer">
+          <a href="/">← Retour à l'accueil</a>
         </div>
       </div>
     </div>
@@ -286,28 +293,50 @@
     document.addEventListener('DOMContentLoaded', () => {
       const token = localStorage.getItem('token');
       if (token) {
-        redirectAfterAuth();
+        window.location.href = 'profile.html';
       }
     });
 
     function switchTab(tab) {
       document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
+      document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
       
-      document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
-      document.getElementById('signupForm').classList.toggle('hidden', tab !== 'signup');
-      
+      if (tab === 'login') {
+        document.querySelectorAll('.auth-tab')[0].classList.add('active');
+        document.getElementById('loginForm').classList.add('active');
+      } else {
+        document.querySelectorAll('.auth-tab')[1].classList.add('active');
+        document.getElementById('signupForm').classList.add('active');
+      }
+
       hideMessages();
+    }
+
+    function showError(msg) {
+      document.getElementById('errorMessage').textContent = msg;
+      document.getElementById('errorMessage').classList.remove('hidden');
+      document.getElementById('successMessage').classList.add('hidden');
+    }
+
+    function showSuccess(msg) {
+      document.getElementById('successMessage').textContent = msg;
+      document.getElementById('successMessage').classList.remove('hidden');
+      document.getElementById('errorMessage').classList.add('hidden');
+    }
+
+    function hideMessages() {
+      document.getElementById('errorMessage').classList.add('hidden');
+      document.getElementById('successMessage').classList.add('hidden');
     }
 
     async function handleLogin(e) {
       e.preventDefault();
       hideMessages();
-      
+
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
       const btn = document.getElementById('loginBtn');
-      
+
       btn.disabled = true;
       btn.textContent = 'Connexion...';
 
@@ -322,15 +351,20 @@
 
         if (data.success) {
           localStorage.setItem('token', data.data.token);
+          localStorage.setItem('user', JSON.stringify(data.data.user));
           showSuccess('Connexion réussie ! Redirection...');
-          setTimeout(() => redirectAfterAuth(), 1000);
+          
+          setTimeout(() => {
+            const redirect = new URLSearchParams(window.location.search).get('redirect');
+            window.location.href = redirect || '/';
+          }, 1000);
         } else {
-          showError(data.message || 'Erreur de connexion');
+          showError(data.message);
           btn.disabled = false;
           btn.textContent = 'Se connecter';
         }
-      } catch (e) {
-        console.error('Login error:', e);
+      } catch (err) {
+        console.error(err);
         showError('Erreur de connexion');
         btn.disabled = false;
         btn.textContent = 'Se connecter';
@@ -340,12 +374,17 @@
     async function handleSignup(e) {
       e.preventDefault();
       hideMessages();
-      
+
       const name = document.getElementById('signupName').value;
       const email = document.getElementById('signupEmail').value;
       const password = document.getElementById('signupPassword').value;
       const btn = document.getElementById('signupBtn');
-      
+
+      if (password.length < 6) {
+        showError('Le mot de passe doit contenir au moins 6 caractères');
+        return;
+      }
+
       btn.disabled = true;
       btn.textContent = 'Création...';
 
@@ -360,47 +399,23 @@
 
         if (data.success) {
           localStorage.setItem('token', data.data.token);
+          localStorage.setItem('user', JSON.stringify(data.data.user));
           showSuccess('Compte créé ! Redirection...');
-          setTimeout(() => redirectAfterAuth(), 1000);
+          
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1000);
         } else {
-          showError(data.message || 'Erreur de création');
+          showError(data.message);
           btn.disabled = false;
           btn.textContent = 'Créer mon compte';
         }
-      } catch (e) {
-        console.error('Signup error:', e);
-        showError('Erreur de création');
+      } catch (err) {
+        console.error(err);
+        showError('Erreur lors de la création');
         btn.disabled = false;
         btn.textContent = 'Créer mon compte';
       }
-    }
-
-    function redirectAfterAuth() {
-      const params = new URLSearchParams(window.location.search);
-      const redirect = params.get('redirect');
-      
-      if (redirect === 'submit') {
-        window.location.href = 'profile.html#submit';
-      } else {
-        window.location.href = 'index.html';
-      }
-    }
-
-    function showError(msg) {
-      const el = document.getElementById('errorMsg');
-      el.textContent = msg;
-      el.classList.remove('hidden');
-    }
-
-    function showSuccess(msg) {
-      const el = document.getElementById('successMsg');
-      el.textContent = msg;
-      el.classList.remove('hidden');
-    }
-
-    function hideMessages() {
-      document.getElementById('errorMsg').classList.add('hidden');
-      document.getElementById('successMsg').classList.add('hidden');
     }
   </script>
 </body>
