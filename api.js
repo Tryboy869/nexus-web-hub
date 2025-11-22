@@ -80,7 +80,7 @@ const routeMap = {
   
   // Webapps
   'GET:/api/webapps': (req) => backend.getWebapps(req.query),
-  'GET:/api/webapps/:id': (req) => backend.getWebapp(req.params.id, req.headers),
+  'GET:/api/webapps/:id': (req) => backend.getWebapp(req.params.id),
   'POST:/api/webapps': (req) => backend.createWebapp(req.body, req.headers),
   'PUT:/api/webapps/:id': (req) => backend.updateWebapp(req.params.id, req.body, req.headers),
   'DELETE:/api/webapps/:id': (req) => backend.deleteWebapp(req.params.id, req.headers),
@@ -152,18 +152,6 @@ app.get('/api/auth/me', async (req, res) => {
   } catch (error) {
     console.error('❌ [API GATEWAY] Error:', error);
     res.status(401).json({ success: false, message: 'Unauthorized' });
-  }
-});
-
-// Verify password for sensitive actions (like delete)
-app.post('/api/auth/verify-password', async (req, res) => {
-  try {
-    console.log('🔐 [API GATEWAY] Verifying password');
-    const result = await backend.verifyPassword(req.body, req.headers);
-    res.json(result);
-  } catch (error) {
-    console.error('❌ [API GATEWAY] Error:', error);
-    res.status(500).json({ success: false, message: error.message });
   }
 });
 
