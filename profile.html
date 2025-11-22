@@ -246,38 +246,66 @@
       border-radius: 12px;
       padding: 1.25rem;
       display: flex;
+      flex-direction: column;
       gap: 1rem;
-      align-items: center;
       transition: all 0.3s;
     }
 
     .webapp-item:hover { border-color: var(--accent-cyan); }
 
+    .webapp-item-top {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
     .webapp-item-image {
-      width: 80px;
+      width: 60px;
       height: 60px;
       border-radius: 8px;
       object-fit: cover;
       background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      flex-shrink: 0;
     }
 
-    .webapp-item-info { flex: 1; }
+    .webapp-item-info { flex: 1; min-width: 0; }
 
     .webapp-item-name {
       font-weight: 600;
       margin-bottom: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .webapp-item-meta {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-secondary);
       display: flex;
-      gap: 1rem;
+      gap: 0.75rem;
+      flex-wrap: wrap;
     }
 
     .webapp-item-actions {
       display: flex;
+      flex-direction: column;
       gap: 0.5rem;
+      align-items: center;
+    }
+
+    .webapp-item-actions-row {
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .webapp-item-actions-row .btn {
+      flex: 1;
+    }
+
+    .btn-delete {
+      width: 100%;
+      max-width: 200px;
     }
 
     .btn-small {
@@ -550,19 +578,23 @@
       empty.classList.add('hidden');
       list.innerHTML = myWebapps.map(w => `
         <div class="webapp-item">
-          <img src="${w.image_url || 'assets/logos/logo-nwh.svg'}" class="webapp-item-image" alt="${w.name}">
-          <div class="webapp-item-info">
-            <div class="webapp-item-name">${w.name}</div>
-            <div class="webapp-item-meta">
-              <span>⭐ ${(w.avg_rating || 0).toFixed(1)}</span>
-              <span>👁️ ${w.views_count || 0} vues</span>
-              <span>💬 ${w.reviews_count || 0} avis</span>
+          <div class="webapp-item-top">
+            <img src="${w.image_url || 'assets/logos/logo-nwh.svg'}" class="webapp-item-image" alt="${w.name}">
+            <div class="webapp-item-info">
+              <div class="webapp-item-name">${w.name}</div>
+              <div class="webapp-item-meta">
+                <span>⭐ ${(w.avg_rating || 0).toFixed(1)}</span>
+                <span>👁️ ${w.views_count || 0}</span>
+                <span>💬 ${w.reviews_count || 0}</span>
+              </div>
             </div>
           </div>
           <div class="webapp-item-actions">
-            <a href="webapp.html?id=${w.id}" class="btn btn-secondary btn-small">Voir</a>
-            <a href="submit.html?edit=${w.id}" class="btn btn-secondary btn-small">Modifier</a>
-            <button class="btn btn-danger btn-small" onclick="openDeleteModal('${w.id}')">Supprimer</button>
+            <div class="webapp-item-actions-row">
+              <a href="webapp.html?id=${w.id}" class="btn btn-secondary btn-small">Voir</a>
+              <a href="submit.html?edit=${w.id}" class="btn btn-secondary btn-small">Modifier</a>
+            </div>
+            <button class="btn btn-danger btn-small btn-delete" onclick="openDeleteModal('${w.id}')">Supprimer</button>
           </div>
         </div>
       `).join('');
@@ -578,18 +610,23 @@
       } else {
         list.innerHTML = filtered.map(w => `
           <div class="webapp-item">
-            <img src="${w.image_url || 'assets/logos/logo-nwh.svg'}" class="webapp-item-image" alt="${w.name}">
-            <div class="webapp-item-info">
-              <div class="webapp-item-name">${w.name}</div>
-              <div class="webapp-item-meta">
-                <span>⭐ ${(w.avg_rating || 0).toFixed(1)}</span>
-                <span>👁️ ${w.views_count || 0} vues</span>
+            <div class="webapp-item-top">
+              <img src="${w.image_url || 'assets/logos/logo-nwh.svg'}" class="webapp-item-image" alt="${w.name}">
+              <div class="webapp-item-info">
+                <div class="webapp-item-name">${w.name}</div>
+                <div class="webapp-item-meta">
+                  <span>⭐ ${(w.avg_rating || 0).toFixed(1)}</span>
+                  <span>👁️ ${w.views_count || 0}</span>
+                  <span>💬 ${w.reviews_count || 0}</span>
+                </div>
               </div>
             </div>
             <div class="webapp-item-actions">
-              <a href="webapp.html?id=${w.id}" class="btn btn-secondary btn-small">Voir</a>
-              <a href="submit.html?edit=${w.id}" class="btn btn-secondary btn-small">Modifier</a>
-              <button class="btn btn-danger btn-small" onclick="openDeleteModal('${w.id}')">Supprimer</button>
+              <div class="webapp-item-actions-row">
+                <a href="webapp.html?id=${w.id}" class="btn btn-secondary btn-small">Voir</a>
+                <a href="submit.html?edit=${w.id}" class="btn btn-secondary btn-small">Modifier</a>
+              </div>
+              <button class="btn btn-danger btn-small btn-delete" onclick="openDeleteModal('${w.id}')">Supprimer</button>
             </div>
           </div>
         `).join('');
