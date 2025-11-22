@@ -4,23 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nexus Web Hub - Le store communautaire pour webapps</title>
-  
-  <!-- Fonts -->
+  <link rel="icon" href="assets/logos/logo-nwh.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   
   <style>
-    /* ========== RESET & VARIABLES ========== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     :root {
-      --bg-deep-space: #0a0e27;
+      --bg-deep: #0a0e27;
       --bg-card: #1a1f3a;
+      --bg-card-hover: #252b4a;
       --text-primary: #E0E6ED;
       --text-secondary: #a0aec0;
       --accent-cyan: #00d9ff;
@@ -28,99 +23,80 @@
       --accent-green: #10b981;
       --accent-gold: #fbbf24;
       --accent-red: #ef4444;
-      --border-glow: rgba(0, 217, 255, 0.1);
-      
+      --border: rgba(0, 217, 255, 0.15);
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       --font-body: 'Inter', sans-serif;
       --font-heading: 'Space Grotesk', sans-serif;
     }
 
     @media (prefers-color-scheme: light) {
       :root {
-        --bg-deep-space: #f5f7fa;
+        --bg-deep: #f0f4f8;
         --bg-card: #ffffff;
+        --bg-card-hover: #f8fafc;
         --text-primary: #1a202c;
         --text-secondary: #4a5568;
-        --border-glow: rgba(0, 0, 0, 0.1);
+        --border: rgba(0, 0, 0, 0.1);
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       }
     }
 
     body {
       font-family: var(--font-body);
-      background: var(--bg-deep-space);
+      background: var(--bg-deep);
       color: var(--text-primary);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* ========== PAGES SYSTEM ========== */
-    .page {
-      display: none;
       min-height: 100vh;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-
-    .page.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      line-height: 1.6;
     }
 
     /* ========== HEADER ========== */
     header {
       position: sticky;
       top: 0;
-      z-index: 1000;
+      z-index: 100;
       background: var(--bg-card);
-      border-bottom: 1px solid var(--border-glow);
-      padding: 1rem 2rem;
-      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
     }
 
-    .header-content {
+    .header-inner {
       max-width: 1400px;
       margin: 0 auto;
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 2rem;
     }
 
     .logo {
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      text-decoration: none;
       font-family: var(--font-heading);
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 700;
       color: var(--accent-cyan);
-      text-decoration: none;
-      cursor: pointer;
     }
 
-    .logo img {
-      width: 40px;
-      height: 40px;
-    }
+    .logo img { width: 36px; height: 36px; }
 
-    .stats {
+    .nav-stats {
       display: flex;
       gap: 2rem;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
     }
 
     .stat {
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
     }
 
-    .stat-value {
-      font-weight: 600;
+    .stat strong {
       color: var(--text-primary);
+      font-weight: 600;
     }
 
     .header-actions {
@@ -130,14 +106,18 @@
     }
 
     .btn {
-      padding: 0.75rem 1.5rem;
+      padding: 0.6rem 1.2rem;
       border: none;
       border-radius: 8px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.3s;
       font-family: var(--font-body);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
     }
 
     .btn-primary {
@@ -147,13 +127,13 @@
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 217, 255, 0.4);
+      box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
     }
 
     .btn-secondary {
       background: transparent;
       color: var(--text-primary);
-      border: 1px solid var(--border-glow);
+      border: 1px solid var(--border);
     }
 
     .btn-secondary:hover {
@@ -161,41 +141,36 @@
       color: var(--accent-cyan);
     }
 
-    .btn-danger {
-      background: var(--accent-red);
-      color: white;
-    }
-
     .user-avatar {
       width: 40px;
       height: 40px;
       border-radius: 50%;
       background: var(--accent-cyan);
-      color: #000;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
+      font-weight: 700;
+      color: #000;
       cursor: pointer;
-      transition: all 0.3s;
+      transition: transform 0.2s;
     }
 
     .user-avatar:hover {
       transform: scale(1.1);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
     }
 
     /* ========== HERO ========== */
     .hero {
       text-align: center;
-      padding: 4rem 2rem;
-      max-width: 900px;
+      padding: 5rem 2rem 3rem;
+      max-width: 800px;
       margin: 0 auto;
     }
 
     .hero h1 {
       font-family: var(--font-heading);
       font-size: 3.5rem;
+      font-weight: 700;
       margin-bottom: 1rem;
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       -webkit-background-clip: text;
@@ -204,12 +179,12 @@
     }
 
     .hero p {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       color: var(--text-secondary);
       margin-bottom: 2rem;
     }
 
-    .hero-cta {
+    .hero-buttons {
       display: flex;
       gap: 1rem;
       justify-content: center;
@@ -223,1269 +198,375 @@
       padding: 2rem;
     }
 
-    .search-bar {
+    .search-box {
       position: relative;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
-    .search-bar input {
+    .search-box input {
       width: 100%;
-      padding: 1rem 1rem 1rem 3rem;
+      padding: 1rem 1rem 1rem 3.5rem;
       background: var(--bg-card);
-      border: 1px solid var(--border-glow);
+      border: 1px solid var(--border);
       border-radius: 12px;
       color: var(--text-primary);
       font-size: 1rem;
       font-family: var(--font-body);
+      transition: border-color 0.2s;
     }
 
-    .search-bar input:focus {
+    .search-box input:focus {
       outline: none;
       border-color: var(--accent-cyan);
     }
 
-    .search-icon {
+    .search-box::before {
+      content: '🔍';
       position: absolute;
-      left: 1rem;
+      left: 1.2rem;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--text-secondary);
+      font-size: 1.1rem;
     }
 
     .filters {
       display: flex;
-      gap: 1rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-
-    .filter-group {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
     }
 
     .filter-btn {
       padding: 0.5rem 1rem;
       background: var(--bg-card);
-      border: 1px solid var(--border-glow);
+      border: 1px solid var(--border);
       border-radius: 8px;
       color: var(--text-primary);
       cursor: pointer;
-      transition: all 0.3s;
       font-family: var(--font-body);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
+      transition: all 0.2s;
     }
 
-    .filter-btn img {
-      width: 20px;
-      height: 20px;
-    }
+    .filter-btn img { width: 18px; height: 18px; }
 
-    .filter-btn:hover,
-    .filter-btn.active {
+    .filter-btn:hover, .filter-btn.active {
       background: var(--accent-cyan);
       color: #000;
       border-color: var(--accent-cyan);
     }
 
-    /* ========== TABS (FIX: Better spacing and centering) ========== */
     .tabs {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.25rem;
+      border-bottom: 1px solid var(--border);
       margin-bottom: 2rem;
-      border-bottom: 1px solid var(--border-glow);
-      overflow-x: auto; /* Allow horizontal scroll on small screens */
-      -webkit-overflow-scrolling: touch;
-      padding-bottom: 2px; /* Prevent border cut-off */
     }
 
     .tab {
-      padding: 1rem 1.25rem; /* Slightly reduced padding for better fit */
+      padding: 0.75rem 1.25rem;
       background: transparent;
       border: none;
       color: var(--text-secondary);
       cursor: pointer;
       font-family: var(--font-body);
-      font-size: 0.9rem; /* Slightly smaller font */
+      font-size: 0.9rem;
       font-weight: 500;
       border-bottom: 2px solid transparent;
-      transition: all 0.3s;
-      white-space: nowrap; /* Prevent text wrapping */
-      flex-shrink: 0; /* Prevent tabs from shrinking */
-      min-width: fit-content; /* Ensure tabs fit their content */
+      margin-bottom: -1px;
+      transition: all 0.2s;
     }
 
-    .tab:hover {
-      color: var(--text-primary);
-    }
-
+    .tab:hover { color: var(--text-primary); }
     .tab.active {
       color: var(--accent-cyan);
       border-bottom-color: var(--accent-cyan);
     }
 
-    /* Better mobile behavior for tabs */
-    @media (max-width: 768px) {
-      .tabs {
-        justify-content: flex-start; /* Align to start on mobile */
-        padding-right: 1rem; /* Add padding for scroll indicator */
-      }
-      
-      .tab {
-        padding: 0.875rem 1rem; /* Smaller padding on mobile */
-        font-size: 0.85rem;
-      }
-    }
-
-    /* ========== CATALOG (Mini Cards) ========== */
-    .catalog {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
+    /* ========== WEBAPP GRID ========== */
     .webapp-grid {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      margin-bottom: 3rem;
-    }
-
-    @media (min-width: 768px) {
-      .webapp-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .webapp-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
     }
 
     .webapp-card {
       background: var(--bg-card);
-      border: 1px solid var(--border-glow);
-      border-radius: 12px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
       overflow: hidden;
       transition: all 0.3s;
       cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
     }
 
     .webapp-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-6px);
       border-color: var(--accent-cyan);
-      box-shadow: 0 8px 24px rgba(0, 217, 255, 0.2);
+      box-shadow: 0 12px 40px rgba(0, 217, 255, 0.15);
     }
 
-    .webapp-image {
-      width: 100%;
-      height: 200px;
+    .webapp-thumb {
+      height: 180px;
       background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      overflow: hidden;
     }
 
-    .webapp-image img {
+    .webapp-thumb img.screenshot {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    .webapp-image .default-logo {
-      width: 100px;
-      height: 100px;
+    .webapp-thumb .default-logo {
+      width: 80px;
+      height: 80px;
+      opacity: 0.8;
     }
 
-    .webapp-content {
-      padding: 1.5rem;
-    }
-
-    .webapp-header {
+    .webapp-badges {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
       display: flex;
-      justify-content: space-between;
-      align-items: start;
-      margin-bottom: 0.5rem;
+      gap: 0.25rem;
+    }
+
+    .webapp-badges img {
+      width: 28px;
+      height: 28px;
+    }
+
+    .webapp-info {
+      padding: 1.25rem;
     }
 
     .webapp-title {
       font-weight: 600;
       font-size: 1.1rem;
-      color: var(--text-primary);
+      margin-bottom: 0.25rem;
     }
 
-    .webapp-badges {
-      display: flex;
-      gap: 0.25rem;
-    }
-
-    .badge-icon {
-      width: 24px;
-      height: 24px;
-    }
-
-    .webapp-developer {
-      font-size: 0.9rem;
+    .webapp-dev {
+      font-size: 0.85rem;
       color: var(--text-secondary);
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
 
     .webapp-rating {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      margin-bottom: 1rem;
       font-size: 0.9rem;
+      margin-bottom: 0.75rem;
     }
 
-    .stars {
-      color: var(--accent-gold);
-    }
+    .stars { color: var(--accent-gold); }
 
-    .webapp-description {
+    .webapp-desc {
+      font-size: 0.9rem;
       color: var(--text-secondary);
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      margin-bottom: 1rem;
     }
 
     .webapp-tags {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
-      margin-bottom: 1rem;
     }
 
     .tag {
-      padding: 0.25rem 0.75rem;
+      padding: 0.2rem 0.6rem;
       background: rgba(0, 217, 255, 0.1);
       border-radius: 4px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--accent-cyan);
     }
 
-    .webapp-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .btn-small {
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-      flex: 1;
-    }
-
-    /* ========== WEBAPP DETAIL PAGE ========== */
-    .webapp-detail {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--accent-cyan);
-      text-decoration: none;
-      margin-bottom: 2rem;
-      cursor: pointer;
-    }
-
-    .back-btn:hover {
-      text-decoration: underline;
-    }
-
-    .webapp-detail-header {
-      display: flex;
-      gap: 2rem;
-      margin-bottom: 3rem;
-      flex-wrap: wrap;
-    }
-
-    .webapp-detail-image {
-      flex: 0 0 400px;
-      height: 300px;
-      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-      border-radius: 12px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .webapp-detail-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .webapp-detail-info {
-      flex: 1;
-      min-width: 300px;
-    }
-
-    .webapp-detail-title {
-      font-family: var(--font-heading);
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .webapp-detail-developer {
-      font-size: 1.1rem;
-      color: var(--text-secondary);
-      margin-bottom: 1.5rem;
-    }
-
-    .webapp-detail-rating {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      font-size: 1.2rem;
-    }
-
-    .webapp-detail-actions {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .webapp-detail-section {
-      background: var(--bg-card);
-      padding: 2rem;
-      border-radius: 12px;
-      margin-bottom: 2rem;
-    }
-
-    .webapp-detail-section h3 {
-      font-family: var(--font-heading);
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .description-preview {
-      max-height: 200px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .description-preview.expanded {
-      max-height: none;
-    }
-
-    .description-fade {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 80px;
-      background: linear-gradient(transparent, var(--bg-card));
-    }
-
-    .video-container {
-      position: relative;
-      padding-bottom: 56.25%; /* 16:9 */
-      height: 0;
-      overflow: hidden;
-      border-radius: 12px;
-    }
-
-    .video-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* ========== REVIEW CARD ========== */
-    .review-card {
-      background: var(--bg-deep-space);
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-
-    .review-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      margin-bottom: 1rem;
-    }
-
-    .review-author {
-      font-weight: 600;
-    }
-
-    .review-comment {
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-
-    /* ========== REVIEW OVERLAY (Mini Form) ========== */
-    .review-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 3000;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .review-overlay.active {
-      display: flex;
-    }
-
-    .review-form-container {
-      background: var(--bg-card);
-      border-radius: 16px;
-      max-width: 500px;
-      width: 100%;
-      padding: 2rem;
-      position: relative;
-    }
-
-    .review-form-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: transparent;
-      border: none;
-      font-size: 1.5rem;
-      color: var(--text-secondary);
-      cursor: pointer;
-    }
-
-    .rating-input {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .star-btn {
-      background: transparent;
-      border: none;
-      font-size: 2rem;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .star-btn.active,
-    .star-btn:hover {
-      color: var(--accent-gold);
-      transform: scale(1.2);
-    }
-
-    /* ========== PROFILE PAGE ========== */
-    .profile-page {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .profile-header {
-      background: var(--bg-card);
-      padding: 2rem;
-      border-radius: 12px;
-      margin-bottom: 2rem;
-      position: relative;
-    }
-
-    .profile-top {
-      display: flex;
-      gap: 2rem;
-      align-items: start;
-      flex-wrap: wrap;
-    }
-
-    .profile-avatar-large {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: var(--accent-cyan);
-      color: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      font-weight: 700;
-    }
-
-    .profile-info {
-      flex: 1;
-      min-width: 250px;
-    }
-
-    .profile-name {
-      font-family: var(--font-heading);
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .profile-email {
-      color: var(--text-secondary);
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .profile-badges {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-
-    .profile-badge {
-      width: 32px;
-      height: 32px;
-    }
-
-    .profile-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-
-    .profile-stat {
+    /* ========== EMPTY & LOADING ========== */
+    .loading, .empty-state {
       text-align: center;
-      padding: 0.75rem;
-      background: var(--bg-deep-space);
-      border-radius: 8px;
-    }
-
-    .profile-stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--accent-cyan);
-    }
-
-    .profile-stat-label {
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-    }
-
-    .notification-toggle {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-    }
-
-    .logout-btn {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      z-index: 100;
-    }
-
-    /* ========== USER WEBAPPS MANAGEMENT ========== */
-    .user-webapps-section {
-      background: var(--bg-card);
-      padding: 2rem;
-      border-radius: 12px;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-
-    .section-title {
-      font-family: var(--font-heading);
-      font-size: 1.5rem;
-    }
-
-    .webapp-manage-card {
-      background: var(--bg-deep-space);
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      transition: all 0.3s ease;
-      flex-wrap: wrap;
-    }
-
-    .webapp-manage-thumb {
-      width: 80px;
-      height: 80px;
-      border-radius: 8px;
-      overflow: hidden;
-      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-      flex-shrink: 0;
-    }
-
-    .webapp-manage-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .webapp-manage-info {
-      flex: 1;
-      min-width: 200px;
-    }
-
-    .webapp-manage-title {
-      font-weight: 600;
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .webapp-manage-meta {
-      display: flex;
-      gap: 1rem;
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      flex-wrap: wrap;
-    }
-
-    .webapp-manage-actions {
-      display: flex;
-      gap: 0.5rem;
-      flex-shrink: 0;
-    }
-
-    /* ========== AUTH MODAL (Only for Login/Signup) ========== */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .modal.active {
-      display: flex;
-    }
-
-    .modal-content {
-      background: var(--bg-card);
-      border-radius: 16px;
-      max-width: 500px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 2rem;
-      position: relative;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: transparent;
-      border: none;
-      font-size: 1.5rem;
-      color: var(--text-secondary);
-      cursor: pointer;
-    }
-
-    .modal-close:hover {
-      color: var(--text-primary);
-    }
-
-    .modal-title {
-      font-family: var(--font-heading);
-      font-size: 1.8rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.75rem;
-      background: var(--bg-deep-space);
-      border: 1px solid var(--border-glow);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-    }
-
-    .form-group textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-    }
-
-    .form-note {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      margin-top: 0.25rem;
-    }
-
-    .error-message {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid var(--accent-red);
-      color: var(--accent-red);
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-
-    .success-message {
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid var(--accent-green);
-      color: var(--accent-green);
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-
-    /* ========== NOTIFICATION PERMISSION POPUP ========== */
-    .notification-popup {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--bg-card);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      z-index: 4000;
-      max-width: 400px;
-      width: 90%;
-    }
-
-    .notification-popup.active {
-      display: block;
-    }
-
-    /* ========== LOADING ========== */
-    .loading {
-      text-align: center;
-      padding: 3rem;
+      padding: 4rem 2rem;
       color: var(--text-secondary);
     }
 
-    .loading-spinner {
+    .spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid var(--border-glow);
+      border: 3px solid var(--border);
       border-top-color: var(--accent-cyan);
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin: 0 auto 1rem;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ========== EMPTY STATE ========== */
-    .empty-state {
-      text-align: center;
-      padding: 4rem 2rem;
-    }
-
-    .empty-state-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
-    }
-
-    .empty-state h3 {
-      font-family: var(--font-heading);
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .empty-state p {
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-    }
-
-    /* ========== FOOTER (FIX: Larger touch targets) ========== */
+    /* ========== FOOTER ========== */
     footer {
-      border-top: 1px solid var(--border-glow);
-      padding: 4rem 2rem; /* Increased from 3rem */
-      margin-top: 4rem;
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem;
       text-align: center;
+      margin-top: 4rem;
+    }
+
+    .footer-intro {
+      max-width: 500px;
+      margin: 0 auto 2rem;
+    }
+
+    .footer-intro img { width: 100%; }
+
+    footer p {
       color: var(--text-secondary);
+      font-size: 0.9rem;
     }
 
-    .footer-content {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    /* Larger clickable areas in footer */
     footer a {
       color: var(--accent-cyan);
       text-decoration: none;
-      padding: 0.5rem; /* Added padding for larger touch target */
-      display: inline-block;
-      font-size: 1rem; /* Slightly larger font */
-      margin: 0 0.25rem; /* Spacing between links */
-      border-radius: 4px;
-      transition: all 0.3s;
-    }
-
-    footer a:hover {
-      background: rgba(0, 217, 255, 0.1);
-      text-decoration: underline;
-    }
-
-    footer p {
-      font-size: 1rem; /* Increased from 0.85rem */
-      line-height: 2; /* More spacing between lines */
-      margin: 1rem 0; /* More vertical spacing */
-    }
-
-    .footer-intro-image {
-      max-width: 600px;
-      width: 100%;
-      margin-bottom: 2.5rem; /* Increased spacing */
     }
 
     /* ========== RESPONSIVE ========== */
     @media (max-width: 768px) {
-      .header-content {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .stats {
-        display: none;
-      }
-
-      .hero h1 {
-        font-size: 2rem;
-      }
-
-      .hero p {
-        font-size: 1rem;
-      }
-
-      .filters {
-        flex-direction: column;
-      }
-
-      .webapp-detail-header {
-        flex-direction: column;
-      }
-
-      .webapp-detail-image {
-        flex: 1 1 auto;
-        width: 100%;
-      }
-
-      .profile-top {
-        flex-direction: column;
-        text-align: center;
-      }
-
-      .notification-toggle {
-        position: static;
-        margin-top: 1rem;
-      }
-
-      /* Better footer on mobile */
-      footer {
-        padding: 3rem 1.5rem;
-      }
-
-      footer a {
-        display: block; /* Stack links vertically on mobile */
-        margin: 0.5rem auto;
-        max-width: fit-content;
-      }
+      .nav-stats { display: none; }
+      .hero h1 { font-size: 2.2rem; }
+      .header-inner { padding: 0.75rem 1rem; }
+      .search-section { padding: 1rem; }
+      .webapp-grid { grid-template-columns: 1fr; }
     }
 
-    /* ========== UTILITIES ========== */
-    .hidden {
-      display: none !important;
-    }
-
-    .text-center {
-      text-align: center;
-    }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- ========== HEADER ========== -->
+  <!-- HEADER -->
   <header>
-    <div class="header-content">
-      <div class="logo" onclick="navigateTo('home')">
-        <img src="assets/logos/logo-nwh.svg" alt="Nexus Web Hub">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <img src="assets/logos/logo-nwh.svg" alt="NWH">
         Nexus Web Hub
-      </div>
+      </a>
 
-      <div class="stats" id="globalStats">
-        <div class="stat">
-          <span>📱</span>
-          <span><span class="stat-value" id="statWebapps">0</span> webapps</span>
-        </div>
-        <div class="stat">
-          <span>👥</span>
-          <span><span class="stat-value" id="statCreators">0</span> créateurs</span>
-        </div>
-        <div class="stat">
-          <span>⭐</span>
-          <span><span class="stat-value" id="statReviews">0</span> avis</span>
-        </div>
+      <div class="nav-stats">
+        <div class="stat">📱 <strong id="statWebapps">0</strong> webapps</div>
+        <div class="stat">👥 <strong id="statCreators">0</strong> créateurs</div>
+        <div class="stat">⭐ <strong id="statReviews">0</strong> avis</div>
       </div>
 
       <div class="header-actions">
-        <button class="btn btn-primary" onclick="openSubmitModal()">✨ Soumettre</button>
-        <button class="btn btn-secondary" id="authBtn" onclick="openAuthModal()">Connexion</button>
-        <button class="lang-toggle" onclick="toggleLanguage()">🇫🇷</button>
+        <a href="auth.html" class="btn btn-primary" id="submitBtn" onclick="return checkAuthForSubmit()">✨ Soumettre</a>
+        
+        <!-- Non connecté -->
+        <a href="auth.html" class="btn btn-secondary" id="loginBtn">Connexion</a>
+        
+        <!-- Connecté (caché par défaut) -->
+        <div class="user-avatar hidden" id="userAvatar" onclick="goToProfile()"></div>
       </div>
     </div>
   </header>
 
-  <!-- ========== HOME PAGE ========== -->
-  <div id="homePage" class="page active">
-    <!-- Hero Section -->
-    <section class="hero">
-      <h1>Découvrez le meilleur du Web</h1>
-      <p>Le store communautaire pour webapps, outils et jeux évalués par la communauté</p>
-      <div class="hero-cta">
-        <button class="btn btn-primary" onclick="scrollToCatalog()">Explorer le Catalogue</button>
-        <button class="btn btn-secondary" onclick="openSubmitModal()">Publier votre webapp</button>
-      </div>
-    </section>
-
-    <!-- Search & Filters -->
-    <section class="search-section">
-      <div class="search-bar">
-        <span class="search-icon">🔍</span>
-        <input 
-          type="text" 
-          id="searchInput" 
-          placeholder="Rechercher webapp, tag, créateur..." 
-          oninput="handleSearch()"
-        >
-      </div>
-
-      <div class="filters">
-        <div class="filter-group">
-          <button class="filter-btn active" onclick="filterCategory('all')">Toutes</button>
-          <button class="filter-btn" onclick="filterCategory('productivity')">
-            <img src="assets/icons/icon-tools.svg" alt=""> Productivité
-          </button>
-          <button class="filter-btn" onclick="filterCategory('design')">
-            <img src="assets/icons/icon-ui-kits.svg" alt=""> Design
-          </button>
-          <button class="filter-btn" onclick="filterCategory('game')">
-            <img src="assets/icons/icon-games.svg" alt=""> Jeu
-          </button>
-          <button class="filter-btn" onclick="filterCategory('api')">
-            <img src="assets/icons/icon-apis.svg" alt=""> API
-          </button>
-          <button class="filter-btn" onclick="filterCategory('nocode')">
-            <img src="assets/icons/icon-websites.svg" alt=""> No-Code
-          </button>
-        </div>
-        <button class="btn btn-secondary" onclick="surpriseMe()">✨ Surprenez-moi</button>
-      </div>
-
-      <div class="tabs">
-        <button class="tab active" onclick="filterSort('all')">Toutes</button>
-        <button class="tab" onclick="filterSort('trending')">🔥 Trending</button>
-        <button class="tab" onclick="filterSort('new')">✨ Nouveautés</button>
-        <button class="tab" onclick="filterSort('top')">⭐ Top Rated</button>
-      </div>
-    </section>
-
-    <!-- Catalog -->
-    <section class="catalog">
-      <div id="webappGrid" class="webapp-grid"></div>
-      <div id="loadingState" class="loading hidden">
-        <div class="loading-spinner"></div>
-        <p>Chargement des webapps...</p>
-      </div>
-      <div id="emptyState" class="empty-state hidden">
-        <div class="empty-state-icon">📭</div>
-        <h3>Aucune webapp trouvée</h3>
-        <p>Essayez de modifier vos filtres ou soyez le premier à soumettre une webapp !</p>
-        <button class="btn btn-primary" onclick="openSubmitModal()">Soumettre une webapp</button>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-      <div class="footer-content">
-        <div style="margin-bottom: 2.5rem;">
-          <img src="assets/storyline/nexus-web-hub-intro.svg" alt="Nexus Web Hub Intro" class="footer-intro-image">
-        </div>
-        <p style="font-size: 1.1rem; font-weight: 500;">🌌 Créé par <a href="https://github.com/Tryboy869" target="_blank">Daouda Abdoul Anzize</a> - <strong>Nexus Studio</strong></p>
-        <p style="margin-top: 1.5rem;">
-          <a href="mailto:nexusstudio100@gmail.com">Contact</a> · 
-          <a href="https://github.com/Tryboy869/nexus-web-hub" target="_blank">GitHub</a> · 
-          <span style="color: var(--text-secondary);">NEXUS AXION 3.5</span>
-        </p>
-      </div>
-    </footer>
-  </div>
-
-  <!-- ========== WEBAPP DETAIL PAGE ========== -->
-  <div id="webappDetailPage" class="page">
-    <div class="webapp-detail">
-      <a class="back-btn" onclick="navigateTo('home')">← Retour au catalogue</a>
-      <div id="webappDetailContent"></div>
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Découvrez le meilleur du Web</h1>
+    <p>Le store communautaire pour webapps, outils et jeux évalués par la communauté</p>
+    <div class="hero-buttons">
+      <button class="btn btn-primary" onclick="scrollToCatalog()">Explorer le Catalogue</button>
+      <a href="auth.html?redirect=submit" class="btn btn-secondary">Publier votre webapp</a>
     </div>
-  </div>
+  </section>
 
-  <!-- ========== PROFILE PAGE ========== -->
-  <div id="profilePage" class="page">
-    <div class="profile-page">
-      <a class="back-btn" onclick="navigateTo('home')">← Retour à l'accueil</a>
-      <div id="profileContent"></div>
+  <!-- SEARCH & FILTERS -->
+  <section class="search-section" id="catalog">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Rechercher webapp, tag, créateur..." oninput="handleSearch()">
     </div>
-  </div>
 
-  <!-- ========== AUTH MODAL ========== -->
-  <div id="authModal" class="modal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeAuthModal()">×</button>
-      <h2 class="modal-title">Connexion / Inscription</h2>
-
-      <div id="authError" class="error-message hidden"></div>
-      <div id="authSuccess" class="success-message hidden"></div>
-
-      <div class="tabs">
-        <button class="tab active" onclick="switchAuthTab('login')">Connexion</button>
-        <button class="tab" onclick="switchAuthTab('signup')">Inscription</button>
-      </div>
-
-      <form id="loginForm" onsubmit="handleLogin(event)">
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="loginEmail" required>
-        </div>
-        <div class="form-group">
-          <label>Mot de passe</label>
-          <input type="password" id="loginPassword" required>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Se connecter</button>
-      </form>
-
-      <form id="signupForm" class="hidden" onsubmit="handleSignup(event)">
-        <div class="form-group">
-          <label>Nom complet</label>
-          <input type="text" id="signupName" required>
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="signupEmail" required>
-        </div>
-        <div class="form-group">
-          <label>Mot de passe</label>
-          <input type="password" id="signupPassword" required>
-          <div class="form-note">Au moins 6 caractères</div>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Créer mon compte</button>
-      </form>
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterCategory('all', this)">Toutes</button>
+      <button class="filter-btn" onclick="filterCategory('productivity', this)">
+        <img src="assets/icons/icon-tools.svg" alt=""> Productivité
+      </button>
+      <button class="filter-btn" onclick="filterCategory('design', this)">
+        <img src="assets/icons/icon-ui-kits.svg" alt=""> Design
+      </button>
+      <button class="filter-btn" onclick="filterCategory('game', this)">
+        <img src="assets/icons/icon-games.svg" alt=""> Jeux
+      </button>
+      <button class="filter-btn" onclick="filterCategory('api', this)">
+        <img src="assets/icons/icon-apis.svg" alt=""> API
+      </button>
+      <button class="filter-btn" onclick="filterCategory('nocode', this)">
+        <img src="assets/icons/icon-websites.svg" alt=""> No-Code
+      </button>
+      <button class="btn btn-secondary" onclick="surpriseMe()" style="margin-left: auto;">✨ Surprenez-moi</button>
     </div>
-  </div>
 
-  <!-- ========== SUBMIT MODAL ========== -->
-  <div id="submitModal" class="modal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeSubmitModal()">×</button>
-      <h2 class="modal-title">Soumettre une webapp</h2>
-
-      <div id="submitError" class="error-message hidden"></div>
-      <div id="submitSuccess" class="success-message hidden"></div>
-
-      <form id="submitForm" onsubmit="handleSubmit(event)">
-        <div class="form-group">
-          <label>Nom du projet *</label>
-          <input type="text" id="submitName" required>
-        </div>
-
-        <div class="form-group">
-          <label>URL principale (HTTPS) *</label>
-          <input type="url" id="submitUrl" placeholder="https://..." required>
-        </div>
-
-        <div class="form-group">
-          <label>Description courte (200 char max) *</label>
-          <textarea id="submitDescShort" maxlength="200" required></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Description longue</label>
-          <textarea id="submitDescLong" maxlength="1000"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Catégorie *</label>
-          <select id="submitCategory" required>
-            <option value="">-- Choisir --</option>
-            <option value="productivity">⚡ Productivité</option>
-            <option value="design">🎨 Design</option>
-            <option value="game">🎮 Jeu</option>
-            <option value="api">🔧 API/Outils Dev</option>
-            <option value="nocode">🚀 No-Code</option>
-            <option value="other">📦 Autre</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Tags (séparés par des virgules)</label>
-          <input type="text" id="submitTags" placeholder="react, productivité, open-source">
-        </div>
-
-        <div class="form-group">
-          <label>URL GitHub (optionnel)</label>
-          <input type="url" id="submitGithub" placeholder="https://github.com/...">
-        </div>
-
-        <div class="form-group">
-          <label>URL Vidéo YouTube (optionnel)</label>
-          <input type="url" id="submitVideo" placeholder="https://youtube.com/watch?v=...">
-          <div class="form-note">La vidéo sera affichée directement sur la page du projet</div>
-        </div>
-
-        <div class="form-group">
-          <label>URL Image/Screenshot (optionnel)</label>
-          <input type="url" id="submitImage" placeholder="https://...">
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Soumettre</button>
-      </form>
+    <div class="tabs">
+      <button class="tab active" onclick="filterSort('recent', this)">Toutes</button>
+      <button class="tab" onclick="filterSort('trending', this)">🔥 Trending</button>
+      <button class="tab" onclick="filterSort('new', this)">✨ Nouveautés</button>
+      <button class="tab" onclick="filterSort('top', this)">⭐ Top Rated</button>
     </div>
-  </div>
 
-  <!-- ========== REVIEW OVERLAY (Mini Form) ========== -->
-  <div id="reviewOverlay" class="review-overlay">
-    <div class="review-form-container">
-      <button class="review-form-close" onclick="closeReviewForm()">×</button>
-      <h3>Laisser un avis</h3>
-      
-      <div class="rating-input" id="ratingStars">
-        <button type="button" class="star-btn" onclick="setRating(1)">☆</button>
-        <button type="button" class="star-btn" onclick="setRating(2)">☆</button>
-        <button type="button" class="star-btn" onclick="setRating(3)">☆</button>
-        <button type="button" class="star-btn" onclick="setRating(4)">☆</button>
-        <button type="button" class="star-btn" onclick="setRating(5)">☆</button>
-      </div>
-
-      <div class="form-group">
-        <label>Commentaire (optionnel)</label>
-        <textarea id="reviewComment" placeholder="Partagez votre expérience..." maxlength="500"></textarea>
-      </div>
-
-      <button class="btn btn-primary" style="width: 100%;" onclick="submitReview()">Publier l'avis</button>
+    <!-- GRID -->
+    <div id="webappGrid" class="webapp-grid"></div>
+    
+    <!-- Loading -->
+    <div id="loadingState" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Chargement des webapps...</p>
     </div>
-  </div>
+    
+    <!-- Empty -->
+    <div id="emptyState" class="empty-state hidden">
+      <p style="font-size: 3rem; margin-bottom: 1rem;">📭</p>
+      <h3 style="margin-bottom: 0.5rem;">Aucune webapp trouvée</h3>
+      <p>Modifiez vos filtres ou soyez le premier à publier !</p>
+    </div>
+  </section>
 
-  <!-- ========== NOTIFICATION PERMISSION POPUP ========== -->
-  <div id="notificationPopup" class="notification-popup">
-    <h3 style="margin-bottom: 1rem;">📬 Activer les notifications</h3>
-    <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">
-      Recevez des notifications pour les nouvelles webapps, avis et mises à jour.
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-intro">
+      <img src="assets/storyline/nexus-web-hub-intro.svg" alt="Nexus Web Hub">
+    </div>
+    <p>
+      🌌 Créé par <a href="https://github.com/Tryboy869" target="_blank">Daouda Abdoul Anzize</a> - <strong>Nexus Studio</strong>
     </p>
-    <div style="display: flex; gap: 1rem;">
-      <button class="btn btn-primary" style="flex: 1;" onclick="enableNotifications()">Activer</button>
-      <button class="btn btn-secondary" style="flex: 1;" onclick="closeNotificationPopup()">Plus tard</button>
-    </div>
-  </div>
+    <p style="margin-top: 0.5rem;">
+      <a href="mailto:nexusstudio100@gmail.com">Contact</a> · 
+      <a href="https://github.com/Tryboy869/nexus-web-hub" target="_blank">GitHub</a> · 
+      NEXUS AXION 3.5
+    </p>
+  </footer>
 
-  <!-- ========== JAVASCRIPT ========== -->
   <script>
-    // ========== CONSTANTS ==========
-    const BADGE_PATHS = {
-      'verified-creator': 'assets/badges/system/badge-verified-creator.svg',
-      'beginner-tester': 'assets/badges/system/badge-beginner-tester.svg',
-      'pro-tester': 'assets/badges/system/badge-pro-tester.svg',
-      'legendary-tester': 'assets/badges/system/badge-legendary-tester.svg',
-      'admin': 'assets/badges/system/badge-admin.svg',
-      'supporter': 'assets/badges/system/badge-supporter.svg',
-      'contributor': 'assets/badges/system/badge-contributor.svg',
-      'trending': 'assets/badges/system/badge-trending.svg',
-      'featured': 'assets/badges/system/badge-featured.svg',
-      'new': 'assets/badges/system/badge-new.svg'
-    };
-
     // ========== STATE ==========
     let currentUser = null;
-    let currentLang = 'fr';
     let webapps = [];
-    let currentFilter = { category: 'all', sort: 'all', search: '' };
-    let currentWebappId = null;
-    let currentRating = 0;
-    let notificationsEnabled = false;
+    let filters = { category: 'all', sort: 'recent', search: '' };
 
     // ========== INIT ==========
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('🌌 NEXUS WEB HUB V2 - Frontend initialized');
+      console.log('🌌 Nexus Web Hub - Initializing...');
       checkAuth();
       loadStats();
       loadWebapps();
-      checkNotificationPermission();
     });
-
-    // ========== NAVIGATION ==========
-    function navigateTo(page) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      
-      if (page === 'home') {
-        document.getElementById('homePage').classList.add('active');
-        window.scrollTo(0, 0);
-      } else if (page === 'profile') {
-        if (!currentUser) {
-          openAuthModal();
-          return;
-        }
-        document.getElementById('profilePage').classList.add('active');
-        loadProfilePage();
-        window.scrollTo(0, 0);
-      }
-    }
 
     // ========== AUTH ==========
     async function checkAuth() {
@@ -1493,693 +574,142 @@
       if (!token) return;
 
       try {
-        const response = await fetch('/api/auth/me', {
+        const res = await fetch('/api/auth/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-
-        if (response.ok) {
-          const result = await response.json();
-          currentUser = result.data;
-          updateAuthUI();
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            currentUser = data.data;
+            updateUI();
+          }
         } else {
           localStorage.removeItem('token');
         }
-      } catch (error) {
-        console.error('Auth check failed:', error);
+      } catch (e) {
+        console.error('Auth check failed:', e);
       }
     }
 
-    function updateAuthUI() {
-      const authBtn = document.getElementById('authBtn');
+    function updateUI() {
       if (currentUser) {
-        const initials = currentUser.name.substring(0, 2).toUpperCase();
-        authBtn.outerHTML = `<div class="user-avatar" onclick="navigateTo('profile')" title="${currentUser.name}">${initials}</div>`;
+        document.getElementById('loginBtn').classList.add('hidden');
+        const avatar = document.getElementById('userAvatar');
+        avatar.classList.remove('hidden');
+        avatar.textContent = currentUser.name.substring(0, 2).toUpperCase();
       }
     }
 
-    async function handleLogin(e) {
-      e.preventDefault();
-      
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
+    function checkAuthForSubmit() {
+      if (!currentUser) {
+        window.location.href = 'auth.html?redirect=submit';
+        return false;
+      }
+      window.location.href = 'profile.html#submit';
+      return false;
+    }
 
+    function goToProfile() {
+      window.location.href = 'profile.html';
+    }
+
+    // ========== STATS ==========
+    async function loadStats() {
       try {
-        const response = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          localStorage.setItem('token', result.data.token);
-          currentUser = result.data.user;
-          showSuccess('authSuccess', result.message);
-          setTimeout(() => {
-            closeAuthModal();
-            updateAuthUI();
-            location.reload();
-          }, 1500);
-        } else {
-          showError('authError', result.message);
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('statWebapps').textContent = data.data.webapps;
+          document.getElementById('statCreators').textContent = data.data.creators;
+          document.getElementById('statReviews').textContent = data.data.reviews;
         }
-      } catch (error) {
-        console.error('Login error:', error);
-        showError('authError', 'Erreur de connexion');
+      } catch (e) {
+        console.error('Stats error:', e);
       }
     }
 
-    async function handleSignup(e) {
-      e.preventDefault();
-      
-      const name = document.getElementById('signupName').value;
-      const email = document.getElementById('signupEmail').value;
-      const password = document.getElementById('signupPassword').value;
-
-      try {
-        const response = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          localStorage.setItem('token', result.data.token);
-          currentUser = result.data.user;
-          showSuccess('authSuccess', result.message);
-          setTimeout(() => {
-            closeAuthModal();
-            updateAuthUI();
-            showNotificationPopup();
-          }, 1500);
-        } else {
-          showError('authError', result.message);
-        }
-      } catch (error) {
-        console.error('Signup error:', error);
-        showError('authError', 'Erreur lors de la création du compte');
-      }
-    }
-
-    function logout() {
-      if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-        localStorage.removeItem('token');
-        currentUser = null;
-        location.reload();
-      }
-    }
-
-    // ========== WEBAPPS - MINI CARDS ==========
+    // ========== WEBAPPS ==========
     async function loadWebapps() {
       showLoading();
 
       try {
         const params = new URLSearchParams();
-        if (currentFilter.category !== 'all') params.append('category', currentFilter.category);
-        if (currentFilter.sort !== 'all') params.append('sort', currentFilter.sort);
-        if (currentFilter.search) params.append('search', currentFilter.search);
+        if (filters.category !== 'all') params.append('category', filters.category);
+        if (filters.sort !== 'recent') params.append('sort', filters.sort);
+        if (filters.search) params.append('search', filters.search);
 
-        const response = await fetch('/api/webapps?' + params.toString());
-        const result = await response.json();
+        const res = await fetch('/api/webapps?' + params.toString());
+        const data = await res.json();
 
-        if (result.success) {
-          webapps = result.data.webapps;
+        if (data.success && data.data.webapps.length > 0) {
+          webapps = data.data.webapps;
           renderWebapps();
         } else {
           showEmpty();
         }
-      } catch (error) {
-        console.error('Load webapps error:', error);
+      } catch (e) {
+        console.error('Load webapps error:', e);
         showEmpty();
       }
     }
 
     function renderWebapps() {
-      const grid = document.getElementById('webappGrid');
       hideLoading();
-
-      if (webapps.length === 0) {
-        showEmpty();
-        return;
-      }
-
       hideEmpty();
 
-      grid.innerHTML = webapps.map(webapp => {
-        let badgesHTML = '';
-        if (webapp.is_trending) {
-          badgesHTML += `<img src="${BADGE_PATHS.trending}" alt="Trending" class="badge-icon">`;
-        }
-        if (webapp.is_featured) {
-          badgesHTML += `<img src="${BADGE_PATHS.featured}" alt="Featured" class="badge-icon">`;
-        }
-        if (webapp.is_new) {
-          badgesHTML += `<img src="${BADGE_PATHS.new}" alt="New" class="badge-icon">`;
-        }
+      const grid = document.getElementById('webappGrid');
+      grid.innerHTML = webapps.map(w => {
+        const badges = [];
+        if (w.is_trending) badges.push('<img src="assets/badges/system/badge-trending.svg" alt="Trending">');
+        if (w.is_featured) badges.push('<img src="assets/badges/system/badge-featured.svg" alt="Featured">');
+        if (w.is_new) badges.push('<img src="assets/badges/system/badge-new.svg" alt="New">');
 
-        const imageHTML = webapp.image_url 
-          ? `<img src="${webapp.image_url}" alt="${webapp.name}">`
-          : `<img src="assets/logos/logo-nwh.svg" alt="Nexus Web Hub" class="default-logo">`;
+        const thumb = w.image_url 
+          ? `<img src="${w.image_url}" class="screenshot" alt="${w.name}">`
+          : `<img src="assets/logos/logo-nwh.svg" class="default-logo" alt="NWH">`;
+
+        const tags = (w.tags || []).slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('');
 
         return `
-          <div class="webapp-card" onclick="showWebappDetail('${webapp.id}')">
-            <div class="webapp-image">
-              ${imageHTML}
+          <a href="webapp.html?id=${w.id}" class="webapp-card">
+            <div class="webapp-thumb">
+              ${thumb}
+              <div class="webapp-badges">${badges.join('')}</div>
             </div>
-            <div class="webapp-content">
-              <div class="webapp-header">
-                <div class="webapp-title">${webapp.name}</div>
-                <div class="webapp-badges">${badgesHTML}</div>
-              </div>
-              <div class="webapp-developer">par ${webapp.developer}</div>
+            <div class="webapp-info">
+              <div class="webapp-title">${w.name}</div>
+              <div class="webapp-dev">par ${w.developer}</div>
               <div class="webapp-rating">
-                <span class="stars">${renderStars(webapp.avg_rating)}</span>
-                <span>${webapp.avg_rating.toFixed(1)}</span>
-                <span style="color: var(--text-secondary)">(${webapp.reviews_count})</span>
+                <span class="stars">${renderStars(w.avg_rating)}</span>
+                <span>${w.avg_rating.toFixed(1)}</span>
+                <span style="color: var(--text-secondary)">(${w.reviews_count})</span>
               </div>
-              <div class="webapp-description">${webapp.description_short}</div>
-              <div class="webapp-tags">
-                ${webapp.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')}
-              </div>
+              <div class="webapp-desc">${w.description_short}</div>
+              <div class="webapp-tags">${tags}</div>
             </div>
-          </div>
+          </a>
         `;
       }).join('');
     }
 
-    function renderStars(rating) {
-      const fullStars = Math.floor(rating);
-      const hasHalfStar = rating % 1 >= 0.5;
-      const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-      
-      return '⭐'.repeat(fullStars) + (hasHalfStar ? '✨' : '') + '☆'.repeat(emptyStars);
-    }
-
-    // ========== WEBAPP DETAIL PAGE ==========
-    async function showWebappDetail(id) {
-      try {
-        const response = await fetch(`/api/webapps/${id}`);
-        const result = await response.json();
-
-        if (result.success) {
-          const { webapp, reviews } = result.data;
-          currentWebappId = id;
-          
-          let badgesHTML = '';
-          if (webapp.is_trending) badgesHTML += `<img src="${BADGE_PATHS.trending}" style="width: 32px; height: 32px;">`;
-          if (webapp.is_featured) badgesHTML += `<img src="${BADGE_PATHS.featured}" style="width: 32px; height: 32px;">`;
-          if (webapp.is_new) badgesHTML += `<img src="${BADGE_PATHS.new}" style="width: 32px; height: 32px;">`;
-
-          const imageHTML = webapp.image_url 
-            ? `<img src="${webapp.image_url}" alt="${webapp.name}">`
-            : `<img src="assets/logos/logo-nwh.svg" style="width: 150px; height: 150px;">`;
-
-          // Extract YouTube ID from URL
-          let youtubeEmbedHTML = '';
-          if (webapp.video_url) {
-            const youtubeId = extractYouTubeID(webapp.video_url);
-            if (youtubeId) {
-              youtubeEmbedHTML = `
-                <div class="webapp-detail-section">
-                  <h3>🎥 Vidéo de démonstration</h3>
-                  <div class="video-container">
-                    <iframe 
-                      src="https://www.youtube.com/embed/${youtubeId}" 
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                      allowfullscreen>
-                    </iframe>
-                  </div>
-                </div>
-              `;
-            }
-          }
-
-          const descriptionLong = webapp.description_long || webapp.description_short;
-          const needsExpand = descriptionLong.length > 500;
-
-          document.getElementById('webappDetailContent').innerHTML = `
-            <div class="webapp-detail-header">
-              <div class="webapp-detail-image">${imageHTML}</div>
-              <div class="webapp-detail-info">
-                <div class="webapp-detail-title">
-                  ${webapp.name}
-                  ${badgesHTML}
-                </div>
-                <div class="webapp-detail-developer">par ${webapp.developer}</div>
-                <div class="webapp-detail-rating">
-                  <span class="stars">${renderStars(webapp.avg_rating)}</span>
-                  <span style="font-weight: 600;">${webapp.avg_rating.toFixed(1)}</span>
-                  <span style="color: var(--text-secondary)">(${webapp.reviews_count} avis)</span>
-                </div>
-                <div class="webapp-tags">
-                  ${webapp.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                </div>
-                <div class="webapp-detail-actions">
-                  <button class="btn btn-primary" onclick="window.open('${webapp.url}', '_blank')">
-                    🚀 Ouvrir la webapp
-                  </button>
-                  ${webapp.github_url ? `<button class="btn btn-secondary" onclick="window.open('${webapp.github_url}', '_blank')">📂 Code Source</button>` : ''}
-                  ${currentUser ? `<button class="btn btn-secondary" onclick="openReviewForm()">⭐ Laisser un avis</button>` : ''}
-                </div>
-              </div>
-            </div>
-
-            ${youtubeEmbedHTML}
-
-            <div class="webapp-detail-section">
-              <h3>📖 Description</h3>
-              <div class="description-preview" id="descriptionText">
-                ${descriptionLong}
-                ${needsExpand ? '<div class="description-fade"></div>' : ''}
-              </div>
-              ${needsExpand ? `<button class="btn btn-secondary" style="margin-top: 1rem;" onclick="toggleDescription()">Voir plus</button>` : ''}
-            </div>
-
-            <div class="webapp-detail-section">
-              <h3>⭐ Avis (${reviews.length})</h3>
-              ${reviews.length > 0 ? reviews.map(review => `
-                <div class="review-card">
-                  <div class="review-header">
-                    <div class="review-author">${review.user_name}</div>
-                    <div class="stars">${renderStars(review.rating)}</div>
-                  </div>
-                  <div class="review-comment">${review.comment || 'Pas de commentaire'}</div>
-                </div>
-              `).join('') : '<p style="color: var(--text-secondary);">Aucun avis pour le moment. Soyez le premier !</p>'}
-            </div>
-          `;
-
-          navigateTo('webappDetail');
-          document.getElementById('webappDetailPage').classList.add('active');
-        }
-      } catch (error) {
-        console.error('Show webapp detail error:', error);
-        alert('Erreur lors du chargement des détails');
-      }
-    }
-
-    function extractYouTubeID(url) {
-      const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-      const match = url.match(regExp);
-      return (match && match[7].length == 11) ? match[7] : null;
-    }
-
-    function toggleDescription() {
-      const desc = document.getElementById('descriptionText');
-      desc.classList.toggle('expanded');
-      event.target.textContent = desc.classList.contains('expanded') ? 'Voir moins' : 'Voir plus';
-    }
-
-    // ========== REVIEW FORM ==========
-    function openReviewForm() {
-      if (!currentUser) {
-        openAuthModal();
-        return;
-      }
-      document.getElementById('reviewOverlay').classList.add('active');
-      currentRating = 0;
-      updateRatingStars();
-    }
-
-    function closeReviewForm() {
-      document.getElementById('reviewOverlay').classList.remove('active');
-      document.getElementById('reviewComment').value = '';
-      currentRating = 0;
-      updateRatingStars();
-    }
-
-    function setRating(rating) {
-      currentRating = rating;
-      updateRatingStars();
-    }
-
-    function updateRatingStars() {
-      const stars = document.querySelectorAll('.star-btn');
-      stars.forEach((star, index) => {
-        if (index < currentRating) {
-          star.classList.add('active');
-          star.textContent = '★';
-        } else {
-          star.classList.remove('active');
-          star.textContent = '☆';
-        }
-      });
-    }
-
-    async function submitReview() {
-      if (currentRating === 0) {
-        alert('Veuillez sélectionner une note');
-        return;
-      }
-
-      const comment = document.getElementById('reviewComment').value;
-      const token = localStorage.getItem('token');
-
-      try {
-        const response = await fetch(`/api/webapps/${currentWebappId}/reviews`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ rating: currentRating, comment })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          alert('Avis publié avec succès !');
-          closeReviewForm();
-          showWebappDetail(currentWebappId);
-        } else {
-          alert(result.message);
-        }
-      } catch (error) {
-        console.error('Submit review error:', error);
-        alert('Erreur lors de la publication de l\'avis');
-      }
-    }
-
-    // ========== PROFILE PAGE ==========
-    async function loadProfilePage() {
-      if (!currentUser) return;
-
-      const initials = currentUser.name.substring(0, 2).toUpperCase();
-      
-      // Load user webapps
-      const token = localStorage.getItem('token');
-      let userWebapps = [];
-      
-      try {
-        const response = await fetch('/api/webapps');
-        const result = await response.json();
-        if (result.success) {
-          userWebapps = result.data.webapps.filter(w => w.creator_id === currentUser.id);
-        }
-      } catch (error) {
-        console.error('Load user webapps error:', error);
-      }
-
-      const badgesHTML = currentUser.badges.map(badge => 
-        `<img src="${BADGE_PATHS[badge]}" class="profile-badge" alt="${badge}">`
-      ).join('');
-
-      document.getElementById('profileContent').innerHTML = `
-        <div class="profile-header">
-          <div class="notification-toggle">
-            <button class="btn ${notificationsEnabled ? 'btn-primary' : 'btn-secondary'}" onclick="toggleNotifications()">
-              ${notificationsEnabled ? '🔔 Notifications ON' : '🔕 Notifications OFF'}
-            </button>
-          </div>
-          
-          <div class="profile-top">
-            <div class="profile-avatar-large">${initials}</div>
-            <div class="profile-info">
-              <div class="profile-name">${currentUser.name}</div>
-              <div class="profile-email">${currentUser.email}</div>
-              <div class="profile-badges">
-                ${badgesHTML || '<span style="color: var(--text-secondary);">Aucun badge pour le moment</span>'}
-              </div>
-            </div>
-          </div>
-
-          <div class="profile-stats">
-            <div class="profile-stat">
-              <div class="profile-stat-value">${userWebapps.length}</div>
-              <div class="profile-stat-label">Webapps publiées</div>
-            </div>
-            <div class="profile-stat">
-              <div class="profile-stat-value">${currentUser.badges.length}</div>
-              <div class="profile-stat-label">Badges obtenus</div>
-            </div>
-            <div class="profile-stat">
-              <div class="profile-stat-value">0</div>
-              <div class="profile-stat-label">Avis donnés</div>
-            </div>
-            <div class="profile-stat">
-              <div class="profile-stat-value">0</div>
-              <div class="profile-stat-label">Score fiabilité</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="user-webapps-section">
-          <div class="section-header">
-            <h2 class="section-title">Mes Webapps</h2>
-            <button class="btn btn-primary" onclick="openSubmitModal()">+ Nouvelle webapp</button>
-          </div>
-
-          ${userWebapps.length > 0 ? userWebapps.map(webapp => `
-            <div class="webapp-manage-card">
-              <div class="webapp-manage-thumb">
-                ${webapp.image_url ? `<img src="${webapp.image_url}" alt="${webapp.name}">` : `<img src="assets/logos/logo-nwh.svg">`}
-              </div>
-              <div class="webapp-manage-info">
-                <div class="webapp-manage-title">${webapp.name}</div>
-                <div class="webapp-manage-meta">
-                  <span>⭐ ${webapp.avg_rating.toFixed(1)}</span>
-                  <span>👁️ ${webapp.views_count} vues</span>
-                  <span>💬 ${webapp.reviews_count} avis</span>
-                </div>
-              </div>
-              <div class="webapp-manage-actions">
-                <button class="btn btn-secondary btn-small" onclick="showWebappDetail('${webapp.id}')">Voir</button>
-                <button class="btn btn-secondary btn-small" onclick="editWebapp('${webapp.id}')">Éditer</button>
-                <button class="btn btn-danger btn-small" onclick="deleteWebapp('${webapp.id}')">Supprimer</button>
-              </div>
-            </div>
-          `).join('') : '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Aucune webapp publiée pour le moment</p>'}
-        </div>
-
-        <button class="btn btn-danger logout-btn" onclick="logout()">🚪 Déconnexion</button>
-      `;
-    }
-
-    function editWebapp(id) {
-      const webapp = webapps.find(w => w.id === id);
-      
-      if (!webapp) {
-        fetch(`/api/webapps/${id}`)
-          .then(res => res.json())
-          .then(result => {
-            if (result.success) {
-              openEditModal(result.data.webapp);
-            }
-          });
-      } else {
-        openEditModal(webapp);
-      }
-    }
-
-    function openEditModal(webapp) {
-      document.getElementById('submitName').value = webapp.name;
-      document.getElementById('submitUrl').value = webapp.url;
-      document.getElementById('submitDescShort').value = webapp.description_short;
-      document.getElementById('submitDescLong').value = webapp.description_long || '';
-      document.getElementById('submitCategory').value = webapp.category;
-      document.getElementById('submitTags').value = webapp.tags.join(', ');
-      document.getElementById('submitGithub').value = webapp.github_url || '';
-      document.getElementById('submitVideo').value = webapp.video_url || '';
-      document.getElementById('submitImage').value = webapp.image_url || '';
-
-      document.querySelector('#submitModal .modal-title').textContent = 'Modifier la webapp';
-
-      const form = document.getElementById('submitForm');
-      form.onsubmit = async (e) => {
-        e.preventDefault();
-        await handleEdit(webapp.id);
-      };
-
-      const submitBtn = form.querySelector('button[type="submit"]');
-      submitBtn.textContent = 'Mettre à jour';
-
-      document.getElementById('submitModal').classList.add('active');
-    }
-
-    async function handleEdit(webappId) {
-      const token = localStorage.getItem('token');
-
-      const data = {
-        name: document.getElementById('submitName').value,
-        description_short: document.getElementById('submitDescShort').value,
-        description_long: document.getElementById('submitDescLong').value,
-        category: document.getElementById('submitCategory').value,
-        tags: document.getElementById('submitTags').value.split(',').map(t => t.trim()).filter(t => t),
-        github_url: document.getElementById('submitGithub').value || null,
-        video_url: document.getElementById('submitVideo').value || null,
-        image_url: document.getElementById('submitImage').value || null
-      };
-
-      try {
-        const response = await fetch(`/api/webapps/${webappId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          showSuccess('submitSuccess', '✅ Webapp mise à jour avec succès !');
-          setTimeout(() => {
-            closeSubmitModal();
-            resetSubmitForm();
-            loadProfilePage();
-            loadWebapps();
-          }, 1500);
-        } else {
-          showError('submitError', result.message);
-        }
-      } catch (error) {
-        console.error('Edit error:', error);
-        showError('submitError', 'Erreur lors de la mise à jour');
-      }
-    }
-
-    function resetSubmitForm() {
-      document.querySelector('#submitModal .modal-title').textContent = 'Soumettre une webapp';
-      
-      const form = document.getElementById('submitForm');
-      form.onsubmit = handleSubmit;
-      
-      const submitBtn = form.querySelector('button[type="submit"]');
-      submitBtn.textContent = 'Soumettre';
-      
-      form.reset();
-    }
-
-    async function deleteWebapp(id) {
-      const password = prompt('⚠️ ATTENTION : Cette action est irréversible.\n\nPour confirmer la suppression, entrez votre mot de passe :');
-      
-      if (!password) return;
-
-      const token = localStorage.getItem('token');
-      
-      try {
-        const verifyResponse = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: currentUser.email, password })
-        });
-
-        const verifyResult = await verifyResponse.json();
-
-        if (!verifyResult.success) {
-          alert('❌ Mot de passe incorrect. Suppression annulée.');
-          return;
-        }
-
-        const response = await fetch(`/api/webapps/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          const cardElement = event.target.closest('.webapp-manage-card');
-          if (cardElement) {
-            cardElement.style.opacity = '0';
-            cardElement.style.transform = 'translateX(-100%)';
-            setTimeout(() => {
-              cardElement.remove();
-              const remainingCards = document.querySelectorAll('.webapp-manage-card');
-              if (remainingCards.length === 0) {
-                loadProfilePage();
-              }
-            }, 300);
-          }
-          
-          alert('✅ Webapp supprimée avec succès');
-          loadWebapps();
-        } else {
-          alert('❌ Erreur : ' + result.message);
-        }
-      } catch (error) {
-        console.error('Delete webapp error:', error);
-        alert('❌ Erreur lors de la suppression');
-      }
-    }
-
-    // ========== SUBMIT WEBAPP ==========
-    async function handleSubmit(e) {
-      e.preventDefault();
-
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Vous devez être connecté pour soumettre une webapp');
-        openAuthModal();
-        return;
-      }
-
-      const data = {
-        name: document.getElementById('submitName').value,
-        url: document.getElementById('submitUrl').value,
-        description_short: document.getElementById('submitDescShort').value,
-        description_long: document.getElementById('submitDescLong').value,
-        category: document.getElementById('submitCategory').value,
-        tags: document.getElementById('submitTags').value.split(',').map(t => t.trim()).filter(t => t),
-        github_url: document.getElementById('submitGithub').value || null,
-        video_url: document.getElementById('submitVideo').value || null,
-        image_url: document.getElementById('submitImage').value || null
-      };
-
-      try {
-        const response = await fetch('/api/webapps', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          showSuccess('submitSuccess', result.message);
-          document.getElementById('submitForm').reset();
-          setTimeout(() => {
-            closeSubmitModal();
-            loadWebapps();
-          }, 1500);
-        } else {
-          showError('submitError', result.message);
-        }
-      } catch (error) {
-        console.error('Submit error:', error);
-        showError('submitError', 'Erreur lors de la soumission');
-      }
+    function renderStars(r) {
+      const full = Math.floor(r);
+      const half = r % 1 >= 0.5;
+      return '⭐'.repeat(full) + (half ? '✨' : '') + '☆'.repeat(5 - full - (half ? 1 : 0));
     }
 
     // ========== FILTERS ==========
-    function filterCategory(category) {
-      currentFilter.category = category;
-      
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      event.target.classList.add('active');
-      
+    function filterCategory(cat, btn) {
+      filters.category = cat;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
       loadWebapps();
     }
 
-    function filterSort(sort) {
-      currentFilter.sort = sort;
-      
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      event.target.classList.add('active');
-      
+    function filterSort(sort, btn) {
+      filters.sort = sort;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
       loadWebapps();
     }
 
@@ -2187,126 +717,19 @@
     function handleSearch() {
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
-        currentFilter.search = document.getElementById('searchInput').value;
+        filters.search = document.getElementById('searchInput').value;
         loadWebapps();
       }, 300);
     }
 
     function surpriseMe() {
-      if (webapps.length === 0) {
-        alert('Aucune webapp disponible');
-        return;
-      }
+      if (webapps.length === 0) return alert('Aucune webapp disponible');
       const random = webapps[Math.floor(Math.random() * webapps.length)];
-      showWebappDetail(random.id);
+      window.location.href = `webapp.html?id=${random.id}`;
     }
 
     function scrollToCatalog() {
-      document.querySelector('.catalog').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // ========== STATS ==========
-    async function loadStats() {
-      try {
-        const response = await fetch('/api/stats');
-        const result = await response.json();
-
-        if (result.success) {
-          document.getElementById('statWebapps').textContent = result.data.webapps;
-          document.getElementById('statCreators').textContent = result.data.creators;
-          document.getElementById('statReviews').textContent = result.data.reviews;
-        }
-      } catch (error) {
-        console.error('Load stats error:', error);
-      }
-    }
-
-    // ========== NOTIFICATIONS ==========
-    function checkNotificationPermission() {
-      if ('Notification' in window) {
-        notificationsEnabled = Notification.permission === 'granted';
-      }
-    }
-
-    function showNotificationPopup() {
-      if ('Notification' in window && Notification.permission === 'default') {
-        document.getElementById('notificationPopup').classList.add('active');
-      }
-    }
-
-    function closeNotificationPopup() {
-      document.getElementById('notificationPopup').classList.remove('active');
-    }
-
-    async function enableNotifications() {
-      if (!('Notification' in window)) {
-        alert('Votre navigateur ne supporte pas les notifications');
-        return;
-      }
-
-      const permission = await Notification.requestPermission();
-      
-      if (permission === 'granted') {
-        notificationsEnabled = true;
-        new Notification('🎉 Notifications activées !', {
-          body: 'Vous recevrez des notifications pour les nouveautés sur Nexus Web Hub',
-          icon: 'assets/logos/logo-nwh.svg'
-        });
-        closeNotificationPopup();
-      } else {
-        alert('Notifications refusées. Vous pouvez les activer plus tard dans les paramètres de votre navigateur.');
-        closeNotificationPopup();
-      }
-    }
-
-    function toggleNotifications() {
-      if (notificationsEnabled) {
-        if (confirm('Désactiver les notifications ?')) {
-          notificationsEnabled = false;
-          alert('Notifications désactivées. Rechargez la page pour appliquer les changements.');
-        }
-      } else {
-        enableNotifications();
-      }
-    }
-
-    // ========== MODALS ==========
-    function openAuthModal() {
-      document.getElementById('authModal').classList.add('active');
-    }
-
-    function closeAuthModal() {
-      document.getElementById('authModal').classList.remove('active');
-      clearMessages();
-    }
-
-    function switchAuthTab(tab) {
-      document.querySelectorAll('#authModal .tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
-      
-      if (tab === 'login') {
-        document.getElementById('loginForm').classList.remove('hidden');
-        document.getElementById('signupForm').classList.add('hidden');
-      } else {
-        document.getElementById('loginForm').classList.add('hidden');
-        document.getElementById('signupForm').classList.remove('hidden');
-      }
-      clearMessages();
-    }
-
-    function openSubmitModal() {
-      if (!currentUser) {
-        alert('Vous devez être connecté pour soumettre une webapp');
-        openAuthModal();
-        return;
-      }
-      document.getElementById('submitModal').classList.add('active');
-    }
-
-    function closeSubmitModal() {
-      document.getElementById('submitModal').classList.remove('active');
-      resetSubmitForm();
-      clearMessages();
+      document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' });
     }
 
     // ========== UI HELPERS ==========
@@ -2329,48 +752,6 @@
     function hideEmpty() {
       document.getElementById('emptyState').classList.add('hidden');
     }
-
-    function showError(id, message) {
-      const el = document.getElementById(id);
-      el.textContent = message;
-      el.classList.remove('hidden');
-      document.getElementById(id.replace('Error', 'Success')).classList.add('hidden');
-    }
-
-    function showSuccess(id, message) {
-      const el = document.getElementById(id);
-      el.textContent = message;
-      el.classList.remove('hidden');
-      document.getElementById(id.replace('Success', 'Error')).classList.add('hidden');
-    }
-
-    function clearMessages() {
-      document.querySelectorAll('.error-message, .success-message').forEach(el => {
-        el.classList.add('hidden');
-        el.textContent = '';
-      });
-    }
-
-    // ========== LANGUAGE ==========
-    function toggleLanguage() {
-      currentLang = currentLang === 'fr' ? 'en' : 'fr';
-      alert('Traduction EN à implémenter (Phase 2)');
-    }
-
-    // ========== CLICK OUTSIDE MODAL ==========
-    document.querySelectorAll('.modal').forEach(modal => {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          modal.classList.remove('active');
-        }
-      });
-    });
-
-    document.getElementById('reviewOverlay').addEventListener('click', (e) => {
-      if (e.target.id === 'reviewOverlay') {
-        closeReviewForm();
-      }
-    });
   </script>
 </body>
 </html>
