@@ -495,7 +495,8 @@
       const userData = localStorage.getItem('user');
 
       if (!token || !userData) {
-        window.location.href = 'auth.html';
+        // Rediriger vers auth avec redirect vers profile
+        window.location.href = 'auth.html?redirect=profile.html';
         return;
       }
 
