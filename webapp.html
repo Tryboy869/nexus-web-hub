@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webapp - Nexus Web Hub</title>
+  <link rel="icon" href="assets/logos/logo-nwh.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-deep: #0a0e27;
+      --bg-card: #1a1f3a;
+      --bg-card-hover: #252b4a;
+      --text-primary: #E0E6ED;
+      --text-secondary: #a0aec0;
+      --accent-cyan: #00d9ff;
+      --accent-purple: #8b5cf6;
+      --accent-green: #10b981;
+      --accent-gold: #fbbf24;
+      --accent-red: #ef4444;
+      --border: rgba(0, 217, 255, 0.15);
+      --font-body: 'Inter', sans-serif;
+      --font-heading: 'Space Grotesk', sans-serif;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg-deep: #f0f4f8;
+        --bg-card: #ffffff;
+        --text-primary: #1a202c;
+        --text-secondary: #4a5568;
+        --border: rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--accent-cyan); }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .logo img { width: 32px; height: 32px; }
+
+    /* MAIN CONTAINER */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* WEBAPP HEADER */
+    .webapp-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 900px) {
+      .webapp-header { grid-template-columns: 1fr; }
+    }
+
+    .webapp-media {
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .webapp-screenshot {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .webapp-screenshot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .webapp-screenshot .default-logo {
+      width: 120px;
+      height: 120px;
+      opacity: 0.7;
+    }
+
+    /* Video iframe */
+    .video-container {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--bg-deep);
+      border-radius: 12px;
+    }
+
+    .video-container iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border: none;
+      border-radius: 8px;
+    }
+
+    .video-placeholder {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+    }
+
+    /* WEBAPP INFO */
+    .webapp-details {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .webapp-title-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .webapp-title {
+      font-family: var(--font-heading);
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .webapp-badges {
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .webapp-badges img {
+      width: 36px;
+      height: 36px;
+    }
+
+    .webapp-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      color: var(--text-secondary);
+    }
+
+    .webapp-dev {
+      font-size: 1.1rem;
+    }
+
+    .webapp-rating {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .stars { color: var(--accent-gold); font-size: 1.2rem; }
+
+    .webapp-views {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .webapp-desc-short {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .webapp-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      padding: 0.4rem 1rem;
+      background: rgba(0, 217, 255, 0.1);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: var(--accent-cyan);
+    }
+
+    /* BUTTONS */
+    .webapp-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent-cyan);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    /* SECTIONS */
+    .section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* DESCRIPTION */
+    .full-description {
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+
+    .full-description.collapsed {
+      max-height: 150px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .full-description.collapsed::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(transparent, var(--bg-card));
+    }
+
+    .expand-btn {
+      margin-top: 1rem;
+      background: transparent;
+      border: none;
+      color: var(--accent-cyan);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    /* REVIEWS */
+    .review-form {
+      background: var(--bg-deep);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .rating-input {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .rating-star {
+      font-size: 2rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .rating-star:hover { transform: scale(1.2); }
+    .rating-star.active { color: var(--accent-gold); }
+    .rating-star.inactive { color: var(--text-secondary); opacity: 0.4; }
+
+    .review-textarea {
+      width: 100%;
+      padding: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      min-height: 100px;
+      resize: vertical;
+      margin-bottom: 1rem;
+    }
+
+    .review-textarea:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .review-item {
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .review-item:last-child { border-bottom: none; }
+
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .review-author {
+      font-weight: 600;
+    }
+
+    .review-text {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* AUTH REQUIRED */
+    .auth-required {
+      text-align: center;
+      padding: 2rem;
+      background: var(--bg-deep);
+      border-radius: 12px;
+    }
+
+    .auth-required a {
+      color: var(--accent-cyan);
+    }
+
+    /* LOADING */
+    .loading {
+      text-align: center;
+      padding: 4rem;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent-cyan);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="back-link">← Retour au catalogue</a>
+      <a href="index.html" class="logo">
+        <img src="assets/logos/logo-nwh.svg" alt="NWH">
+        NWH
+      </a>
+    </div>
+  </header>
+
+  <!-- LOADING -->
+  <div id="loadingState" class="loading">
+    <div class="spinner"></div>
+    <p>Chargement de la webapp...</p>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="container hidden" id="mainContent">
+    
+    <!-- WEBAPP HEADER -->
+    <div class="webapp-header">
+      <div class="webapp-media">
+        <div class="webapp-screenshot" id="webappScreenshot">
+          <img src="assets/logos/logo-nwh.svg" class="default-logo" alt="NWH">
+        </div>
+        
+        <!-- VIDEO (si disponible) -->
+        <div class="video-container hidden" id="videoContainer">
+          <iframe id="videoFrame" src="" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <div class="webapp-details">
+        <div class="webapp-title-row">
+          <h1 class="webapp-title" id="webappTitle">...</h1>
+          <div class="webapp-badges" id="webappBadges"></div>
+        </div>
+
+        <div class="webapp-meta">
+          <span class="webapp-dev">par <strong id="webappDev">...</strong></span>
+          <div class="webapp-rating">
+            <span class="stars" id="webappStars">⭐⭐⭐⭐⭐</span>
+            <span id="webappRating">0.0</span>
+            <span style="color: var(--text-secondary)">(<span id="webappReviewsCount">0</span> avis)</span>
+          </div>
+          <div class="webapp-views">
+            👁️ <span id="webappViews">0</span> vues
+          </div>
+        </div>
+
+        <p class="webapp-desc-short" id="webappDescShort">...</p>
+
+        <div class="webapp-tags" id="webappTags"></div>
+
+        <div class="webapp-actions">
+          <a href="#" class="btn btn-primary" id="openBtn" target="_blank">🚀 Ouvrir la webapp</a>
+          <a href="#" class="btn btn-secondary hidden" id="githubBtn" target="_blank">📂 Code Source</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESCRIPTION COMPLETE -->
+    <section class="section">
+      <h2 class="section-title">📖 Description</h2>
+      <div class="full-description collapsed" id="fullDesc">...</div>
+      <button class="expand-btn" id="expandBtn" onclick="toggleDescription()">Voir plus ▼</button>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="section">
+      <h2 class="section-title">⭐ Avis (<span id="reviewsTotal">0</span>)</h2>
+      
+      <!-- Formulaire review (connecté uniquement) -->
+      <div id="reviewFormContainer">
+        <div class="review-form hidden" id="reviewForm">
+          <p style="margin-bottom: 1rem; font-weight: 500;">Donnez votre avis :</p>
+          <div class="rating-input" id="ratingInput">
+            <span class="rating-star inactive" data-rating="1" onclick="setRating(1)">⭐</span>
+            <span class="rating-star inactive" data-rating="2" onclick="setRating(2)">⭐</span>
+            <span class="rating-star inactive" data-rating="3" onclick="setRating(3)">⭐</span>
+            <span class="rating-star inactive" data-rating="4" onclick="setRating(4)">⭐</span>
+            <span class="rating-star inactive" data-rating="5" onclick="setRating(5)">⭐</span>
+          </div>
+          <textarea class="review-textarea" id="reviewComment" placeholder="Partagez votre expérience (optionnel)..."></textarea>
+          <button class="btn btn-primary" onclick="submitReview()">Publier mon avis</button>
+        </div>
+        
+        <div class="auth-required hidden" id="authRequired">
+          <p>🔒 <a href="auth.html">Connectez-vous</a> pour laisser un avis</p>
+        </div>
+      </div>
+
+      <!-- Liste reviews -->
+      <div id="reviewsList"></div>
+    </section>
+  </main>
+
+  <script>
+    // ========== STATE ==========
+    let currentUser = null;
+    let webapp = null;
+    let selectedRating = 0;
+
+    // ========== INIT ==========
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuth();
+      await loadWebapp();
+    });
+
+    // ========== AUTH ==========
+    async function checkAuth() {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) currentUser = data.data;
+        }
+      } catch (e) {
+        console.error('Auth error:', e);
+      }
+    }
+
+    // ========== LOAD WEBAPP ==========
+    async function loadWebapp() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+
+      if (!id) {
+        alert('Webapp non trouvée');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      try {
+        // Ajouter header auth si connecté (pour comptage vues)
+        const headers = {};
+        const token = localStorage.getItem('token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const res = await fetch(`/api/webapps/${id}`, { headers });
+        const data = await res.json();
+
+        if (data.success) {
+          webapp = data.data.webapp;
+          const reviews = data.data.reviews || [];
+          
+          renderWebapp(webapp);
+          renderReviews(reviews);
+          
+          document.getElementById('loadingState').classList.add('hidden');
+          document.getElementById('mainContent').classList.remove('hidden');
+          
+          // Update title
+          document.title = `${webapp.name} - Nexus Web Hub`;
+        } else {
+          alert('Webapp non trouvée');
+          window.location.href = 'index.html';
+        }
+      } catch (e) {
+        console.error('Load webapp error:', e);
+        alert('Erreur de chargement');
+      }
+    }
+
+    // ========== RENDER ==========
+    function renderWebapp(w) {
+      // Title & meta
+      document.getElementById('webappTitle').textContent = w.name;
+      document.getElementById('webappDev').textContent = w.developer;
+      document.getElementById('webappDescShort').textContent = w.description_short;
+      document.getElementById('webappRating').textContent = w.avg_rating.toFixed(1);
+      document.getElementById('webappReviewsCount').textContent = w.reviews_count;
+      document.getElementById('webappViews').textContent = w.views_count;
+      document.getElementById('webappStars').textContent = renderStars(w.avg_rating);
+
+      // Screenshot
+      if (w.image_url) {
+        document.getElementById('webappScreenshot').innerHTML = `<img src="${w.image_url}" alt="${w.name}">`;
+      }
+
+      // Video YouTube
+      if (w.video_url) {
+        const videoId = extractYouTubeId(w.video_url);
+        if (videoId) {
+          document.getElementById('videoContainer').classList.remove('hidden');
+          document.getElementById('videoFrame').src = `https://www.youtube.com/embed/${videoId}`;
+        }
+      }
+
+      // Badges
+      let badgesHTML = '';
+      if (w.is_trending) badgesHTML += `<img src="assets/badges/system/badge-trending.svg" alt="Trending" title="Trending">`;
+      if (w.is_featured) badgesHTML += `<img src="assets/badges/system/badge-featured.svg" alt="Featured" title="Featured">`;
+      if (w.is_new) badgesHTML += `<img src="assets/badges/system/badge-new.svg" alt="Nouveau" title="Nouveau">`;
+      document.getElementById('webappBadges').innerHTML = badgesHTML;
+
+      // Tags
+      const tags = w.tags || [];
+      document.getElementById('webappTags').innerHTML = tags.map(t => `<span class="tag">${t}</span>`).join('');
+
+      // Buttons
+      document.getElementById('openBtn').href = w.url;
+      if (w.github_url) {
+        const githubBtn = document.getElementById('githubBtn');
+        githubBtn.href = w.github_url;
+        githubBtn.classList.remove('hidden');
+      }
+
+      // Full description
+      document.getElementById('fullDesc').textContent = w.description_long || w.description_short;
+
+      // Review form
+      if (currentUser) {
+        // Check si pas son propre projet
+        if (w.creator_id !== currentUser.id) {
+          document.getElementById('reviewForm').classList.remove('hidden');
+        }
+      } else {
+        document.getElementById('authRequired').classList.remove('hidden');
+      }
+    }
+
+    function renderStars(r) {
+      const full = Math.floor(r);
+      const half = r % 1 >= 0.5;
+      return '⭐'.repeat(full) + (half ? '✨' : '') + '☆'.repeat(5 - full - (half ? 1 : 0));
+    }
+
+    function extractYouTubeId(url) {
+      const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    }
+
+    function renderReviews(reviews) {
+      document.getElementById('reviewsTotal').textContent = reviews.length;
+
+      if (reviews.length === 0) {
+        document.getElementById('reviewsList').innerHTML = `
+          <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">
+            Aucun avis pour le moment. Soyez le premier !
+          </p>
+        `;
+        return;
+      }
+
+      document.getElementById('reviewsList').innerHTML = reviews.map(r => `
+        <div class="review-item">
+          <div class="review-header">
+            <span class="review-author">${r.user_name}</span>
+            <span class="stars">${renderStars(r.rating)}</span>
+          </div>
+          <p class="review-text">${r.comment || 'Pas de commentaire.'}</p>
+        </div>
+      `).join('');
+    }
+
+    // ========== INTERACTIONS ==========
+    function toggleDescription() {
+      const desc = document.getElementById('fullDesc');
+      const btn = document.getElementById('expandBtn');
+      
+      if (desc.classList.contains('collapsed')) {
+        desc.classList.remove('collapsed');
+        btn.textContent = 'Voir moins ▲';
+      } else {
+        desc.classList.add('collapsed');
+        btn.textContent = 'Voir plus ▼';
+      }
+    }
+
+    function setRating(rating) {
+      selectedRating = rating;
+      document.querySelectorAll('.rating-star').forEach((star, i) => {
+        star.classList.toggle('active', i < rating);
+        star.classList.toggle('inactive', i >= rating);
+      });
+    }
+
+    async function submitReview() {
+      if (selectedRating === 0) {
+        alert('Veuillez sélectionner une note');
+        return;
+      }
+
+      const comment = document.getElementById('reviewComment').value;
+      const token = localStorage.getItem('token');
+
+      try {
+        const res = await fetch(`/api/webapps/${webapp.id}/reviews`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ rating: selectedRating, comment })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert('Avis publié avec succès !');
+          location.reload();
+        } else {
+          alert(data.message || 'Erreur');
+        }
+      } catch (e) {
+        console.error('Submit review error:', e);
+        alert('Erreur lors de la publication');
+      }
+    }
+  </script>
+</body>
+</html>
