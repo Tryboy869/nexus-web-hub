@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soumettre une Webapp - Nexus Web Hub</title>
+  <link rel="icon" href="assets/logos/logo-nwh.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-deep-space: #0a0e27;
+      --bg-card: #1a1f3a;
+      --text-primary: #E0E6ED;
+      --text-secondary: #a0aec0;
+      --accent-cyan: #00d9ff;
+      --accent-purple: #8b5cf6;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --border-glow: rgba(0, 217, 255, 0.15);
+      --font-body: 'Inter', sans-serif;
+      --font-heading: 'Space Grotesk', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep-space);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* HEADER */
+    header {
+      background: rgba(26, 31, 58, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-glow);
+      padding: 1rem 2rem;
+    }
+
+    .header-content {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .back-link {
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .back-link:hover { color: var(--accent-cyan); }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .logo img { width: 32px; height: 32px; }
+
+    /* MAIN */
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-title {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    /* FORM */
+    .submit-form {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+
+    .form-section {
+      margin-bottom: 2rem;
+    }
+
+    .form-section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-glow);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .form-group label .required {
+      color: var(--accent-red);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: var(--bg-deep-space);
+      border: 1px solid var(--border-glow);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(0, 217, 255, 0.15);
+    }
+
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-hint {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.35rem;
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* CATEGORY SELECT */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .category-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-deep-space);
+      border: 1px solid var(--border-glow);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .category-option:hover { border-color: var(--accent-cyan); }
+
+    .category-option.active {
+      border-color: var(--accent-cyan);
+      background: rgba(0, 217, 255, 0.1);
+    }
+
+    .category-option img { width: 24px; height: 24px; }
+
+    .category-option input { display: none; }
+
+    /* BUTTONS */
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-glow);
+    }
+
+    .btn {
+      padding: 0.9rem 2rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 217, 255, 0.4);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-glow);
+    }
+
+    .btn-secondary:hover { border-color: var(--accent-cyan); }
+
+    /* MESSAGES */
+    .message {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    .message.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    .message.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    /* PREVIEW */
+    .preview-section {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--bg-deep-space);
+      border-radius: 12px;
+    }
+
+    .preview-title {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .preview-video {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border-radius: 8px;
+      border: none;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-content">
+      <a href="/" class="back-link">← Retour</a>
+      <a href="/" class="logo">
+        <img src="assets/logos/logo-nwh.svg" alt="NWH">
+        Nexus Web Hub
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+    <h1 class="page-title" id="pageTitle">Soumettre une webapp</h1>
+    <p class="page-subtitle" id="pageSubtitle">Partagez votre création avec la communauté</p>
+
+    <!-- MESSAGES -->
+    <div id="errorMessage" class="message error hidden"></div>
+    <div id="successMessage" class="message success hidden"></div>
+
+    <!-- FORM -->
+    <form class="submit-form" id="submitForm" onsubmit="handleSubmit(event)">
+      
+      <!-- BASIC INFO -->
+      <div class="form-section">
+        <h2 class="form-section-title">📝 Informations de base</h2>
+        
+        <div class="form-group">
+          <label>Nom du projet <span class="required">*</span></label>
+          <input type="text" id="name" required placeholder="Ex: Super Todo App" maxlength="100">
+        </div>
+
+        <div class="form-group">
+          <label>URL principale (HTTPS) <span class="required">*</span></label>
+          <input type="url" id="url" required placeholder="https://votre-webapp.com">
+          <div class="form-hint">L'URL doit commencer par https://</div>
+        </div>
+
+        <div class="form-group">
+          <label>Description courte <span class="required">*</span></label>
+          <textarea id="descriptionShort" required maxlength="200" placeholder="Décrivez votre webapp en quelques mots..." oninput="updateCharCount()"></textarea>
+          <div class="char-count"><span id="charCount">0</span>/200</div>
+        </div>
+
+        <div class="form-group">
+          <label>Description détaillée</label>
+          <textarea id="descriptionLong" maxlength="2000" placeholder="Décrivez en détail les fonctionnalités, l'utilisation, etc..."></textarea>
+        </div>
+      </div>
+
+      <!-- CATEGORY -->
+      <div class="form-section">
+        <h2 class="form-section-title">📁 Catégorie</h2>
+        
+        <div class="category-grid">
+          <label class="category-option" data-cat="productivity">
+            <input type="radio" name="category" value="productivity">
+            <img src="assets/icons/icon-tools.svg" alt="">
+            <span>Productivité</span>
+          </label>
+          <label class="category-option" data-cat="design">
+            <input type="radio" name="category" value="design">
+            <img src="assets/icons/icon-ui-kits.svg" alt="">
+            <span>Design</span>
+          </label>
+          <label class="category-option" data-cat="game">
+            <input type="radio" name="category" value="game">
+            <img src="assets/icons/icon-games.svg" alt="">
+            <span>Jeux</span>
+          </label>
+          <label class="category-option" data-cat="api">
+            <input type="radio" name="category" value="api">
+            <img src="assets/icons/icon-apis.svg" alt="">
+            <span>API / Dev</span>
+          </label>
+          <label class="category-option" data-cat="nocode">
+            <input type="radio" name="category" value="nocode">
+            <img src="assets/icons/icon-websites.svg" alt="">
+            <span>No-Code</span>
+          </label>
+          <label class="category-option" data-cat="other">
+            <input type="radio" name="category" value="other">
+            <img src="assets/icons/icon-other.svg" alt="">
+            <span>Autre</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- TAGS -->
+      <div class="form-section">
+        <h2 class="form-section-title">🏷️ Tags</h2>
+        
+        <div class="form-group">
+          <input type="text" id="tags" placeholder="react, productivité, open-source (séparés par virgules)">
+          <div class="form-hint">Ajoutez des tags pour aider les utilisateurs à trouver votre webapp</div>
+        </div>
+      </div>
+
+      <!-- MEDIA -->
+      <div class="form-section">
+        <h2 class="form-section-title">🎬 Médias (optionnel)</h2>
+        
+        <div class="form-group">
+          <label>URL GitHub</label>
+          <input type="url" id="githubUrl" placeholder="https://github.com/username/repo">
+        </div>
+
+        <div class="form-group">
+          <label>URL Vidéo YouTube</label>
+          <input type="url" id="videoUrl" placeholder="https://youtube.com/watch?v=..." oninput="previewVideo()">
+          <div class="form-hint">La vidéo sera intégrée directement sur la page de votre webapp</div>
+        </div>
+
+        <div class="preview-section hidden" id="videoPreview">
+          <div class="preview-title">Aperçu vidéo</div>
+          <iframe id="previewFrame" class="preview-video" allowfullscreen></iframe>
+        </div>
+
+        <div class="form-group">
+          <label>URL Screenshot</label>
+          <input type="url" id="imageUrl" placeholder="https://exemple.com/screenshot.png">
+          <div class="form-hint">URL directe vers une image de votre webapp</div>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="form-actions">
+        <a href="/" class="btn btn-secondary">Annuler</a>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Publier</button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    let editMode = false;
+    let editId = null;
+    let currentUser = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      setupCategorySelection();
+      checkEditMode();
+    });
+
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+
+      if (!token || !userData) {
+        window.location.href = 'auth.html?redirect=submit.html';
+        return;
+      }
+
+      currentUser = JSON.parse(userData);
+    }
+
+    function setupCategorySelection() {
+      document.querySelectorAll('.category-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          document.querySelectorAll('.category-option').forEach(o => o.classList.remove('active'));
+          opt.classList.add('active');
+          opt.querySelector('input').checked = true;
+        });
+      });
+    }
+
+    function checkEditMode() {
+      const params = new URLSearchParams(window.location.search);
+      editId = params.get('edit');
+
+      if (editId) {
+        editMode = true;
+        document.getElementById('pageTitle').textContent = 'Modifier la webapp';
+        document.getElementById('pageSubtitle').textContent = 'Mettez à jour les informations de votre webapp';
+        document.getElementById('submitBtn').textContent = 'Enregistrer';
+        loadWebappData();
+      }
+    }
+
+    async function loadWebappData() {
+      try {
+        const res = await fetch(`/api/webapps/${editId}`);
+        const data = await res.json();
+
+        if (data.success) {
+          const w = data.data.webapp;
+          document.getElementById('name').value = w.name;
+          document.getElementById('url').value = w.url;
+          document.getElementById('descriptionShort').value = w.description_short;
+          document.getElementById('descriptionLong').value = w.description_long || '';
+          document.getElementById('tags').value = (w.tags || []).join(', ');
+          document.getElementById('githubUrl').value = w.github_url || '';
+          document.getElementById('videoUrl').value = w.video_url || '';
+          document.getElementById('imageUrl').value = w.image_url || '';
+
+          // Select category
+          const catOpt = document.querySelector(`[data-cat="${w.category}"]`);
+          if (catOpt) {
+            catOpt.classList.add('active');
+            catOpt.querySelector('input').checked = true;
+          }
+
+          updateCharCount();
+          previewVideo();
+        }
+      } catch (e) {
+        console.error(e);
+        showError('Impossible de charger les données');
+      }
+    }
+
+    function updateCharCount() {
+      const text = document.getElementById('descriptionShort').value;
+      document.getElementById('charCount').textContent = text.length;
+    }
+
+    function previewVideo() {
+      const url = document.getElementById('videoUrl').value;
+      const preview = document.getElementById('videoPreview');
+      const frame = document.getElementById('previewFrame');
+
+      if (url && url.includes('youtube')) {
+        const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+        if (match) {
+          frame.src = `https://www.youtube.com/embed/${match[1]}`;
+          preview.classList.remove('hidden');
+          return;
+        }
+      }
+      preview.classList.add('hidden');
+    }
+
+    function showError(msg) {
+      document.getElementById('errorMessage').textContent = msg;
+      document.getElementById('errorMessage').classList.remove('hidden');
+      document.getElementById('successMessage').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showSuccess(msg) {
+      document.getElementById('successMessage').textContent = msg;
+      document.getElementById('successMessage').classList.remove('hidden');
+      document.getElementById('errorMessage').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+
+      const categoryInput = document.querySelector('input[name="category"]:checked');
+      if (!categoryInput) {
+        showError('Veuillez sélectionner une catégorie');
+        return;
+      }
+
+      const data = {
+        name: document.getElementById('name').value,
+        url: document.getElementById('url').value,
+        description_short: document.getElementById('descriptionShort').value,
+        description_long: document.getElementById('descriptionLong').value || null,
+        category: categoryInput.value,
+        tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t),
+        github_url: document.getElementById('githubUrl').value || null,
+        video_url: document.getElementById('videoUrl').value || null,
+        image_url: document.getElementById('imageUrl').value || null
+      };
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = editMode ? 'Enregistrement...' : 'Publication...';
+
+      try {
+        const token = localStorage.getItem('token');
+        const method = editMode ? 'PUT' : 'POST';
+        const endpoint = editMode ? `/api/webapps/${editId}` : '/api/webapps';
+
+        const res = await fetch(endpoint, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          showSuccess(editMode ? 'Webapp mise à jour !' : 'Webapp publiée avec succès !');
+          setTimeout(() => {
+            window.location.href = editMode ? 'profile.html' : `webapp.html?id=${result.data.id}`;
+          }, 1500);
+        } else {
+          showError(result.message);
+          btn.disabled = false;
+          btn.textContent = editMode ? 'Enregistrer' : 'Publier';
+        }
+      } catch (err) {
+        console.error(err);
+        showError('Erreur lors de la soumission');
+        btn.disabled = false;
+        btn.textContent = editMode ? 'Enregistrer' : 'Publier';
+      }
+    }
+  </script>
+</body>
+</html>
