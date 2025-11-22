@@ -326,6 +326,7 @@
     .webapp-item-actions {
       display: flex;
       gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
     .btn {
@@ -358,6 +359,17 @@
     .btn-secondary:hover {
       border-color: var(--accent-cyan);
       color: var(--accent-cyan);
+    }
+
+    .btn-warning {
+      background: transparent;
+      color: var(--accent-gold);
+      border: 1px solid var(--accent-gold);
+    }
+
+    .btn-warning:hover {
+      background: var(--accent-gold);
+      color: #000;
     }
 
     .btn-danger {
@@ -574,12 +586,19 @@
     <!-- TAB: SOUMETTRE -->
     <div class="tab-content" id="tab-submit">
       <div class="section-card">
-        <h2 class="section-title">➕ Soumettre une webapp</h2>
+        <h2 class="section-title" id="submitTitle">➕ Soumettre une webapp</h2>
 
         <div class="message error hidden" id="submitError"></div>
         <div class="message success hidden" id="submitSuccess"></div>
 
+        <!-- Mode édition info -->
+        <div class="message hidden" id="editModeInfo" style="background: rgba(139, 92, 246, 0.1); border-color: var(--accent-purple); color: var(--accent-purple);">
+          ✏️ Mode édition - <button onclick="cancelEdit()" style="background: none; border: none; color: var(--accent-purple); text-decoration: underline; cursor: pointer;">Annuler et créer nouveau</button>
+        </div>
+
         <form id="submitForm" onsubmit="handleSubmit(event)">
+          <input type="hidden" id="editingWebappId" value="">
+          
           <div class="form-grid">
             <div class="form-group">
               <label>Nom du projet *</label>
@@ -626,7 +645,7 @@
               <input type="url" id="submitImage" placeholder="https://...">
             </div>
           </div>
-          <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">🚀 Soumettre</button>
+          <button type="submit" class="btn btn-primary" id="submitBtn" style="margin-top: 1.5rem;">🚀 Soumettre</button>
         </form>
       </div>
     </div>
@@ -769,7 +788,8 @@
             </div>
           </div>
           <div class="webapp-item-actions">
-            <a href="webapp.html?id=${w.id}" class="btn btn-secondary btn-sm">Voir</a>
+            <a href="webapp.html?id=${w.id}" class="btn btn-secondary btn-sm">👁️</a>
+            <button class="btn btn-warning btn-sm" onclick="editWebapp('${w.id}')">✏️</button>
             <button class="btn btn-danger btn-sm" onclick="openDeleteModal('${w.id}', '${w.name}')">🗑️</button>
           </div>
         </div>
@@ -791,6 +811,50 @@
       myWebapps = filtered;
       renderMyWebapps();
       myWebapps = original;
+    }
+
+    // ========== EDIT WEBAPP ==========
+    function editWebapp(id) {
+      const webapp = myWebapps.find(w => w.id === id);
+      if (!webapp) {
+        alert('Webapp non trouvée');
+        return;
+      }
+
+      // Switch to submit tab
+      switchTab('submit', document.querySelector('[onclick*="submit"]'));
+
+      // Fill form with existing data
+      document.getElementById('editingWebappId').value = webapp.id;
+      document.getElementById('submitName').value = webapp.name;
+      document.getElementById('submitUrl').value = webapp.url;
+      document.getElementById('submitDescShort').value = webapp.description_short;
+      document.getElementById('submitDescLong').value = webapp.description_long || '';
+      document.getElementById('submitCategory').value = webapp.category;
+      document.getElementById('submitTags').value = (webapp.tags || []).join(', ');
+      document.getElementById('submitGithub').value = webapp.github_url || '';
+      document.getElementById('submitVideo').value = webapp.video_url || '';
+      document.getElementById('submitImage').value = webapp.image_url || '';
+
+      // Update UI to show edit mode
+      document.getElementById('submitTitle').innerHTML = '✏️ Modifier la webapp';
+      document.getElementById('submitBtn').innerHTML = '💾 Enregistrer les modifications';
+      document.getElementById('editModeInfo').classList.remove('hidden');
+
+      // Scroll to form
+      document.getElementById('tab-submit').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+      // Reset form
+      document.getElementById('submitForm').reset();
+      document.getElementById('editingWebappId').value = '';
+      
+      // Reset UI
+      document.getElementById('submitTitle').innerHTML = '➕ Soumettre une webapp';
+      document.getElementById('submitBtn').innerHTML = '🚀 Soumettre';
+      document.getElementById('editModeInfo').classList.add('hidden');
+      hideMessages();
     }
 
     // ========== DELETE ==========
@@ -852,12 +916,15 @@
       }
     }
 
-    // ========== SUBMIT ==========
+    // ========== SUBMIT (Create or Update) ==========
     async function handleSubmit(e) {
       e.preventDefault();
       hideMessages();
 
       const token = localStorage.getItem('token');
+      const editingId = document.getElementById('editingWebappId').value;
+      const isEditing = editingId !== '';
+
       const data = {
         name: document.getElementById('submitName').value,
         url: document.getElementById('submitUrl').value,
@@ -871,21 +938,45 @@
       };
 
       try {
-        const res = await fetch('/api/webapps', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(data)
-        });
+        let res;
+        
+        if (isEditing) {
+          // UPDATE existing webapp
+          console.log('Updating webapp:', editingId);
+          res = await fetch(`/api/webapps/${editingId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+          });
+        } else {
+          // CREATE new webapp
+          console.log('Creating new webapp');
+          res = await fetch('/api/webapps', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+          });
+        }
 
         const result = await res.json();
 
         if (result.success) {
-          showSuccess('submitSuccess', 'Webapp publiée avec succès !');
-          document.getElementById('submitForm').reset();
+          const successMsg = isEditing ? 'Webapp modifiée avec succès !' : 'Webapp publiée avec succès !';
+          showSuccess('submitSuccess', successMsg);
+          
+          // Reset form and edit mode
+          cancelEdit();
+          
+          // Reload webapps list
           loadMyWebapps();
+          
+          // Switch to webapps tab after delay
           setTimeout(() => switchTab('webapps', document.querySelector('[onclick*="webapps"]')), 1500);
         } else {
           showError('submitError', result.message);
@@ -893,6 +984,8 @@
       } catch (e) {
         console.error('Submit error:', e);
         showError('submitError', 'Erreur de soumission');
+      }
+    }
       }
     }
 
