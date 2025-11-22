@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - Nexus Web Hub</title>
+  <link rel="icon" href="assets/logos/logo-nwh.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-deep: #0a0e27;
+      --bg-card: #1a1f3a;
+      --text-primary: #E0E6ED;
+      --text-secondary: #a0aec0;
+      --accent-cyan: #00d9ff;
+      --accent-purple: #8b5cf6;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --border: rgba(0, 217, 255, 0.15);
+      --font-body: 'Inter', sans-serif;
+      --font-heading: 'Space Grotesk', sans-serif;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg-deep: #f0f4f8;
+        --bg-card: #ffffff;
+        --text-primary: #1a202c;
+        --text-secondary: #4a5568;
+        --border: rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .logo img { width: 40px; height: 40px; }
+
+    /* MAIN */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .auth-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .auth-title {
+      font-family: var(--font-heading);
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    /* TABS */
+    .auth-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      background: var(--bg-deep);
+      border-radius: 10px;
+      padding: 0.25rem;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .auth-tab.active {
+      background: var(--accent-cyan);
+      color: #000;
+    }
+
+    /* FORM */
+    .auth-form { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .form-group label {
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .form-group input {
+      padding: 0.9rem 1rem;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .form-note {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .btn {
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent-cyan);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* MESSAGES */
+    .message {
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .message.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    .message.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    /* BACK LINK */
+    .back-link {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    .back-link a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .back-link a:hover { color: var(--accent-cyan); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <a href="index.html" class="logo">
+      <img src="assets/logos/logo-nwh.svg" alt="NWH">
+      Nexus Web Hub
+    </a>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+    <div class="auth-container">
+      <div class="auth-card">
+        <h1 class="auth-title">Bienvenue 👋</h1>
+
+        <!-- TABS -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="switchTab('login')">Connexion</button>
+          <button class="auth-tab" onclick="switchTab('signup')">Inscription</button>
+        </div>
+
+        <!-- MESSAGES -->
+        <div class="message error hidden" id="errorMsg"></div>
+        <div class="message success hidden" id="successMsg"></div>
+
+        <!-- LOGIN FORM -->
+        <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" required placeholder="votre@email.com">
+          </div>
+          <div class="form-group">
+            <label>Mot de passe</label>
+            <input type="password" id="loginPassword" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn-primary" id="loginBtn">Se connecter</button>
+        </form>
+
+        <!-- SIGNUP FORM -->
+        <form class="auth-form hidden" id="signupForm" onsubmit="handleSignup(event)">
+          <div class="form-group">
+            <label>Nom complet</label>
+            <input type="text" id="signupName" required placeholder="Votre nom">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="signupEmail" required placeholder="votre@email.com">
+          </div>
+          <div class="form-group">
+            <label>Mot de passe</label>
+            <input type="password" id="signupPassword" required placeholder="••••••••" minlength="6">
+            <span class="form-note">Minimum 6 caractères</span>
+          </div>
+          <button type="submit" class="btn btn-primary" id="signupBtn">Créer mon compte</button>
+        </form>
+
+        <div class="back-link">
+          <a href="index.html">← Retour à l'accueil</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Check if already logged in
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        redirectAfterAuth();
+      }
+    });
+
+    function switchTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
+      document.getElementById('signupForm').classList.toggle('hidden', tab !== 'signup');
+      
+      hideMessages();
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      hideMessages();
+      
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginBtn');
+      
+      btn.disabled = true;
+      btn.textContent = 'Connexion...';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem('token', data.data.token);
+          showSuccess('Connexion réussie ! Redirection...');
+          setTimeout(() => redirectAfterAuth(), 1000);
+        } else {
+          showError(data.message || 'Erreur de connexion');
+          btn.disabled = false;
+          btn.textContent = 'Se connecter';
+        }
+      } catch (e) {
+        console.error('Login error:', e);
+        showError('Erreur de connexion');
+        btn.disabled = false;
+        btn.textContent = 'Se connecter';
+      }
+    }
+
+    async function handleSignup(e) {
+      e.preventDefault();
+      hideMessages();
+      
+      const name = document.getElementById('signupName').value;
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+      const btn = document.getElementById('signupBtn');
+      
+      btn.disabled = true;
+      btn.textContent = 'Création...';
+
+      try {
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem('token', data.data.token);
+          showSuccess('Compte créé ! Redirection...');
+          setTimeout(() => redirectAfterAuth(), 1000);
+        } else {
+          showError(data.message || 'Erreur de création');
+          btn.disabled = false;
+          btn.textContent = 'Créer mon compte';
+        }
+      } catch (e) {
+        console.error('Signup error:', e);
+        showError('Erreur de création');
+        btn.disabled = false;
+        btn.textContent = 'Créer mon compte';
+      }
+    }
+
+    function redirectAfterAuth() {
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get('redirect');
+      
+      if (redirect === 'submit') {
+        window.location.href = 'profile.html#submit';
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    function showSuccess(msg) {
+      const el = document.getElementById('successMsg');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    function hideMessages() {
+      document.getElementById('errorMsg').classList.add('hidden');
+      document.getElementById('successMsg').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
