@@ -5,16 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Webapp - Nexus Web Hub</title>
   <link rel="icon" href="assets/logos/logo-nwh.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+
     :root {
-      --bg-deep: #0a0e27;
+      --bg-deep-space: #0a0e27;
       --bg-card: #1a1f3a;
-      --bg-card-hover: #252b4a;
       --text-primary: #E0E6ED;
       --text-secondary: #a0aec0;
       --accent-cyan: #00d9ff;
@@ -22,40 +20,40 @@
       --accent-green: #10b981;
       --accent-gold: #fbbf24;
       --accent-red: #ef4444;
-      --border: rgba(0, 217, 255, 0.15);
+      --border-glow: rgba(0, 217, 255, 0.15);
       --font-body: 'Inter', sans-serif;
       --font-heading: 'Space Grotesk', sans-serif;
     }
 
     @media (prefers-color-scheme: light) {
       :root {
-        --bg-deep: #f0f4f8;
+        --bg-deep-space: #f5f7fa;
         --bg-card: #ffffff;
         --text-primary: #1a202c;
         --text-secondary: #4a5568;
-        --border: rgba(0, 0, 0, 0.1);
+        --border-glow: rgba(0, 0, 0, 0.1);
       }
     }
 
     body {
       font-family: var(--font-body);
-      background: var(--bg-deep);
+      background: var(--bg-deep-space);
       color: var(--text-primary);
-      min-height: 100vh;
       line-height: 1.6;
+      min-height: 100vh;
     }
+
+    a { color: inherit; text-decoration: none; }
 
     /* HEADER */
     header {
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border);
+      background: rgba(26, 31, 58, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-glow);
       padding: 1rem 2rem;
-      position: sticky;
-      top: 0;
-      z-index: 100;
     }
 
-    .header-inner {
+    .header-content {
       max-width: 1200px;
       margin: 0 auto;
       display: flex;
@@ -68,9 +66,8 @@
       align-items: center;
       gap: 0.5rem;
       color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.95rem;
-      transition: color 0.2s;
+      font-size: 0.9rem;
+      transition: color 0.3s;
     }
 
     .back-link:hover { color: var(--accent-cyan); }
@@ -79,16 +76,16 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      text-decoration: none;
       font-family: var(--font-heading);
+      font-size: 1.2rem;
       font-weight: 700;
       color: var(--accent-cyan);
     }
 
     .logo img { width: 32px; height: 32px; }
 
-    /* MAIN CONTAINER */
-    .container {
+    /* MAIN CONTENT */
+    main {
       max-width: 1200px;
       margin: 0 auto;
       padding: 2rem;
@@ -110,130 +107,93 @@
       background: var(--bg-card);
       border-radius: 16px;
       overflow: hidden;
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-glow);
     }
 
     .webapp-screenshot {
       width: 100%;
-      aspect-ratio: 16/9;
-      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .webapp-screenshot img {
-      width: 100%;
-      height: 100%;
+      aspect-ratio: 16/10;
       object-fit: cover;
+      display: block;
     }
 
-    .webapp-screenshot .default-logo {
-      width: 120px;
-      height: 120px;
-      opacity: 0.7;
-    }
-
-    /* Video iframe */
-    .video-container {
-      margin-top: 1rem;
-      padding: 1rem;
-      background: var(--bg-deep);
-      border-radius: 12px;
-    }
-
-    .video-container iframe {
+    .webapp-video {
       width: 100%;
       aspect-ratio: 16/9;
       border: none;
-      border-radius: 8px;
     }
 
-    .video-placeholder {
-      text-align: center;
-      padding: 2rem;
-      color: var(--text-secondary);
-    }
-
-    /* WEBAPP INFO */
-    .webapp-details {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .webapp-title-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-
-    .webapp-title {
+    .webapp-info h1 {
       font-family: var(--font-heading);
       font-size: 2.5rem;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-
-    .webapp-badges {
-      display: flex;
-      gap: 0.5rem;
-      flex-shrink: 0;
-    }
-
-    .webapp-badges img {
-      width: 36px;
-      height: 36px;
+      margin-bottom: 0.5rem;
     }
 
     .webapp-meta {
       display: flex;
       align-items: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
+      gap: 1rem;
       color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
     }
 
-    .webapp-dev {
-      font-size: 1.1rem;
+    .webapp-badges {
+      display: flex;
+      gap: 0.5rem;
     }
+
+    .badge-icon { width: 32px; height: 32px; }
 
     .webapp-rating {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 1.1rem;
+      gap: 0.75rem;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
     }
 
-    .stars { color: var(--accent-gold); font-size: 1.2rem; }
+    .stars { color: var(--accent-gold); font-size: 1.4rem; }
+    .rating-value { font-weight: 700; font-size: 1.5rem; }
 
-    .webapp-views {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
-    .webapp-desc-short {
-      font-size: 1.1rem;
+    .webapp-description {
       color: var(--text-secondary);
-      line-height: 1.7;
+      font-size: 1rem;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+
+    .webapp-description.collapsed {
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .show-more-btn {
+      background: none;
+      border: none;
+      color: var(--accent-cyan);
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
     }
 
     .webapp-tags {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
 
     .tag {
       padding: 0.4rem 1rem;
       background: rgba(0, 217, 255, 0.1);
-      border-radius: 6px;
-      font-size: 0.9rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
       color: var(--accent-cyan);
     }
 
-    /* BUTTONS */
     .webapp-actions {
       display: flex;
       gap: 1rem;
@@ -241,34 +201,33 @@
     }
 
     .btn {
-      padding: 0.8rem 1.5rem;
+      padding: 0.9rem 2rem;
       border: none;
       border-radius: 10px;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.3s;
       font-family: var(--font-body);
       font-size: 1rem;
-      text-decoration: none;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      transition: all 0.2s;
     }
 
     .btn-primary {
-      background: var(--accent-cyan);
-      color: #000;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: #fff;
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
+      box-shadow: 0 8px 25px rgba(0, 217, 255, 0.4);
     }
 
     .btn-secondary {
       background: var(--bg-card);
       color: var(--text-primary);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-glow);
     }
 
     .btn-secondary:hover {
@@ -276,85 +235,91 @@
       color: var(--accent-cyan);
     }
 
-    /* SECTIONS */
-    .section {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .section-title {
-      font-family: var(--font-heading);
-      font-size: 1.4rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
+    /* STATS BAR */
+    .stats-bar {
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      gap: 2rem;
+      padding: 1.5rem 2rem;
+      background: var(--bg-card);
+      border-radius: 12px;
+      margin-bottom: 3rem;
+      border: 1px solid var(--border-glow);
+      flex-wrap: wrap;
     }
 
-    /* DESCRIPTION */
-    .full-description {
-      line-height: 1.8;
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
       color: var(--text-secondary);
     }
 
-    .full-description.collapsed {
-      max-height: 150px;
-      overflow: hidden;
-      position: relative;
+    /* REVIEWS SECTION */
+    .reviews-section {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid var(--border-glow);
     }
 
-    .full-description.collapsed::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: linear-gradient(transparent, var(--bg-card));
+    .reviews-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
-    .expand-btn {
-      margin-top: 1rem;
-      background: transparent;
-      border: none;
-      color: var(--accent-cyan);
-      cursor: pointer;
-      font-weight: 500;
+    .reviews-header h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
     }
 
-    /* REVIEWS */
-    .review-form {
-      background: var(--bg-deep);
+    /* RATING FORM */
+    .rating-form {
+      background: var(--bg-deep-space);
       border-radius: 12px;
       padding: 1.5rem;
       margin-bottom: 2rem;
     }
 
-    .rating-input {
+    .rating-form h3 {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .star-selector {
       display: flex;
       gap: 0.5rem;
       margin-bottom: 1rem;
     }
 
-    .rating-star {
+    .star-btn {
+      background: none;
+      border: none;
       font-size: 2rem;
       cursor: pointer;
-      transition: transform 0.1s;
+      transition: transform 0.2s;
+      color: var(--text-secondary);
     }
 
-    .rating-star:hover { transform: scale(1.2); }
-    .rating-star.active { color: var(--accent-gold); }
-    .rating-star.inactive { color: var(--text-secondary); opacity: 0.4; }
+    .star-btn:hover { transform: scale(1.2); }
+    .star-btn.active { color: var(--accent-gold); }
 
-    .review-textarea {
+    .rating-form textarea {
       width: 100%;
       padding: 1rem;
       background: var(--bg-card);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-glow);
       border-radius: 8px;
       color: var(--text-primary);
       font-family: var(--font-body);
@@ -364,17 +329,23 @@
       margin-bottom: 1rem;
     }
 
-    .review-textarea:focus {
+    .rating-form textarea:focus {
       outline: none;
       border-color: var(--accent-cyan);
     }
 
-    .review-item {
-      padding: 1.5rem 0;
-      border-bottom: 1px solid var(--border);
+    /* REVIEWS LIST */
+    .reviews-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
-    .review-item:last-child { border-bottom: none; }
+    .review-card {
+      background: var(--bg-deep-space);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
 
     .review-header {
       display: flex;
@@ -383,44 +354,37 @@
       margin-bottom: 0.75rem;
     }
 
-    .review-author {
+    .review-user {
       font-weight: 600;
     }
 
-    .review-text {
-      color: var(--text-secondary);
-      line-height: 1.6;
+    .review-stars {
+      color: var(--accent-gold);
     }
 
-    /* AUTH REQUIRED */
-    .auth-required {
+    .review-comment {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .review-date {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+
+    /* LOGIN PROMPT */
+    .login-prompt {
       text-align: center;
       padding: 2rem;
-      background: var(--bg-deep);
+      background: var(--bg-deep-space);
       border-radius: 12px;
     }
 
-    .auth-required a {
-      color: var(--accent-cyan);
+    .login-prompt p {
+      margin-bottom: 1rem;
+      color: var(--text-secondary);
     }
-
-    /* LOADING */
-    .loading {
-      text-align: center;
-      padding: 4rem;
-    }
-
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent-cyan);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
 
     .hidden { display: none !important; }
   </style>
@@ -429,291 +393,277 @@
 
   <!-- HEADER -->
   <header>
-    <div class="header-inner">
-      <a href="index.html" class="back-link">← Retour au catalogue</a>
-      <a href="index.html" class="logo">
+    <div class="header-content">
+      <a href="/" class="back-link">← Retour au catalogue</a>
+      <a href="/" class="logo">
         <img src="assets/logos/logo-nwh.svg" alt="NWH">
-        NWH
+        Nexus Web Hub
       </a>
     </div>
   </header>
 
-  <!-- LOADING -->
-  <div id="loadingState" class="loading">
-    <div class="spinner"></div>
-    <p>Chargement de la webapp...</p>
-  </div>
-
-  <!-- MAIN CONTENT -->
-  <main class="container hidden" id="mainContent">
-    
-    <!-- WEBAPP HEADER -->
-    <div class="webapp-header">
-      <div class="webapp-media">
-        <div class="webapp-screenshot" id="webappScreenshot">
-          <img src="assets/logos/logo-nwh.svg" class="default-logo" alt="NWH">
-        </div>
-        
-        <!-- VIDEO (si disponible) -->
-        <div class="video-container hidden" id="videoContainer">
-          <iframe id="videoFrame" src="" allowfullscreen></iframe>
-        </div>
-      </div>
-
-      <div class="webapp-details">
-        <div class="webapp-title-row">
-          <h1 class="webapp-title" id="webappTitle">...</h1>
-          <div class="webapp-badges" id="webappBadges"></div>
-        </div>
-
-        <div class="webapp-meta">
-          <span class="webapp-dev">par <strong id="webappDev">...</strong></span>
-          <div class="webapp-rating">
-            <span class="stars" id="webappStars">⭐⭐⭐⭐⭐</span>
-            <span id="webappRating">0.0</span>
-            <span style="color: var(--text-secondary)">(<span id="webappReviewsCount">0</span> avis)</span>
-          </div>
-          <div class="webapp-views">
-            👁️ <span id="webappViews">0</span> vues
-          </div>
-        </div>
-
-        <p class="webapp-desc-short" id="webappDescShort">...</p>
-
-        <div class="webapp-tags" id="webappTags"></div>
-
-        <div class="webapp-actions">
-          <a href="#" class="btn btn-primary" id="openBtn" target="_blank">🚀 Ouvrir la webapp</a>
-          <a href="#" class="btn btn-secondary hidden" id="githubBtn" target="_blank">📂 Code Source</a>
-        </div>
-      </div>
+  <!-- MAIN -->
+  <main>
+    <div id="loadingState" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Chargement...</p>
     </div>
 
-    <!-- DESCRIPTION COMPLETE -->
-    <section class="section">
-      <h2 class="section-title">📖 Description</h2>
-      <div class="full-description collapsed" id="fullDesc">...</div>
-      <button class="expand-btn" id="expandBtn" onclick="toggleDescription()">Voir plus ▼</button>
-    </section>
-
-    <!-- REVIEWS -->
-    <section class="section">
-      <h2 class="section-title">⭐ Avis (<span id="reviewsTotal">0</span>)</h2>
-      
-      <!-- Formulaire review (connecté uniquement) -->
-      <div id="reviewFormContainer">
-        <div class="review-form hidden" id="reviewForm">
-          <p style="margin-bottom: 1rem; font-weight: 500;">Donnez votre avis :</p>
-          <div class="rating-input" id="ratingInput">
-            <span class="rating-star inactive" data-rating="1" onclick="setRating(1)">⭐</span>
-            <span class="rating-star inactive" data-rating="2" onclick="setRating(2)">⭐</span>
-            <span class="rating-star inactive" data-rating="3" onclick="setRating(3)">⭐</span>
-            <span class="rating-star inactive" data-rating="4" onclick="setRating(4)">⭐</span>
-            <span class="rating-star inactive" data-rating="5" onclick="setRating(5)">⭐</span>
-          </div>
-          <textarea class="review-textarea" id="reviewComment" placeholder="Partagez votre expérience (optionnel)..."></textarea>
-          <button class="btn btn-primary" onclick="submitReview()">Publier mon avis</button>
-        </div>
+    <div id="webappContent" class="hidden">
+      <!-- HEADER -->
+      <div class="webapp-header">
+        <div class="webapp-media" id="mediaContainer"></div>
         
-        <div class="auth-required hidden" id="authRequired">
-          <p>🔒 <a href="auth.html">Connectez-vous</a> pour laisser un avis</p>
+        <div class="webapp-info">
+          <div class="webapp-badges" id="webappBadges"></div>
+          <h1 id="webappName"></h1>
+          <div class="webapp-meta">
+            <span>par <strong id="webappDeveloper"></strong></span>
+            <span>•</span>
+            <span id="webappCategory"></span>
+          </div>
+          
+          <div class="webapp-rating">
+            <span class="stars" id="webappStars"></span>
+            <span class="rating-value" id="webappRating"></span>
+            <span style="color:var(--text-secondary)" id="webappReviewCount"></span>
+          </div>
+
+          <div class="webapp-description collapsed" id="webappDescription"></div>
+          <button class="show-more-btn" id="showMoreBtn" onclick="toggleDescription()">Voir plus ↓</button>
+
+          <div class="webapp-tags" id="webappTags"></div>
+
+          <div class="webapp-actions">
+            <button class="btn btn-primary" id="openBtn" onclick="openWebapp()">🚀 Ouvrir la Webapp</button>
+            <a class="btn btn-secondary hidden" id="githubBtn" target="_blank">📂 Code Source</a>
+          </div>
         </div>
       </div>
 
-      <!-- Liste reviews -->
-      <div id="reviewsList"></div>
-    </section>
+      <!-- STATS BAR -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-value" id="statViews">0</div>
+          <div class="stat-label">Vues</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statRating">0</div>
+          <div class="stat-label">Note moyenne</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statReviewsCount">0</div>
+          <div class="stat-label">Avis</div>
+        </div>
+      </div>
+
+      <!-- REVIEWS -->
+      <div class="reviews-section">
+        <div class="reviews-header">
+          <h2>Avis de la communauté</h2>
+        </div>
+
+        <!-- Rating Form (if logged in) -->
+        <div id="ratingForm" class="rating-form hidden">
+          <h3>Donnez votre avis</h3>
+          <div class="star-selector">
+            <button class="star-btn" data-rating="1" onclick="selectRating(1)">☆</button>
+            <button class="star-btn" data-rating="2" onclick="selectRating(2)">☆</button>
+            <button class="star-btn" data-rating="3" onclick="selectRating(3)">☆</button>
+            <button class="star-btn" data-rating="4" onclick="selectRating(4)">☆</button>
+            <button class="star-btn" data-rating="5" onclick="selectRating(5)">☆</button>
+          </div>
+          <textarea id="reviewComment" placeholder="Votre commentaire (optionnel)..."></textarea>
+          <button class="btn btn-primary" onclick="submitReview()">Publier mon avis</button>
+        </div>
+
+        <!-- Login Prompt (if not logged in) -->
+        <div id="loginPrompt" class="login-prompt hidden">
+          <p>Connectez-vous pour donner votre avis</p>
+          <a href="auth.html" class="btn btn-primary">Se connecter</a>
+        </div>
+
+        <!-- Reviews List -->
+        <div class="reviews-list" id="reviewsList"></div>
+      </div>
+    </div>
   </main>
 
   <script>
-    // ========== STATE ==========
-    let currentUser = null;
     let webapp = null;
+    let reviews = [];
+    let currentUser = null;
     let selectedRating = 0;
 
-    // ========== INIT ==========
-    document.addEventListener('DOMContentLoaded', async () => {
-      await checkAuth();
-      await loadWebapp();
+    // Get webapp ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const webappId = urlParams.get('id');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      if (webappId) {
+        loadWebapp();
+      } else {
+        window.location.href = '/';
+      }
     });
 
-    // ========== AUTH ==========
-    async function checkAuth() {
+    function checkAuth() {
       const token = localStorage.getItem('token');
-      if (!token) return;
-
-      try {
-        const res = await fetch('/api/auth/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success) currentUser = data.data;
-        }
-      } catch (e) {
-        console.error('Auth error:', e);
+      const userData = localStorage.getItem('user');
+      if (token && userData) {
+        currentUser = JSON.parse(userData);
       }
     }
 
-    // ========== LOAD WEBAPP ==========
     async function loadWebapp() {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get('id');
-
-      if (!id) {
-        alert('Webapp non trouvée');
-        window.location.href = 'index.html';
-        return;
-      }
-
       try {
-        // Ajouter header auth si connecté (pour comptage vues)
-        const headers = {};
         const token = localStorage.getItem('token');
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-
-        const res = await fetch(`/api/webapps/${id}`, { headers });
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+        
+        const res = await fetch(`/api/webapps/${webappId}`, { headers });
         const data = await res.json();
 
         if (data.success) {
           webapp = data.data.webapp;
-          const reviews = data.data.reviews || [];
-          
-          renderWebapp(webapp);
-          renderReviews(reviews);
-          
+          reviews = data.data.reviews || [];
+          renderWebapp();
           document.getElementById('loadingState').classList.add('hidden');
-          document.getElementById('mainContent').classList.remove('hidden');
-          
-          // Update title
-          document.title = `${webapp.name} - Nexus Web Hub`;
+          document.getElementById('webappContent').classList.remove('hidden');
         } else {
           alert('Webapp non trouvée');
-          window.location.href = 'index.html';
+          window.location.href = '/';
         }
       } catch (e) {
-        console.error('Load webapp error:', e);
-        alert('Erreur de chargement');
+        console.error(e);
+        window.location.href = '/';
       }
     }
 
-    // ========== RENDER ==========
-    function renderWebapp(w) {
-      // Title & meta
-      document.getElementById('webappTitle').textContent = w.name;
-      document.getElementById('webappDev').textContent = w.developer;
-      document.getElementById('webappDescShort').textContent = w.description_short;
-      document.getElementById('webappRating').textContent = w.avg_rating.toFixed(1);
-      document.getElementById('webappReviewsCount').textContent = w.reviews_count;
-      document.getElementById('webappViews').textContent = w.views_count;
-      document.getElementById('webappStars').textContent = renderStars(w.avg_rating);
-
-      // Screenshot
-      if (w.image_url) {
-        document.getElementById('webappScreenshot').innerHTML = `<img src="${w.image_url}" alt="${w.name}">`;
-      }
-
-      // Video YouTube
-      if (w.video_url) {
-        const videoId = extractYouTubeId(w.video_url);
-        if (videoId) {
-          document.getElementById('videoContainer').classList.remove('hidden');
-          document.getElementById('videoFrame').src = `https://www.youtube.com/embed/${videoId}`;
-        }
-      }
+    function renderWebapp() {
+      document.title = `${webapp.name} - Nexus Web Hub`;
 
       // Badges
-      let badgesHTML = '';
-      if (w.is_trending) badgesHTML += `<img src="assets/badges/system/badge-trending.svg" alt="Trending" title="Trending">`;
-      if (w.is_featured) badgesHTML += `<img src="assets/badges/system/badge-featured.svg" alt="Featured" title="Featured">`;
-      if (w.is_new) badgesHTML += `<img src="assets/badges/system/badge-new.svg" alt="Nouveau" title="Nouveau">`;
-      document.getElementById('webappBadges').innerHTML = badgesHTML;
+      let badges = '';
+      if (webapp.is_trending) badges += `<img src="assets/badges/system/badge-trending.svg" class="badge-icon">`;
+      if (webapp.is_featured) badges += `<img src="assets/badges/system/badge-featured.svg" class="badge-icon">`;
+      if (webapp.is_new) badges += `<img src="assets/badges/system/badge-new.svg" class="badge-icon">`;
+      document.getElementById('webappBadges').innerHTML = badges;
+
+      // Basic info
+      document.getElementById('webappName').textContent = webapp.name;
+      document.getElementById('webappDeveloper').textContent = webapp.developer;
+      document.getElementById('webappCategory').textContent = getCategoryName(webapp.category);
+
+      // Rating
+      document.getElementById('webappStars').textContent = renderStars(webapp.avg_rating || 0);
+      document.getElementById('webappRating').textContent = (webapp.avg_rating || 0).toFixed(1);
+      document.getElementById('webappReviewCount').textContent = `(${webapp.reviews_count || 0} avis)`;
+
+      // Description
+      document.getElementById('webappDescription').textContent = webapp.description_long || webapp.description_short;
 
       // Tags
-      const tags = w.tags || [];
-      document.getElementById('webappTags').innerHTML = tags.map(t => `<span class="tag">${t}</span>`).join('');
+      const tags = (webapp.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
+      document.getElementById('webappTags').innerHTML = tags;
 
-      // Buttons
-      document.getElementById('openBtn').href = w.url;
-      if (w.github_url) {
-        const githubBtn = document.getElementById('githubBtn');
-        githubBtn.href = w.github_url;
-        githubBtn.classList.remove('hidden');
-      }
-
-      // Full description
-      document.getElementById('fullDesc').textContent = w.description_long || w.description_short;
-
-      // Review form
-      if (currentUser) {
-        // Check si pas son propre projet
-        if (w.creator_id !== currentUser.id) {
-          document.getElementById('reviewForm').classList.remove('hidden');
-        }
+      // Media (Video or Screenshot)
+      const media = document.getElementById('mediaContainer');
+      if (webapp.video_url && webapp.video_url.includes('youtube')) {
+        const videoId = extractYouTubeId(webapp.video_url);
+        media.innerHTML = `<iframe class="webapp-video" src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
+      } else if (webapp.image_url) {
+        media.innerHTML = `<img src="${webapp.image_url}" class="webapp-screenshot" alt="${webapp.name}">`;
       } else {
-        document.getElementById('authRequired').classList.remove('hidden');
+        media.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:300px;"><img src="assets/logos/logo-nwh.svg" style="width:120px;opacity:0.5"></div>`;
       }
+
+      // GitHub button
+      if (webapp.github_url) {
+        const ghBtn = document.getElementById('githubBtn');
+        ghBtn.href = webapp.github_url;
+        ghBtn.classList.remove('hidden');
+      }
+
+      // Stats
+      document.getElementById('statViews').textContent = webapp.views_count || 0;
+      document.getElementById('statRating').textContent = (webapp.avg_rating || 0).toFixed(1);
+      document.getElementById('statReviewsCount').textContent = webapp.reviews_count || 0;
+
+      // Reviews section
+      if (currentUser) {
+        document.getElementById('ratingForm').classList.remove('hidden');
+        document.getElementById('loginPrompt').classList.add('hidden');
+      } else {
+        document.getElementById('ratingForm').classList.add('hidden');
+        document.getElementById('loginPrompt').classList.remove('hidden');
+      }
+
+      renderReviews();
     }
 
-    function renderStars(r) {
-      const full = Math.floor(r);
-      const half = r % 1 >= 0.5;
-      return '⭐'.repeat(full) + (half ? '✨' : '') + '☆'.repeat(5 - full - (half ? 1 : 0));
-    }
-
-    function extractYouTubeId(url) {
-      const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-      const match = url.match(regex);
-      return match ? match[1] : null;
-    }
-
-    function renderReviews(reviews) {
-      document.getElementById('reviewsTotal').textContent = reviews.length;
-
+    function renderReviews() {
+      const list = document.getElementById('reviewsList');
       if (reviews.length === 0) {
-        document.getElementById('reviewsList').innerHTML = `
-          <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">
-            Aucun avis pour le moment. Soyez le premier !
-          </p>
-        `;
+        list.innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:2rem;">Aucun avis pour le moment. Soyez le premier !</p>';
         return;
       }
 
-      document.getElementById('reviewsList').innerHTML = reviews.map(r => `
-        <div class="review-item">
+      list.innerHTML = reviews.map(r => `
+        <div class="review-card">
           <div class="review-header">
-            <span class="review-author">${r.user_name}</span>
-            <span class="stars">${renderStars(r.rating)}</span>
+            <span class="review-user">${r.user_name || 'Utilisateur'}</span>
+            <span class="review-stars">${renderStars(r.rating)}</span>
           </div>
-          <p class="review-text">${r.comment || 'Pas de commentaire.'}</p>
+          <p class="review-comment">${r.comment || 'Pas de commentaire'}</p>
         </div>
       `).join('');
     }
 
-    // ========== INTERACTIONS ==========
-    function toggleDescription() {
-      const desc = document.getElementById('fullDesc');
-      const btn = document.getElementById('expandBtn');
-      
-      if (desc.classList.contains('collapsed')) {
-        desc.classList.remove('collapsed');
-        btn.textContent = 'Voir moins ▲';
-      } else {
-        desc.classList.add('collapsed');
-        btn.textContent = 'Voir plus ▼';
-      }
+    function renderStars(r) {
+      const full = Math.floor(r || 0);
+      return '⭐'.repeat(full) + '☆'.repeat(5 - full);
     }
 
-    function setRating(rating) {
+    function extractYouTubeId(url) {
+      const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+      return match ? match[1] : '';
+    }
+
+    function getCategoryName(cat) {
+      const names = {
+        productivity: '⚡ Productivité',
+        design: '🎨 Design',
+        game: '🎮 Jeux',
+        api: '🔧 API',
+        nocode: '🚀 No-Code',
+        other: '📦 Autre'
+      };
+      return names[cat] || cat;
+    }
+
+    function toggleDescription() {
+      const desc = document.getElementById('webappDescription');
+      const btn = document.getElementById('showMoreBtn');
+      desc.classList.toggle('collapsed');
+      btn.textContent = desc.classList.contains('collapsed') ? 'Voir plus ↓' : 'Voir moins ↑';
+    }
+
+    function openWebapp() {
+      window.open(webapp.url, '_blank');
+    }
+
+    // Rating
+    function selectRating(rating) {
       selectedRating = rating;
-      document.querySelectorAll('.rating-star').forEach((star, i) => {
-        star.classList.toggle('active', i < rating);
-        star.classList.toggle('inactive', i >= rating);
+      document.querySelectorAll('.star-btn').forEach((btn, i) => {
+        btn.textContent = i < rating ? '⭐' : '☆';
+        btn.classList.toggle('active', i < rating);
       });
     }
 
     async function submitReview() {
-      if (selectedRating === 0) {
+      if (!selectedRating) {
         alert('Veuillez sélectionner une note');
         return;
       }
@@ -722,7 +672,7 @@
       const token = localStorage.getItem('token');
 
       try {
-        const res = await fetch(`/api/webapps/${webapp.id}/reviews`, {
+        const res = await fetch(`/api/webapps/${webappId}/reviews`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -734,13 +684,13 @@
         const data = await res.json();
 
         if (data.success) {
-          alert('Avis publié avec succès !');
+          alert('Avis publié !');
           location.reload();
         } else {
-          alert(data.message || 'Erreur');
+          alert(data.message);
         }
       } catch (e) {
-        console.error('Submit review error:', e);
+        console.error(e);
         alert('Erreur lors de la publication');
       }
     }
