@@ -291,45 +291,6 @@ export class BackendService {
     });
   }
 
-  // Verify password for sensitive actions (delete webapp)
-  async verifyPassword(body, headers) {
-    console.log('[BACKEND] verifyPassword called');
-
-    const userId = headers['x-user-id'];
-    
-    if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
-    }
-
-    const { password } = body;
-
-    if (!password) {
-      return errorResponse('Mot de passe requis');
-    }
-
-    // Get user
-    const result = await this.db.execute({
-      sql: 'SELECT password_hash FROM users WHERE id = ?',
-      args: [userId]
-    });
-
-    if (result.rows.length === 0) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
-    }
-
-    const user = result.rows[0];
-
-    // Verify password
-    const valid = await bcrypt.compare(password, user.password_hash);
-
-    if (!valid) {
-      return errorResponse('Mot de passe incorrect');
-    }
-
-    console.log('✅ [BACKEND] Password verified');
-    return successResponse({ verified: true });
-  }
-
   // ========== WEBAPPS ==========
 
   async getWebapps(query) {
@@ -401,16 +362,16 @@ export class BackendService {
 
     const webapp = result.rows[0];
 
-    // Increment views ONLY if user is logged in
-    const userId = headers ? headers['x-user-id'] : null;
+    // Increment views ONLY for logged-in users
+    const userId = headers['x-user-id'];
     if (userId) {
       await this.db.execute({
         sql: 'UPDATE webapps SET views_count = views_count + 1 WHERE id = ?',
         args: [id]
       });
-      console.log('   └─ View counted for logged user:', userId);
+      console.log(`   └─ View counted for user ${userId}`);
     } else {
-      console.log('   └─ View NOT counted (anonymous user)');
+      console.log(`   └─ View NOT counted (anonymous user)`);
     }
 
     // Get reviews
