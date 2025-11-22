@@ -291,6 +291,45 @@ export class BackendService {
     });
   }
 
+  // Verify password for sensitive actions (delete webapp)
+  async verifyPassword(body, headers) {
+    console.log('[BACKEND] verifyPassword called');
+
+    const userId = headers['x-user-id'];
+    
+    if (!userId) {
+      return errorResponse(ERRORS.UNAUTHORIZED, 401);
+    }
+
+    const { password } = body;
+
+    if (!password) {
+      return errorResponse('Mot de passe requis');
+    }
+
+    // Get user
+    const result = await this.db.execute({
+      sql: 'SELECT password_hash FROM users WHERE id = ?',
+      args: [userId]
+    });
+
+    if (result.rows.length === 0) {
+      return errorResponse(ERRORS.UNAUTHORIZED, 401);
+    }
+
+    const user = result.rows[0];
+
+    // Verify password
+    const valid = await bcrypt.compare(password, user.password_hash);
+
+    if (!valid) {
+      return errorResponse('Mot de passe incorrect');
+    }
+
+    console.log('✅ [BACKEND] Password verified');
+    return successResponse({ verified: true });
+  }
+
   // ========== WEBAPPS ==========
 
   async getWebapps(query) {
@@ -298,7 +337,6 @@ export class BackendService {
 
     const { category, search, sort = 'recent', page = 1, limit = 12 } = query;
 
-    // IMPORTANT: Toujours afficher les webapps approved (connecté ou non)
     let sql = 'SELECT * FROM webapps WHERE status = ?';
     let args = ['approved'];
 
@@ -333,10 +371,7 @@ export class BackendService {
     // Pagination
     const offset = (page - 1) * limit;
     sql += ' LIMIT ? OFFSET ?';
-    args.push(parseInt(limit), parseInt(offset));
-
-    console.log('[BACKEND] SQL:', sql);
-    console.log('[BACKEND] Args:', args);
+    args.push(limit, offset);
 
     const result = await this.db.execute({ sql, args });
 
@@ -348,8 +383,6 @@ export class BackendService {
       is_featured: Boolean(row.is_featured),
       is_new: Boolean(row.is_new)
     }));
-
-    console.log(`[BACKEND] Returning ${webapps.length} webapps`);
 
     return successResponse({ webapps, total: result.rows.length });
   }
@@ -368,16 +401,16 @@ export class BackendService {
 
     const webapp = result.rows[0];
 
-    // Increment views ONLY if user is authenticated
-    const userId = headers['x-user-id'];
+    // Increment views ONLY if user is logged in
+    const userId = headers ? headers['x-user-id'] : null;
     if (userId) {
       await this.db.execute({
         sql: 'UPDATE webapps SET views_count = views_count + 1 WHERE id = ?',
         args: [id]
       });
-      console.log(`[BACKEND] View counted for user: ${userId}`);
+      console.log('   └─ View counted for logged user:', userId);
     } else {
-      console.log('[BACKEND] View not counted (anonymous user)');
+      console.log('   └─ View NOT counted (anonymous user)');
     }
 
     // Get reviews
