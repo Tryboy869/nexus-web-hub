@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Profil - Nexus Web Hub</title>
+  <link rel="icon" href="assets/logos/logo-nwh.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-deep: #0a0e27;
+      --bg-card: #1a1f3a;
+      --text-primary: #E0E6ED;
+      --text-secondary: #a0aec0;
+      --accent-cyan: #00d9ff;
+      --accent-purple: #8b5cf6;
+      --accent-green: #10b981;
+      --accent-gold: #fbbf24;
+      --accent-red: #ef4444;
+      --border: rgba(0, 217, 255, 0.15);
+      --font-body: 'Inter', sans-serif;
+      --font-heading: 'Space Grotesk', sans-serif;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg-deep: #f0f4f8;
+        --bg-card: #ffffff;
+        --text-primary: #1a202c;
+        --text-secondary: #4a5568;
+        --border: rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .back-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .back-link:hover { color: var(--accent-cyan); }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .logo img { width: 32px; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .notif-toggle {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .notif-toggle.active {
+      background: var(--accent-green);
+      color: #000;
+      border-color: var(--accent-green);
+    }
+
+    /* MAIN CONTAINER */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* PROFILE HEADER */
+    .profile-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .profile-header { flex-direction: column; align-items: center; text-align: center; }
+    }
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .profile-info { flex: 1; }
+
+    .profile-name {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .profile-email {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .profile-badges {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-badges img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .profile-stats {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* TABS */
+    .profile-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .profile-tab {
+      padding: 1rem 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .profile-tab:hover { color: var(--text-primary); }
+    .profile-tab.active {
+      color: var(--accent-cyan);
+      border-bottom-color: var(--accent-cyan);
+    }
+
+    /* TAB CONTENT */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* SECTION CARD */
+    .section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* WEBAPP MANAGER */
+    .webapp-controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.75rem 1rem;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .webapp-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .webapp-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--bg-deep);
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+
+    .webapp-item:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .webapp-item-thumb {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .webapp-item-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .webapp-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .webapp-item-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .webapp-item-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 1rem;
+    }
+
+    .webapp-item-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent-cyan);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--accent-red);
+      border: 1px solid var(--accent-red);
+    }
+
+    .btn-danger:hover {
+      background: var(--accent-red);
+      color: #fff;
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+    }
+
+    /* SUBMIT FORM */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 0.75rem 1rem;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .form-note {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* MESSAGES */
+    .message {
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .message.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    .message.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .modal-title {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* LOGOUT */
+    .logout-section {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <a href="index.html" class="back-link">← Accueil</a>
+      <a href="index.html" class="logo">
+        <img src="assets/logos/logo-nwh.svg" alt="NWH">
+        NWH
+      </a>
+    </div>
+    <div class="header-right">
+      <button class="notif-toggle" id="notifToggle" onclick="toggleNotifications()">
+        🔔 Notifications
+      </button>
+    </div>
+  </header>
+
+  <!-- LOADING -->
+  <div class="container" id="loadingState">
+    <div style="text-align: center; padding: 4rem;">
+      <p>Chargement du profil...</p>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="container hidden" id="mainContent">
+    
+    <!-- PROFILE HEADER -->
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">?</div>
+      <div class="profile-info">
+        <h1 class="profile-name" id="profileName">...</h1>
+        <p class="profile-email" id="profileEmail">...</p>
+        <div class="profile-badges" id="profileBadges"></div>
+        <div class="profile-stats">
+          <div class="stat-item">
+            <div class="stat-value" id="statWebapps">0</div>
+            <div class="stat-label">Webapps</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="statReviews">0</div>
+            <div class="stat-label">Avis donnés</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="statBadges">0</div>
+            <div class="stat-label">Badges</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="profile-tabs">
+      <button class="profile-tab active" onclick="switchTab('webapps', this)">📱 Mes Webapps</button>
+      <button class="profile-tab" onclick="switchTab('submit', this)">➕ Soumettre</button>
+      <button class="profile-tab" onclick="switchTab('settings', this)">⚙️ Paramètres</button>
+    </div>
+
+    <!-- TAB: MES WEBAPPS -->
+    <div class="tab-content active" id="tab-webapps">
+      <div class="section-card">
+        <h2 class="section-title">📱 Mes Webapps</h2>
+        
+        <div class="webapp-controls">
+          <input type="text" class="search-input" placeholder="Rechercher..." oninput="filterMyWebapps(this.value)">
+        </div>
+
+        <div class="webapp-list" id="myWebappsList">
+          <div class="empty-state">Vous n'avez pas encore publié de webapp.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SOUMETTRE -->
+    <div class="tab-content" id="tab-submit">
+      <div class="section-card">
+        <h2 class="section-title">➕ Soumettre une webapp</h2>
+
+        <div class="message error hidden" id="submitError"></div>
+        <div class="message success hidden" id="submitSuccess"></div>
+
+        <form id="submitForm" onsubmit="handleSubmit(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Nom du projet *</label>
+              <input type="text" id="submitName" required>
+            </div>
+            <div class="form-group">
+              <label>URL principale (HTTPS) *</label>
+              <input type="url" id="submitUrl" required placeholder="https://...">
+            </div>
+            <div class="form-group full-width">
+              <label>Description courte (200 char max) *</label>
+              <textarea id="submitDescShort" maxlength="200" required></textarea>
+            </div>
+            <div class="form-group full-width">
+              <label>Description longue</label>
+              <textarea id="submitDescLong" maxlength="1000"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Catégorie *</label>
+              <select id="submitCategory" required>
+                <option value="">-- Choisir --</option>
+                <option value="productivity">⚡ Productivité</option>
+                <option value="design">🎨 Design</option>
+                <option value="game">🎮 Jeu</option>
+                <option value="api">🔧 API</option>
+                <option value="nocode">🚀 No-Code</option>
+                <option value="other">📦 Autre</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tags (virgules)</label>
+              <input type="text" id="submitTags" placeholder="react, open-source">
+            </div>
+            <div class="form-group">
+              <label>URL GitHub (optionnel)</label>
+              <input type="url" id="submitGithub" placeholder="https://github.com/...">
+            </div>
+            <div class="form-group">
+              <label>URL Vidéo YouTube (optionnel)</label>
+              <input type="url" id="submitVideo" placeholder="https://youtube.com/...">
+            </div>
+            <div class="form-group full-width">
+              <label>URL Image/Screenshot (optionnel)</label>
+              <input type="url" id="submitImage" placeholder="https://...">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">🚀 Soumettre</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB: PARAMÈTRES -->
+    <div class="tab-content" id="tab-settings">
+      <div class="section-card">
+        <h2 class="section-title">⚙️ Paramètres</h2>
+        <p style="color: var(--text-secondary);">Les paramètres avancés seront disponibles dans une future mise à jour.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- LOGOUT BUTTON -->
+  <div class="logout-section">
+    <button class="btn btn-danger" onclick="logout()">🚪 Déconnexion</button>
+  </div>
+
+  <!-- MODAL DELETE -->
+  <div class="modal" id="deleteModal">
+    <div class="modal-content">
+      <h2 class="modal-title">⚠️ Confirmer la suppression</h2>
+      <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">
+        Pour supprimer "<span id="deleteWebappName"></span>", entrez votre mot de passe :
+      </p>
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <input type="password" id="deletePassword" placeholder="Votre mot de passe">
+      </div>
+      <div style="display: flex; gap: 1rem;">
+        <button class="btn btn-secondary" onclick="closeDeleteModal()">Annuler</button>
+        <button class="btn btn-danger" onclick="confirmDelete()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========== STATE ==========
+    let currentUser = null;
+    let myWebapps = [];
+    let webappToDelete = null;
+
+    // ========== INIT ==========
+    document.addEventListener('DOMContentLoaded', async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      await loadProfile();
+      
+      // Check if #submit in URL
+      if (window.location.hash === '#submit') {
+        switchTab('submit', document.querySelector('[onclick*="submit"]'));
+      }
+    });
+
+    // ========== LOAD PROFILE ==========
+    async function loadProfile() {
+      const token = localStorage.getItem('token');
+
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!res.ok) {
+          localStorage.removeItem('token');
+          window.location.href = 'auth.html';
+          return;
+        }
+
+        const data = await res.json();
+        if (data.success) {
+          currentUser = data.data;
+          renderProfile();
+          loadMyWebapps();
+          checkNotificationPermission();
+          
+          document.getElementById('loadingState').classList.add('hidden');
+          document.getElementById('mainContent').classList.remove('hidden');
+        }
+      } catch (e) {
+        console.error('Profile error:', e);
+        window.location.href = 'auth.html';
+      }
+    }
+
+    function renderProfile() {
+      document.getElementById('profileAvatar').textContent = currentUser.name.substring(0, 2).toUpperCase();
+      document.getElementById('profileName').textContent = currentUser.name;
+      document.getElementById('profileEmail').textContent = currentUser.email;
+
+      // Badges
+      const badges = currentUser.badges || [];
+      const badgesHTML = badges.map(b => `<img src="assets/badges/system/badge-${b}.svg" alt="${b}" title="${b}">`).join('');
+      document.getElementById('profileBadges').innerHTML = badgesHTML || '<span style="color: var(--text-secondary)">Aucun badge</span>';
+      document.getElementById('statBadges').textContent = badges.length;
+    }
+
+    // ========== MY WEBAPPS ==========
+    async function loadMyWebapps() {
+      const token = localStorage.getItem('token');
+
+      try {
+        const res = await fetch('/api/webapps?creator=' + currentUser.id, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          myWebapps = data.data.webapps.filter(w => w.creator_id === currentUser.id);
+          renderMyWebapps();
+          document.getElementById('statWebapps').textContent = myWebapps.length;
+        }
+      } catch (e) {
+        console.error('Load webapps error:', e);
+      }
+    }
+
+    function renderMyWebapps() {
+      const list = document.getElementById('myWebappsList');
+
+      if (myWebapps.length === 0) {
+        list.innerHTML = '<div class="empty-state">Vous n\'avez pas encore publié de webapp.</div>';
+        return;
+      }
+
+      list.innerHTML = myWebapps.map(w => `
+        <div class="webapp-item">
+          <div class="webapp-item-thumb">
+            ${w.image_url ? `<img src="${w.image_url}" alt="">` : `<img src="assets/logos/logo-nwh.svg" style="width: 30px; opacity: 0.7;">`}
+          </div>
+          <div class="webapp-item-info">
+            <div class="webapp-item-title">${w.name}</div>
+            <div class="webapp-item-meta">
+              <span>⭐ ${w.avg_rating.toFixed(1)}</span>
+              <span>👁️ ${w.views_count} vues</span>
+              <span>💬 ${w.reviews_count} avis</span>
+            </div>
+          </div>
+          <div class="webapp-item-actions">
+            <a href="webapp.html?id=${w.id}" class="btn btn-secondary btn-sm">Voir</a>
+            <button class="btn btn-danger btn-sm" onclick="openDeleteModal('${w.id}', '${w.name}')">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterMyWebapps(query) {
+      const filtered = myWebapps.filter(w => 
+        w.name.toLowerCase().includes(query.toLowerCase())
+      );
+      // Temporary update
+      const list = document.getElementById('myWebappsList');
+      if (filtered.length === 0) {
+        list.innerHTML = '<div class="empty-state">Aucun résultat.</div>';
+        return;
+      }
+      // Re-render with filtered
+      const original = myWebapps;
+      myWebapps = filtered;
+      renderMyWebapps();
+      myWebapps = original;
+    }
+
+    // ========== DELETE ==========
+    function openDeleteModal(id, name) {
+      webappToDelete = id;
+      document.getElementById('deleteWebappName').textContent = name;
+      document.getElementById('deletePassword').value = '';
+      document.getElementById('deleteModal').classList.add('active');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.remove('active');
+      webappToDelete = null;
+    }
+
+    async function confirmDelete() {
+      const password = document.getElementById('deletePassword').value;
+      if (!password) {
+        alert('Mot de passe requis');
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+
+      try {
+        // Verify password first
+        const verifyRes = await fetch('/api/auth/verify-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ password })
+        });
+
+        const verifyData = await verifyRes.json();
+        if (!verifyData.success) {
+          alert('Mot de passe incorrect');
+          return;
+        }
+
+        // Delete webapp
+        const deleteRes = await fetch(`/api/webapps/${webappToDelete}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const deleteData = await deleteRes.json();
+        if (deleteData.success) {
+          alert('Webapp supprimée !');
+          closeDeleteModal();
+          loadMyWebapps();
+        } else {
+          alert(deleteData.message || 'Erreur');
+        }
+      } catch (e) {
+        console.error('Delete error:', e);
+        alert('Erreur de suppression');
+      }
+    }
+
+    // ========== SUBMIT ==========
+    async function handleSubmit(e) {
+      e.preventDefault();
+      hideMessages();
+
+      const token = localStorage.getItem('token');
+      const data = {
+        name: document.getElementById('submitName').value,
+        url: document.getElementById('submitUrl').value,
+        description_short: document.getElementById('submitDescShort').value,
+        description_long: document.getElementById('submitDescLong').value,
+        category: document.getElementById('submitCategory').value,
+        tags: document.getElementById('submitTags').value.split(',').map(t => t.trim()).filter(t => t),
+        github_url: document.getElementById('submitGithub').value || null,
+        video_url: document.getElementById('submitVideo').value || null,
+        image_url: document.getElementById('submitImage').value || null
+      };
+
+      try {
+        const res = await fetch('/api/webapps', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          showSuccess('submitSuccess', 'Webapp publiée avec succès !');
+          document.getElementById('submitForm').reset();
+          loadMyWebapps();
+          setTimeout(() => switchTab('webapps', document.querySelector('[onclick*="webapps"]')), 1500);
+        } else {
+          showError('submitError', result.message);
+        }
+      } catch (e) {
+        console.error('Submit error:', e);
+        showError('submitError', 'Erreur de soumission');
+      }
+    }
+
+    // ========== TABS ==========
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      btn.classList.add('active');
+      document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    // ========== NOTIFICATIONS ==========
+    function checkNotificationPermission() {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        document.getElementById('notifToggle').classList.add('active');
+        document.getElementById('notifToggle').innerHTML = '🔔 Notifications ON';
+      }
+    }
+
+    async function toggleNotifications() {
+      if (!('Notification' in window)) {
+        alert('Les notifications ne sont pas supportées sur ce navigateur');
+        return;
+      }
+
+      if (Notification.permission === 'granted') {
+        // Already granted, can't revoke via JS, show message
+        alert('Pour désactiver, allez dans les paramètres de votre navigateur');
+      } else if (Notification.permission === 'denied') {
+        alert('Notifications bloquées. Modifiez dans les paramètres du navigateur.');
+      } else {
+        // Ask permission
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          document.getElementById('notifToggle').classList.add('active');
+          document.getElementById('notifToggle').innerHTML = '🔔 Notifications ON';
+          
+          // Test notification
+          new Notification('Nexus Web Hub', {
+            body: 'Les notifications sont activées !',
+            icon: 'assets/logos/logo-nwh.svg'
+          });
+        }
+      }
+    }
+
+    // ========== LOGOUT ==========
+    function logout() {
+      if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+      }
+    }
+
+    // ========== UTILS ==========
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    function showSuccess(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    function hideMessages() {
+      document.querySelectorAll('.message').forEach(m => m.classList.add('hidden'));
+    }
+
+    // Close modal on outside click
+    document.getElementById('deleteModal').addEventListener('click', (e) => {
+      if (e.target.id === 'deleteModal') closeDeleteModal();
+    });
+  </script>
+</body>
+</html>
