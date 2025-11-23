@@ -49,6 +49,149 @@
 
     a { color: inherit; text-decoration: none; }
 
+    /* ========== WELCOME MODAL ========== */
+    .welcome-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .welcome-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 14, 39, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .welcome-content {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 24px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 3rem 2.5rem;
+      box-shadow: 0 20px 60px rgba(0, 217, 255, 0.2);
+      animation: slideUp 0.4s ease;
+    }
+
+    .welcome-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .welcome-logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1.5rem;
+    }
+
+    .welcome-header h1 {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome-tagline {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    .welcome-body {
+      margin-bottom: 2rem;
+    }
+
+    .welcome-feature {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .welcome-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .welcome-feature h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.25rem;
+      color: var(--accent-cyan);
+    }
+
+    .welcome-feature p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .welcome-disclaimer {
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 3px solid var(--accent-red);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+
+    .welcome-disclaimer p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .welcome-disclaimer strong {
+      color: var(--text-primary);
+    }
+
+    .welcome-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .welcome-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      justify-content: center;
+    }
+
+    .welcome-checkbox input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .welcome-checkbox label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
     /* ========== HEADER ========== */
     header {
       position: sticky;
@@ -403,12 +546,65 @@
       .hero h1 { font-size: 2.2rem; }
       .hero p { font-size: 1rem; }
       .webapp-grid { grid-template-columns: 1fr; }
+      .welcome-content { padding: 2rem 1.5rem; }
+      .welcome-actions { flex-direction: column; }
     }
 
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
+
+  <!-- WELCOME MODAL -->
+  <div id="welcomeModal" class="welcome-modal hidden">
+    <div class="welcome-overlay"></div>
+    <div class="welcome-content">
+      <div class="welcome-header">
+        <img src="assets/logos/logo-nwh.svg" alt="NWH" class="welcome-logo">
+        <h1>Bienvenue sur Nexus Web Hub</h1>
+        <p class="welcome-tagline">Le catalogue communautaire des meilleures webapps</p>
+      </div>
+      
+      <div class="welcome-body">
+        <div class="welcome-feature">
+          <span class="welcome-icon">🔍</span>
+          <div>
+            <h3>Découvrez</h3>
+            <p>Explorez des webapps innovantes soumises par la communauté mondiale</p>
+          </div>
+        </div>
+        
+        <div class="welcome-feature">
+          <span class="welcome-icon">⭐</span>
+          <div>
+            <h3>Évaluez</h3>
+            <p>Partagez vos avis et aidez les autres à trouver les meilleures applications</p>
+          </div>
+        </div>
+        
+        <div class="welcome-feature">
+          <span class="welcome-icon">🚀</span>
+          <div>
+            <h3>Partagez</h3>
+            <p>Soumettez vos propres créations et gagnez en visibilité gratuitement</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="welcome-disclaimer">
+        <p>⚠️ <strong>Important :</strong> Nexus Web Hub est un annuaire communautaire. Les webapps listées sont hébergées par leurs créateurs respectifs. Nous ne garantissons pas leur accessibilité permanente ni leur contenu. En cliquant sur "Ouvrir", vous serez redirigé vers des sites externes.</p>
+      </div>
+
+      <div class="welcome-checkbox">
+        <input type="checkbox" id="dontShowAgain">
+        <label for="dontShowAgain">Ne plus afficher ce message</label>
+      </div>
+      
+      <div class="welcome-actions">
+        <button class="btn btn-primary" onclick="closeWelcomeModal()">Compris, explorer !</button>
+      </div>
+    </div>
+  </div>
 
   <!-- HEADER -->
   <header>
@@ -501,6 +697,22 @@
   </footer>
 
   <script>
+    // ========== WELCOME MODAL ==========
+    function showWelcomeModal() {
+      const hasSeenWelcome = localStorage.getItem('nwh_welcome_seen');
+      if (!hasSeenWelcome) {
+        document.getElementById('welcomeModal').classList.remove('hidden');
+      }
+    }
+
+    function closeWelcomeModal() {
+      const dontShow = document.getElementById('dontShowAgain').checked;
+      if (dontShow) {
+        localStorage.setItem('nwh_welcome_seen', 'true');
+      }
+      document.getElementById('welcomeModal').classList.add('hidden');
+    }
+
     // ========== STATE ==========
     let currentUser = null;
     let webapps = [];
@@ -515,6 +727,7 @@
 
     // ========== INIT ==========
     document.addEventListener('DOMContentLoaded', () => {
+      showWelcomeModal();
       checkAuth();
       loadStats();
       loadWebapps();
@@ -526,8 +739,14 @@
       const userData = localStorage.getItem('user');
       
       if (token && userData) {
-        currentUser = JSON.parse(userData);
-        renderAuthUI(true);
+        try {
+          currentUser = JSON.parse(userData);
+          renderAuthUI(true);
+        } catch (e) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          renderAuthUI(false);
+        }
       } else {
         renderAuthUI(false);
       }
@@ -598,7 +817,13 @@
           ? `<img src="${w.image_url}" alt="${w.name}">`
           : `<img src="assets/logos/logo-nwh.svg" class="default-logo" alt="NWH">`;
 
-        const tags = (w.tags || []).slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('');
+        let tags = [];
+        try {
+          tags = typeof w.tags === 'string' ? JSON.parse(w.tags) : (w.tags || []);
+        } catch (e) {
+          tags = [];
+        }
+        const tagsHTML = tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('');
 
         return `
           <article class="webapp-card" onclick="window.location.href='webapp.html?id=${w.id}'">
@@ -615,7 +840,7 @@
                 <span style="color:var(--text-secondary)">(${w.reviews_count || 0})</span>
               </div>
               <p class="webapp-description">${w.description_short}</p>
-              <div class="webapp-tags">${tags}</div>
+              <div class="webapp-tags">${tagsHTML}</div>
             </div>
           </article>
         `;
@@ -653,7 +878,7 @@
     }
 
     function surpriseMe() {
-      if (webapps.length === 0) return alert('Aucune webapp');
+      if (webapps.length === 0) return alert('Aucune webapp disponible');
       const r = webapps[Math.floor(Math.random() * webapps.length)];
       window.location.href = `webapp.html?id=${r.id}`;
     }
