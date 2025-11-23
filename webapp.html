@@ -726,7 +726,7 @@
     }
 
     // ============================================
-    // WEBAPP OPENING (FIXED)
+    // WEBAPP OPENING (WITH REDIRECT PAGE)
     // ============================================
     function openWebapp() {
       if (!webapp.url) {
@@ -734,17 +734,9 @@
         return;
       }
 
-      let url = webapp.url.trim();
-
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-      }
-
-      const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-
-      if (!newWindow) {
-        showNotification('Popup bloqué - Cliquez à nouveau ou autorisez les popups', 'warning');
-      }
+      // Rediriger vers la page de redirection avec l'URL en paramètre
+      const encodedUrl = encodeURIComponent(webapp.url);
+      window.location.href = `redirect.html?url=${encodedUrl}`;
     }
 
     // ============================================
