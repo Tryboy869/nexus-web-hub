@@ -84,7 +84,7 @@
 
     .logo img { width: 32px; height: 32px; }
 
-    /* MAIN CONTENT */
+    /* MAIN */
     main {
       max-width: 1200px;
       margin: 0 auto;
@@ -110,9 +110,7 @@
       animation: spin 1s linear infinite;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* WEBAPP HEADER */
     .webapp-header {
@@ -156,15 +154,8 @@
       background: var(--bg-card);
     }
 
-    .media-fallback img {
-      width: 80px;
-      opacity: 0.5;
-    }
-
-    .media-fallback p {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
+    .media-fallback img { width: 80px; opacity: 0.5; }
+    .media-fallback p { color: var(--text-secondary); font-size: 0.9rem; }
 
     .webapp-info h1 {
       font-family: var(--font-heading);
@@ -277,6 +268,17 @@
     .btn-secondary:hover {
       border-color: var(--accent-cyan);
       color: var(--accent-cyan);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--accent-red);
+      border: 1px solid var(--accent-red);
+    }
+
+    .btn-danger:hover {
+      background: var(--accent-red);
+      color: #fff;
     }
 
     .btn-small {
@@ -409,12 +411,6 @@
       font-size: 0.95rem;
     }
 
-    .review-date {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      margin-top: 0.5rem;
-    }
-
     /* LOGIN PROMPT */
     .login-prompt {
       text-align: center;
@@ -444,7 +440,6 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header>
     <div class="header-content">
       <a href="/" class="back-link">← Retour au catalogue</a>
@@ -455,7 +450,6 @@
     </div>
   </header>
 
-  <!-- MAIN -->
   <main>
     <div id="loadingState" class="loading">
       <div class="loading-spinner"></div>
@@ -463,7 +457,6 @@
     </div>
 
     <div id="webappContent" class="hidden">
-      <!-- HEADER -->
       <div class="webapp-header">
         <div class="webapp-media" id="mediaContainer"></div>
 
@@ -488,13 +481,13 @@
           <div class="webapp-tags" id="webappTags"></div>
 
           <div class="webapp-actions">
-            <button class="btn btn-primary" id="openBtn" onclick="openWebapp()">🚀 Ouvrir la Webapp</button>
+            <button class="btn btn-primary" onclick="openWebapp()">🚀 Ouvrir la Webapp</button>
             <a class="btn btn-secondary hidden" id="githubBtn" target="_blank" rel="noopener">📂 Code Source</a>
+            <button class="btn btn-danger btn-small" id="reportBtn" onclick="reportWebapp()">🚨 Signaler</button>
           </div>
         </div>
       </div>
 
-      <!-- STATS BAR -->
       <div class="stats-bar">
         <div class="stat-item">
           <div class="stat-value" id="statViews">0</div>
@@ -510,33 +503,29 @@
         </div>
       </div>
 
-      <!-- REVIEWS -->
       <div class="reviews-section">
         <div class="reviews-header">
           <h2>Avis de la communauté</h2>
         </div>
 
-        <!-- Rating Form (if logged in) -->
         <div id="ratingForm" class="rating-form hidden">
           <h3>Donnez votre avis</h3>
           <div class="star-selector">
-            <button class="star-btn" data-rating="1" onclick="selectRating(1)">☆</button>
-            <button class="star-btn" data-rating="2" onclick="selectRating(2)">☆</button>
-            <button class="star-btn" data-rating="3" onclick="selectRating(3)">☆</button>
-            <button class="star-btn" data-rating="4" onclick="selectRating(4)">☆</button>
-            <button class="star-btn" data-rating="5" onclick="selectRating(5)">☆</button>
+            <button class="star-btn" onclick="selectRating(1)">☆</button>
+            <button class="star-btn" onclick="selectRating(2)">☆</button>
+            <button class="star-btn" onclick="selectRating(3)">☆</button>
+            <button class="star-btn" onclick="selectRating(4)">☆</button>
+            <button class="star-btn" onclick="selectRating(5)">☆</button>
           </div>
           <textarea id="reviewComment" placeholder="Votre commentaire (optionnel)..."></textarea>
           <button class="btn btn-primary" onclick="submitReview()">Publier mon avis</button>
         </div>
 
-        <!-- Login Prompt (if not logged in) -->
         <div id="loginPrompt" class="login-prompt hidden">
           <p>Connectez-vous pour donner votre avis</p>
           <a href="auth.html" class="btn btn-primary">Se connecter</a>
         </div>
 
-        <!-- Reviews List -->
         <div class="reviews-list" id="reviewsList"></div>
       </div>
     </div>
@@ -548,7 +537,6 @@
     let currentUser = null;
     let selectedRating = 0;
 
-    // Get webapp ID from URL
     const urlParams = new URLSearchParams(window.location.search);
     const webappId = urlParams.get('id');
 
@@ -602,27 +590,22 @@
     function renderWebapp() {
       document.title = `${webapp.name} - Nexus Web Hub`;
 
-      // Badges
       let badges = '';
       if (webapp.is_trending) badges += `<img src="assets/badges/system/badge-trending.svg" class="badge-icon" alt="Trending">`;
       if (webapp.is_featured) badges += `<img src="assets/badges/system/badge-featured.svg" class="badge-icon" alt="Featured">`;
       if (webapp.is_new) badges += `<img src="assets/badges/system/badge-new.svg" class="badge-icon" alt="New">`;
       document.getElementById('webappBadges').innerHTML = badges;
 
-      // Basic info
       document.getElementById('webappName').textContent = webapp.name;
       document.getElementById('webappDeveloper').textContent = webapp.developer;
       document.getElementById('webappCategory').textContent = getCategoryName(webapp.category);
 
-      // Rating
       document.getElementById('webappStars').textContent = renderStars(webapp.avg_rating || 0);
       document.getElementById('webappRating').textContent = (webapp.avg_rating || 0).toFixed(1);
       document.getElementById('webappReviewCount').textContent = `(${webapp.reviews_count || 0} avis)`;
 
-      // Description
       document.getElementById('webappDescription').textContent = webapp.description_long || webapp.description_short || 'Aucune description';
 
-      // Tags
       let tags = [];
       try {
         tags = typeof webapp.tags === 'string' ? JSON.parse(webapp.tags) : (webapp.tags || []);
@@ -631,22 +614,18 @@
       }
       document.getElementById('webappTags').innerHTML = tags.map(t => `<span class="tag">${t}</span>`).join('');
 
-      // Media (Video or Screenshot)
       renderMedia();
 
-      // GitHub button
       if (webapp.github_url) {
         const ghBtn = document.getElementById('githubBtn');
         ghBtn.href = webapp.github_url;
         ghBtn.classList.remove('hidden');
       }
 
-      // Stats
       document.getElementById('statViews').textContent = webapp.views_count || 0;
       document.getElementById('statRating').textContent = (webapp.avg_rating || 0).toFixed(1);
       document.getElementById('statReviewsCount').textContent = webapp.reviews_count || 0;
 
-      // Reviews section
       if (currentUser) {
         document.getElementById('ratingForm').classList.remove('hidden');
         document.getElementById('loginPrompt').classList.add('hidden');
@@ -658,9 +637,6 @@
       renderReviews();
     }
 
-    // ============================================
-    // MEDIA RENDERING (FIXED)
-    // ============================================
     function renderMedia() {
       const media = document.getElementById('mediaContainer');
 
@@ -698,14 +674,9 @@
       `;
     }
 
-    // ============================================
-    // YOUTUBE ID EXTRACTION (FIXED)
-    // ============================================
     function extractYouTubeId(url) {
       if (!url) return null;
-
       url = url.trim();
-
       const patterns = [
         /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
         /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
@@ -714,34 +685,64 @@
         /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
         /^([a-zA-Z0-9_-]{11})$/
       ];
-
       for (const pattern of patterns) {
         const match = url.match(pattern);
-        if (match && match[1]) {
-          return match[1];
-        }
+        if (match && match[1]) return match[1];
       }
-
       return null;
     }
 
-    // ============================================
-    // WEBAPP OPENING (WITH REDIRECT PAGE)
-    // ============================================
     function openWebapp() {
       if (!webapp.url) {
         showNotification('URL non disponible', 'error');
         return;
       }
-
-      // Rediriger vers la page de redirection avec l'URL en paramètre
       const encodedUrl = encodeURIComponent(webapp.url);
       window.location.href = `redirect.html?url=${encodedUrl}`;
     }
 
-    // ============================================
-    // NOTIFICATIONS
-    // ============================================
+    async function reportWebapp() {
+      if (!currentUser) {
+        showNotification('Connectez-vous pour signaler', 'error');
+        setTimeout(() => window.location.href = 'auth.html', 1500);
+        return;
+      }
+
+      const reason = prompt('Raison du signalement (minimum 10 caractères) :\n\nExemple: "Le site ne fonctionne plus", "Contenu inapproprié", etc.');
+
+      if (!reason || reason.length < 10) {
+        showNotification('Raison trop courte (minimum 10 caractères)', 'error');
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/reports', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            target_type: 'webapp',
+            target_id: webappId,
+            reason: reason
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          showNotification('Signalement envoyé !', 'success');
+        } else {
+          showNotification(data.message || 'Erreur', 'error');
+        }
+      } catch (e) {
+        console.error(e);
+        showNotification('Erreur lors du signalement', 'error');
+      }
+    }
+
     function showNotification(message, type = 'info') {
       const existing = document.querySelector('.nwh-notification');
       if (existing) existing.remove();
@@ -769,18 +770,13 @@
         max-width: 300px;
       `;
       notification.textContent = message;
-
       document.body.appendChild(notification);
-
       setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => notification.remove(), 300);
       }, 4000);
     }
 
-    // ============================================
-    // HELPERS
-    // ============================================
     function renderStars(r) {
       const full = Math.floor(r || 0);
       return '⭐'.repeat(full) + '☆'.repeat(5 - full);
@@ -805,16 +801,12 @@
       btn.textContent = desc.classList.contains('collapsed') ? 'Voir plus ↓' : 'Voir moins ↑';
     }
 
-    // ============================================
-    // REVIEWS
-    // ============================================
     function renderReviews() {
       const list = document.getElementById('reviewsList');
       if (reviews.length === 0) {
         list.innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:2rem;">Aucun avis pour le moment. Soyez le premier !</p>';
         return;
       }
-
       list.innerHTML = reviews.map(r => `
         <div class="review-card">
           <div class="review-header">
