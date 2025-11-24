@@ -102,6 +102,7 @@ export class BackendService {
         avg_rating REAL DEFAULT 0,
         reviews_count INTEGER DEFAULT 0,
         views_count INTEGER DEFAULT 0,
+        clicks_count INTEGER DEFAULT 0,
         is_trending INTEGER DEFAULT 0,
         is_featured INTEGER DEFAULT 0,
         is_new INTEGER DEFAULT 1,
@@ -141,6 +142,19 @@ export class BackendService {
         created_at INTEGER DEFAULT (strftime('%s', 'now')),
         resolved_at INTEGER,
         FOREIGN KEY (reporter_id) REFERENCES users(id)
+      )
+    `);
+
+    // Webapp Views (pour tracking vues uniques)
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS webapp_views (
+        id TEXT PRIMARY KEY,
+        webapp_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        viewed_at INTEGER DEFAULT (strftime('%s', 'now')),
+        FOREIGN KEY (webapp_id) REFERENCES webapps(id),
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        UNIQUE(webapp_id, user_id)
       )
     `);
 
@@ -326,14 +340,39 @@ export class BackendService {
 
     const webapp = result.rows[0];
 
+    // Système de vues uniques : 1 user = 1 vue max
     const userId = headers['x-user-id'];
     if (userId) {
-      await this.db.execute({
-        sql: 'UPDATE webapps SET views_count = views_count + 1 WHERE id = ?',
-        args: [id]
-      });
+      try {
+        // Vérifier si déjà vu
+        const viewCheck = await this.db.execute({
+          sql: 'SELECT id FROM webapp_views WHERE webapp_id = ? AND user_id = ?',
+          args: [id, userId]
+        });
+
+        // Si pas encore vu, enregistrer
+        if (viewCheck.rows.length === 0) {
+          await this.db.execute({
+            sql: 'INSERT INTO webapp_views (id, webapp_id, user_id) VALUES (?, ?, ?)',
+            args: [generateId(), id, userId]
+          });
+
+          // Incrémenter compteur
+          await this.db.execute({
+            sql: 'UPDATE webapps SET views_count = views_count + 1 WHERE id = ?',
+            args: [id]
+          });
+
+          console.log(`   └─ Vue comptée pour user ${userId}`);
+        } else {
+          console.log(`   └─ Vue déjà comptée pour user ${userId}`);
+        }
+      } catch (error) {
+        console.error('Error tracking view:', error);
+      }
     }
 
+    // Get reviews
     const reviewsResult = await this.db.execute({
       sql: `SELECT r.*, u.name as user_name, u.avatar_url as user_avatar 
             FROM reviews r 
@@ -728,6 +767,24 @@ export class BackendService {
     });
 
     return successResponse({ id }, 'Signalement mis à jour');
+  }
+
+  // ========== WEBAPP CLICKS ==========
+
+  async trackWebappClick(id, headers) {
+    console.log('[BACKEND] trackWebappClick called:', id);
+
+    const userId = headers['x-user-id'];
+
+    // Toujours incrémenter les clics, même pour utilisateurs non connectés
+    await this.db.execute({
+      sql: 'UPDATE webapps SET clicks_count = clicks_count + 1 WHERE id = ?',
+      args: [id]
+    });
+
+    console.log(`   └─ Click compté (user: ${userId || 'anonymous'})`);
+
+    return successResponse({ success: true });
   }
 
   // ========== STATS ==========
