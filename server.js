@@ -1,4 +1,4 @@
-// server.js - Backend Service (Pas de serveur HTTP !)
+// server.js - Backend Service avec Admin Methods
 // NEXUS WEB HUB - Nexus Studio
 
 import { createClient } from '@libsql/client';
@@ -13,7 +13,6 @@ import {
   generateId,
   sanitizeInput,
   calculateBadges,
-  calculateAverageRating,
   ERRORS,
   SUCCESS,
   successResponse,
@@ -30,9 +29,8 @@ export class BackendService {
 
   async init() {
     console.log('✅ [BACKEND] Initializing...');
-    
+
     try {
-      // Connexion Turso
       this.db = createClient({
         url: process.env.DATABASE_URL || 'file:local.db',
         authToken: process.env.DATABASE_AUTH_TOKEN
@@ -40,15 +38,12 @@ export class BackendService {
 
       console.log('✅ [BACKEND] Database connected');
 
-      // RESET DATABASE si variable d'environnement activée
       if (process.env.RESET_DB === 'true') {
         console.log('🔥 [BACKEND] RESET_DB=true detected - Dropping all tables...');
         await this.resetDatabase();
       }
 
-      // Créer les tables si elles n'existent pas
       await this.createTables();
-      
       console.log('✅ [BACKEND] Backend ready');
     } catch (error) {
       console.error('❌ [BACKEND] Initialization failed:', error);
@@ -57,10 +52,8 @@ export class BackendService {
   }
 
   async resetDatabase() {
-    console.log('🗑️ [BACKEND] Resetting database...');
-    
     const tables = ['reports', 'reviews', 'webapps', 'users'];
-    
+
     for (const table of tables) {
       try {
         await this.db.execute(`DROP TABLE IF EXISTS ${table}`);
@@ -69,7 +62,7 @@ export class BackendService {
         console.log(`   ⚠️ Could not drop ${table}:`, error.message);
       }
     }
-    
+
     console.log('✅ [BACKEND] Database reset complete');
   }
 
@@ -146,6 +139,7 @@ export class BackendService {
         status TEXT DEFAULT 'pending',
         admin_notes TEXT,
         created_at INTEGER DEFAULT (strftime('%s', 'now')),
+        resolved_at INTEGER,
         FOREIGN KEY (reporter_id) REFERENCES users(id)
       )
     `);
@@ -156,11 +150,8 @@ export class BackendService {
   // ========== AUTH ==========
 
   async signup(body) {
-    console.log('[BACKEND] signup called');
-
     const { email, password, name } = body;
 
-    // Validation
     if (!validateEmail(email)) {
       return errorResponse(ERRORS.INVALID_EMAIL);
     }
@@ -173,7 +164,6 @@ export class BackendService {
       return errorResponse('Le nom doit contenir au moins 2 caractères');
     }
 
-    // Check if email exists
     const existing = await this.db.execute({
       sql: 'SELECT id FROM users WHERE email = ?',
       args: [email]
@@ -183,22 +173,16 @@ export class BackendService {
       return errorResponse(ERRORS.EMAIL_ALREADY_EXISTS);
     }
 
-    // Hash password
     const password_hash = await bcrypt.hash(password, 10);
-
-    // Create user
     const userId = generateId();
-    
+
     await this.db.execute({
       sql: `INSERT INTO users (id, email, password_hash, name) 
             VALUES (?, ?, ?, ?)`,
       args: [userId, email, password_hash, sanitizeInput(name)]
     });
 
-    // Generate JWT
     const token = jwt.sign({ userId, email }, this.JWT_SECRET, { expiresIn: '30d' });
-
-    console.log('✅ [BACKEND] User created:', userId);
 
     return successResponse({
       token,
@@ -213,16 +197,12 @@ export class BackendService {
   }
 
   async login(body) {
-    console.log('[BACKEND] login called');
-
     const { email, password } = body;
 
-    // Validation
     if (!validateEmail(email) || !password) {
       return errorResponse(ERRORS.INVALID_CREDENTIALS);
     }
 
-    // Get user
     const result = await this.db.execute({
       sql: 'SELECT * FROM users WHERE email = ?',
       args: [email]
@@ -233,18 +213,13 @@ export class BackendService {
     }
 
     const user = result.rows[0];
-
-    // Check password
     const valid = await bcrypt.compare(password, user.password_hash);
-    
+
     if (!valid) {
       return errorResponse(ERRORS.INVALID_CREDENTIALS);
     }
 
-    // Generate JWT
     const token = jwt.sign({ userId: user.id, email: user.email }, this.JWT_SECRET, { expiresIn: '30d' });
-
-    console.log('✅ [BACKEND] Login successful:', user.id);
 
     return successResponse({
       token,
@@ -261,10 +236,8 @@ export class BackendService {
   }
 
   async getMe(headers) {
-    console.log('[BACKEND] getMe called');
-
     const userId = headers['x-user-id'];
-    
+
     if (!userId) {
       return errorResponse(ERRORS.UNAUTHORIZED, 401);
     }
@@ -294,27 +267,22 @@ export class BackendService {
   // ========== WEBAPPS ==========
 
   async getWebapps(query) {
-    console.log('[BACKEND] getWebapps called');
-
     const { category, search, sort = 'recent', page = 1, limit = 12 } = query;
 
     let sql = 'SELECT * FROM webapps WHERE status = ?';
     let args = ['approved'];
 
-    // Category filter
     if (category && category !== 'all') {
       sql += ' AND category = ?';
       args.push(category);
     }
 
-    // Search filter
     if (search) {
       sql += ' AND (name LIKE ? OR description_short LIKE ? OR tags LIKE ?)';
       const searchTerm = `%${search}%`;
       args.push(searchTerm, searchTerm, searchTerm);
     }
 
-    // Sort
     switch (sort) {
       case 'trending':
         sql += ' ORDER BY is_trending DESC, views_count DESC';
@@ -329,14 +297,12 @@ export class BackendService {
         sql += ' ORDER BY created_at DESC';
     }
 
-    // Pagination
     const offset = (page - 1) * limit;
     sql += ' LIMIT ? OFFSET ?';
     args.push(limit, offset);
 
     const result = await this.db.execute({ sql, args });
 
-    // Parse JSON fields
     const webapps = result.rows.map(row => ({
       ...row,
       tags: JSON.parse(row.tags || '[]'),
@@ -349,8 +315,6 @@ export class BackendService {
   }
 
   async getWebapp(id, headers) {
-    console.log('[BACKEND] getWebapp called:', id);
-
     const result = await this.db.execute({
       sql: 'SELECT * FROM webapps WHERE id = ?',
       args: [id]
@@ -362,19 +326,14 @@ export class BackendService {
 
     const webapp = result.rows[0];
 
-    // Increment views ONLY for logged-in users
     const userId = headers['x-user-id'];
     if (userId) {
       await this.db.execute({
         sql: 'UPDATE webapps SET views_count = views_count + 1 WHERE id = ?',
         args: [id]
       });
-      console.log(`   └─ View counted for user ${userId}`);
-    } else {
-      console.log(`   └─ View NOT counted (anonymous user)`);
     }
 
-    // Get reviews
     const reviewsResult = await this.db.execute({
       sql: `SELECT r.*, u.name as user_name, u.avatar_url as user_avatar 
             FROM reviews r 
@@ -397,17 +356,14 @@ export class BackendService {
   }
 
   async createWebapp(body, headers) {
-    console.log('[BACKEND] createWebapp called');
-
     const userId = headers['x-user-id'];
-    
+
     if (!userId) {
       return errorResponse(ERRORS.UNAUTHORIZED, 401);
     }
 
     const { name, url, description_short, description_long, category, tags, github_url, video_url, image_url } = body;
 
-    // Validation
     if (!validateWebappName(name)) {
       return errorResponse(ERRORS.INVALID_NAME);
     }
@@ -424,7 +380,6 @@ export class BackendService {
       return errorResponse(ERRORS.INVALID_CATEGORY);
     }
 
-    // Check duplicate URL
     const existing = await this.db.execute({
       sql: 'SELECT id FROM webapps WHERE url = ?',
       args: [url]
@@ -434,17 +389,14 @@ export class BackendService {
       return errorResponse(ERRORS.URL_ALREADY_EXISTS);
     }
 
-    // Get user info
     const userResult = await this.db.execute({
       sql: 'SELECT name FROM users WHERE id = ?',
       args: [userId]
     });
 
     const developer = userResult.rows[0].name;
-
-    // Create webapp
     const webappId = generateId();
-    
+
     await this.db.execute({
       sql: `INSERT INTO webapps 
             (id, name, developer, creator_id, description_short, description_long, 
@@ -463,28 +415,22 @@ export class BackendService {
         github_url || null,
         video_url || null,
         image_url || null,
-        'approved' // Auto-approved (pas de modération complexe pour MVP)
+        'approved'
       ]
     });
 
-    console.log('✅ [BACKEND] Webapp created:', webappId);
-
-    // Check badges
     await this.updateUserBadges(userId);
 
     return successResponse({ id: webappId }, SUCCESS.WEBAPP_CREATED);
   }
 
   async updateWebapp(id, body, headers) {
-    console.log('[BACKEND] updateWebapp called:', id);
-
     const userId = headers['x-user-id'];
-    
+
     if (!userId) {
       return errorResponse(ERRORS.UNAUTHORIZED, 401);
     }
 
-    // Check ownership
     const webappResult = await this.db.execute({
       sql: 'SELECT creator_id FROM webapps WHERE id = ?',
       args: [id]
@@ -498,7 +444,6 @@ export class BackendService {
       return errorResponse(ERRORS.NOT_OWNER, 403);
     }
 
-    // Update
     const { name, description_short, description_long, tags, github_url, video_url, image_url } = body;
 
     await this.db.execute({
@@ -519,21 +464,16 @@ export class BackendService {
       ]
     });
 
-    console.log('✅ [BACKEND] Webapp updated:', id);
-
     return successResponse({ id }, SUCCESS.WEBAPP_UPDATED);
   }
 
   async deleteWebapp(id, headers) {
-    console.log('[BACKEND] deleteWebapp called:', id);
-
     const userId = headers['x-user-id'];
-    
+
     if (!userId) {
       return errorResponse(ERRORS.UNAUTHORIZED, 401);
     }
 
-    // Check ownership
     const webappResult = await this.db.execute({
       sql: 'SELECT creator_id FROM webapps WHERE id = ?',
       args: [id]
@@ -547,19 +487,15 @@ export class BackendService {
       return errorResponse(ERRORS.NOT_OWNER, 403);
     }
 
-    // Delete
     await this.db.execute({
       sql: 'DELETE FROM webapps WHERE id = ?',
       args: [id]
     });
 
-    // Delete associated reviews
     await this.db.execute({
       sql: 'DELETE FROM reviews WHERE webapp_id = ?',
       args: [id]
     });
-
-    console.log('✅ [BACKEND] Webapp deleted:', id);
 
     return successResponse({ id }, SUCCESS.WEBAPP_DELETED);
   }
@@ -567,22 +503,18 @@ export class BackendService {
   // ========== REVIEWS ==========
 
   async createReview(webappId, body, headers) {
-    console.log('[BACKEND] createReview called');
-
     const userId = headers['x-user-id'];
-    
+
     if (!userId) {
       return errorResponse(ERRORS.UNAUTHORIZED, 401);
     }
 
     const { rating, comment } = body;
 
-    // Validation
     if (!rating || rating < 1 || rating > 5) {
       return errorResponse(ERRORS.INVALID_RATING);
     }
 
-    // Check webapp exists
     const webappResult = await this.db.execute({
       sql: 'SELECT creator_id FROM webapps WHERE id = ?',
       args: [webappId]
@@ -592,12 +524,10 @@ export class BackendService {
       return errorResponse(ERRORS.WEBAPP_NOT_FOUND, 404);
     }
 
-    // Cannot review own webapp
     if (webappResult.rows[0].creator_id === userId) {
       return errorResponse(ERRORS.CANNOT_REVIEW_OWN);
     }
 
-    // Check if already reviewed
     const existingReview = await this.db.execute({
       sql: 'SELECT id FROM reviews WHERE webapp_id = ? AND user_id = ?',
       args: [webappId, userId]
@@ -607,22 +537,16 @@ export class BackendService {
       return errorResponse(ERRORS.ALREADY_REVIEWED);
     }
 
-    // Create review
     const reviewId = generateId();
-    
+
     await this.db.execute({
       sql: `INSERT INTO reviews (id, webapp_id, user_id, rating, comment) 
             VALUES (?, ?, ?, ?, ?)`,
       args: [reviewId, webappId, userId, rating, sanitizeInput(comment || '')]
     });
 
-    // Update webapp average rating
     await this.updateWebappRating(webappId);
-
-    // Check badges
     await this.updateUserBadges(userId);
-
-    console.log('✅ [BACKEND] Review created:', reviewId);
 
     return successResponse({ id: reviewId }, SUCCESS.REVIEW_CREATED);
   }
@@ -645,9 +569,6 @@ export class BackendService {
   // ========== BADGES ==========
 
   async updateUserBadges(userId) {
-    console.log('[BACKEND] updateUserBadges called:', userId);
-
-    // Get user stats
     const webappsCount = await this.db.execute({
       sql: 'SELECT COUNT(*) as count FROM webapps WHERE creator_id = ? AND status = ?',
       args: [userId, 'approved']
@@ -669,28 +590,23 @@ export class BackendService {
       webapps_count: webappsCount.rows[0].count,
       reviews_count: reviewsCount.rows[0].count,
       account_age_days: accountAgeDays,
-      helpful_percentage: 75, // TODO: Calculate real percentage
-      has_github_contribution: false // TODO: Check GitHub
+      helpful_percentage: 75,
+      has_github_contribution: false
     };
 
     const badges = calculateBadges(stats);
 
-    // Update user badges
     await this.db.execute({
       sql: 'UPDATE users SET badges = ? WHERE id = ?',
       args: [JSON.stringify(badges), userId]
     });
-
-    console.log('✅ [BACKEND] Badges updated:', badges);
   }
 
   // ========== REPORTS ==========
 
   async createReport(body, headers) {
-    console.log('[BACKEND] createReport called');
-
     const userId = headers['x-user-id'];
-    
+
     if (!userId) {
       return errorResponse(ERRORS.UNAUTHORIZED, 401);
     }
@@ -701,7 +617,6 @@ export class BackendService {
       return errorResponse(ERRORS.INVALID_REASON);
     }
 
-    // Check if already reported
     const existing = await this.db.execute({
       sql: 'SELECT id FROM reports WHERE reporter_id = ? AND target_type = ? AND target_id = ?',
       args: [userId, target_type, target_id]
@@ -711,25 +626,113 @@ export class BackendService {
       return errorResponse(ERRORS.ALREADY_REPORTED);
     }
 
-    // Create report
     const reportId = generateId();
-    
+
     await this.db.execute({
       sql: `INSERT INTO reports (id, reporter_id, target_type, target_id, reason) 
             VALUES (?, ?, ?, ?, ?)`,
       args: [reportId, userId, target_type, target_id, sanitizeInput(reason)]
     });
 
-    console.log('✅ [BACKEND] Report created:', reportId);
-
     return successResponse({ id: reportId }, SUCCESS.REPORT_CREATED);
+  }
+
+  // ========== ADMIN METHODS ==========
+
+  async getReports() {
+    console.log('[BACKEND] getReports (admin) called');
+
+    const result = await this.db.execute({
+      sql: `SELECT r.*, 
+                   u.name as reporter_name, u.email as reporter_email,
+                   w.name as webapp_name, w.url as webapp_url
+            FROM reports r
+            LEFT JOIN users u ON r.reporter_id = u.id
+            LEFT JOIN webapps w ON r.target_id = w.id AND r.target_type = 'webapp'
+            ORDER BY 
+              CASE WHEN r.status = 'pending' THEN 0 ELSE 1 END,
+              r.created_at DESC`
+    });
+
+    return successResponse({ reports: result.rows });
+  }
+
+  async getAllWebapps() {
+    console.log('[BACKEND] getAllWebapps (admin) called');
+
+    const result = await this.db.execute({
+      sql: `SELECT w.*, u.email as creator_email
+            FROM webapps w
+            LEFT JOIN users u ON w.creator_id = u.id
+            ORDER BY w.created_at DESC`
+    });
+
+    const webapps = result.rows.map(row => ({
+      ...row,
+      tags: JSON.parse(row.tags || '[]'),
+      is_trending: Boolean(row.is_trending),
+      is_featured: Boolean(row.is_featured),
+      is_new: Boolean(row.is_new)
+    }));
+
+    return successResponse({ webapps });
+  }
+
+  async adminDeleteWebapp(id) {
+    console.log('[BACKEND] adminDeleteWebapp called:', id);
+
+    const webappResult = await this.db.execute({
+      sql: 'SELECT * FROM webapps WHERE id = ?',
+      args: [id]
+    });
+
+    if (webappResult.rows.length === 0) {
+      return errorResponse(ERRORS.WEBAPP_NOT_FOUND, 404);
+    }
+
+    // Supprimer webapp
+    await this.db.execute({
+      sql: 'DELETE FROM webapps WHERE id = ?',
+      args: [id]
+    });
+
+    // Supprimer reviews associées
+    await this.db.execute({
+      sql: 'DELETE FROM reviews WHERE webapp_id = ?',
+      args: [id]
+    });
+
+    // Supprimer reports associés
+    await this.db.execute({
+      sql: 'DELETE FROM reports WHERE target_type = ? AND target_id = ?',
+      args: ['webapp', id]
+    });
+
+    console.log('✅ [BACKEND] Admin deleted webapp:', id);
+
+    return successResponse({ id }, 'Webapp supprimée avec succès');
+  }
+
+  async updateReportStatus(id, body) {
+    console.log('[BACKEND] updateReportStatus called:', id);
+
+    const { status, admin_notes } = body;
+
+    await this.db.execute({
+      sql: `UPDATE reports SET 
+            status = ?, 
+            admin_notes = ?,
+            resolved_at = CASE WHEN ? = 'resolved' THEN strftime('%s', 'now') ELSE resolved_at END
+            WHERE id = ?`,
+      args: [status, admin_notes || null, status, id]
+    });
+
+    return successResponse({ id }, 'Signalement mis à jour');
   }
 
   // ========== STATS ==========
 
   async getStats() {
-    console.log('[BACKEND] getStats called');
-
     try {
       const webappsCount = await this.db.execute({
         sql: 'SELECT COUNT(*) as count FROM webapps WHERE status = ?',
