@@ -18,6 +18,277 @@
       --accent-cyan: #00d9ff;
       --accent-purple: #8b5cf6;
       --accent-red: #ef4444;
+      --border-glow: rgba(0, 217, 255, 0.15);
+      --font-body: 'Inter', sans-serif;
+      --font-heading: 'Space Grotesk', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep-space);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .redirect-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 24px;
+      padding: 3rem 2.5rem;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 217, 255, 0.15);
+    }
+
+    .redirect-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 2rem;
+    }
+
+    .redirect-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-family: var(--font-heading);
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .redirect-message {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .redirect-url {
+      background: rgba(0, 217, 255, 0.1);
+      border: 1px solid var(--border-glow);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      word-break: break-all;
+      color: var(--accent-cyan);
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+
+    .redirect-warning {
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 3px solid var(--accent-red);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .redirect-warning p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .redirect-warning strong {
+      color: var(--text-primary);
+    }
+
+    .redirect-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 0.9rem 2rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 217, 255, 0.4);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-glow);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .countdown {
+      margin-top: 1.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .countdown-number {
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .back-link {
+      margin-top: 2rem;
+      display: inline-block;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      transition: color 0.3s;
+    }
+
+    .back-link:hover {
+      color: var(--accent-cyan);
+    }
+
+    @media (max-width: 600px) {
+      .redirect-container {
+        padding: 2rem 1.5rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      .redirect-actions {
+        flex-direction: column;
+      }
+      .btn {
+        width: 100%;
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .loading-dots {
+      display: inline-block;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="redirect-container">
+    <img src="assets/logos/logo-nwh.svg" alt="NWH" class="redirect-logo">
+    
+    <div class="redirect-icon">🚀</div>
+    
+    <h1>Vous quittez Nexus Web Hub</h1>
+    
+    <p class="redirect-message">
+      Vous allez être redirigé vers une webapp externe hébergée par son créateur.
+    </p>
+
+    <div class="redirect-url" id="targetUrl">
+      Chargement<span class="loading-dots">...</span>
+    </div>
+
+    <div class="redirect-warning">
+      <p>
+        ⚠️ <strong>Important :</strong> 
+        Cette webapp est hébergée en dehors de Nexus Web Hub. 
+        Nous ne contrôlons pas son contenu, sa disponibilité ou sa sécurité. 
+        Continuez à vos risques et périls.
+      </p>
+    </div>
+
+    <div class="redirect-actions">
+      <button class="btn btn-primary" id="continueBtn" onclick="continueRedirect()">
+        Continuer vers la webapp
+      </button>
+      <a href="/" class="btn btn-secondary">Retour au catalogue</a>
+    </div>
+
+    <div class="countdown">
+      Redirection automatique dans <span class="countdown-number" id="countdownNumber">5</span>s
+    </div>
+
+    <a href="/" class="back-link">← Retour au catalogue</a>
+  </div>
+
+  <script>
+    let targetUrl = '';
+    let countdown = 5;
+    let countdownInterval;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      targetUrl = params.get('url');
+
+      if (!targetUrl) {
+        window.location.href = '/';
+        return;
+      }
+
+      document.getElementById('targetUrl').textContent = targetUrl;
+      startCountdown();
+    });
+
+    function startCountdown() {
+      countdownInterval = setInterval(() => {
+        countdown--;
+        document.getElementById('countdownNumber').textContent = countdown;
+
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          continueRedirect();
+        }
+      }, 1000);
+    }
+
+    function continueRedirect() {
+      clearInterval(countdownInterval);
+      
+      let url = targetUrl.trim();
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
+
+      window.location.href = url;
+    }
+
+    document.querySelector('.btn-secondary').addEventListener('click', () => {
+      clearInterval(countdownInterval);
+    });
+  </script>
+</body>
+</html>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-deep-space: #0a0e27;
+      --bg-card: #1a1f3a;
+      --text-primary: #E0E6ED;
+      --text-secondary: #a0aec0;
+      --accent-cyan: #00d9ff;
+      --accent-purple: #8b5cf6;
+      --accent-red: #ef4444;
       --accent-green: #10b981;
       --border-glow: rgba(0, 217, 255, 0.15);
       --font-body: 'Inter', sans-serif;
