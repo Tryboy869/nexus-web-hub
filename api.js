@@ -220,6 +220,7 @@ const routeMap = {
   'POST:/api/webapps': (req) => backend.createWebapp(req.body, req.headers),
   'PUT:/api/webapps/:id': (req) => backend.updateWebapp(req.params.id, req.body, req.headers),
   'DELETE:/api/webapps/:id': (req) => backend.deleteWebapp(req.params.id, req.headers),
+  'POST:/api/webapps/:id/click': (req) => backend.trackWebappClick(req.params.id, req.headers),
   
   // Reviews
   'POST:/api/webapps/:id/reviews': (req) => backend.createReview(req.params.id, req.body, req.headers),
@@ -329,6 +330,16 @@ app.put('/api/webapps/:id', async (req, res) => {
 app.delete('/api/webapps/:id', async (req, res) => {
   try {
     const result = await routeRequest('DELETE', '/api/webapps/:id', req);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Track webapp click
+app.post('/api/webapps/:id/click', async (req, res) => {
+  try {
+    const result = await routeRequest('POST', '/api/webapps/:id/click', req);
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
