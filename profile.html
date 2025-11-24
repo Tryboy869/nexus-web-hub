@@ -7,6 +7,9 @@
   <link rel="icon" href="assets/logos/logo-nwh.svg" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -55,6 +58,7 @@
       align-items: center;
       gap: 0.5rem;
       color: var(--text-secondary);
+      transition: color 0.3s;
     }
 
     .back-link:hover { color: var(--accent-cyan); }
@@ -123,6 +127,9 @@
     .profile-email {
       color: var(--text-secondary);
       margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .profile-badges {
@@ -174,6 +181,9 @@
       font-weight: 500;
       border-bottom: 2px solid transparent;
       transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .tab:hover { color: var(--text-primary); }
@@ -194,15 +204,30 @@
     .search-input {
       flex: 1;
       min-width: 200px;
-      padding: 0.75rem 1rem;
+      padding: 0.75rem 1rem 0.75rem 3rem;
       background: var(--bg-card);
       border: 1px solid var(--border-glow);
       border-radius: 8px;
       color: var(--text-primary);
       font-family: var(--font-body);
+      position: relative;
     }
 
     .search-input:focus { outline: none; border-color: var(--accent-cyan); }
+
+    .search-container {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-icon-input {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+    }
 
     .btn {
       padding: 0.75rem 1.5rem;
@@ -213,6 +238,9 @@
       font-family: var(--font-body);
       font-size: 0.9rem;
       transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .btn-primary {
@@ -284,6 +312,7 @@
       display: flex;
       gap: 0.75rem;
       flex-wrap: wrap;
+      align-items: center;
     }
 
     .webapp-item-actions {
@@ -350,6 +379,10 @@
       font-size: 1.5rem;
       margin-bottom: 1rem;
       color: var(--accent-red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
     .modal-text {
@@ -406,10 +439,14 @@
   <!-- HEADER -->
   <header>
     <div class="header-content">
-      <a href="/" class="back-link">← Retour à l'accueil</a>
+      <a href="/" class="back-link">
+        <i data-lucide="arrow-left" width="18" height="18"></i>
+        Retour à l'accueil
+      </a>
       <div class="header-right">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotifications()">
-          🔔 <span id="notifText">Activer notifs</span>
+          <i data-lucide="bell" width="18" height="18"></i>
+          <span id="notifText">Activer notifs</span>
         </button>
       </div>
     </div>
@@ -422,7 +459,10 @@
       <div class="profile-avatar" id="profileAvatar"></div>
       <div class="profile-info">
         <h1 class="profile-name" id="profileName"></h1>
-        <p class="profile-email" id="profileEmail"></p>
+        <p class="profile-email" id="profileEmail">
+          <i data-lucide="mail" width="16" height="16"></i>
+          <span id="emailText"></span>
+        </p>
         <div class="profile-badges" id="profileBadges"></div>
         <div class="profile-stats">
           <div class="profile-stat">
@@ -443,23 +483,41 @@
 
     <!-- TABS -->
     <div class="tabs">
-      <button class="tab active" data-tab="webapps" onclick="switchTab('webapps')">📱 Mes Webapps</button>
-      <button class="tab" data-tab="reviews" onclick="switchTab('reviews')">⭐ Mes Avis</button>
-      <button class="tab" data-tab="settings" onclick="switchTab('settings')">⚙️ Paramètres</button>
+      <button class="tab active" data-tab="webapps" onclick="switchTab('webapps')">
+        <i data-lucide="layout-grid" width="18" height="18"></i>
+        Mes Webapps
+      </button>
+      <button class="tab" data-tab="reviews" onclick="switchTab('reviews')">
+        <i data-lucide="star" width="18" height="18"></i>
+        Mes Avis
+      </button>
+      <button class="tab" data-tab="settings" onclick="switchTab('settings')">
+        <i data-lucide="settings" width="18" height="18"></i>
+        Paramètres
+      </button>
     </div>
 
     <!-- MY WEBAPPS -->
     <div class="section active" id="section-webapps">
       <div class="toolbar">
-        <input type="text" class="search-input" id="searchWebapps" placeholder="Rechercher mes webapps..." oninput="filterMyWebapps()">
-        <a href="submit.html" class="btn btn-primary">+ Nouvelle Webapp</a>
+        <div class="search-container">
+          <i data-lucide="search" class="search-icon-input" width="18" height="18"></i>
+          <input type="text" class="search-input" id="searchWebapps" placeholder="Rechercher mes webapps..." oninput="filterMyWebapps()">
+        </div>
+        <a href="submit.html" class="btn btn-primary">
+          <i data-lucide="plus" width="18" height="18"></i>
+          Nouvelle Webapp
+        </a>
       </div>
       <div class="webapp-list" id="myWebappsList"></div>
       <div class="empty-state hidden" id="emptyWebapps">
         <div class="empty-state-icon">📭</div>
         <h3>Aucune webapp</h3>
         <p>Vous n'avez pas encore publié de webapp</p>
-        <a href="submit.html" class="btn btn-primary" style="margin-top:1rem;">Publier ma première webapp</a>
+        <a href="submit.html" class="btn btn-primary" style="margin-top:1rem;">
+          <i data-lucide="upload" width="18" height="18"></i>
+          Publier ma première webapp
+        </a>
       </div>
     </div>
 
@@ -485,18 +543,30 @@
   <!-- DELETE MODAL -->
   <div class="modal" id="deleteModal">
     <div class="modal-content">
-      <h2 class="modal-title">⚠️ Supprimer la webapp</h2>
+      <h2 class="modal-title">
+        <i data-lucide="alert-triangle" width="24" height="24"></i>
+        Supprimer la webapp
+      </h2>
       <p class="modal-text">Cette action est irréversible. Entrez votre mot de passe pour confirmer.</p>
       <input type="password" class="modal-input" id="deletePassword" placeholder="Votre mot de passe">
       <div class="modal-actions">
-        <button class="btn btn-secondary" onclick="closeDeleteModal()">Annuler</button>
-        <button class="btn btn-danger" onclick="confirmDelete()">Supprimer</button>
+        <button class="btn btn-secondary" onclick="closeDeleteModal()">
+          <i data-lucide="x" width="18" height="18"></i>
+          Annuler
+        </button>
+        <button class="btn btn-danger" onclick="confirmDelete()">
+          <i data-lucide="trash-2" width="18" height="18"></i>
+          Supprimer
+        </button>
       </div>
     </div>
   </div>
 
   <!-- LOGOUT BTN -->
-  <button class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
+  <button class="logout-btn" onclick="logout()">
+    <i data-lucide="log-out" width="20" height="20"></i>
+    Déconnexion
+  </button>
 
   <script>
     let currentUser = null;
@@ -514,6 +584,7 @@
     };
 
     document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
       checkAuth();
       checkNotificationStatus();
     });
@@ -523,7 +594,6 @@
       const userData = localStorage.getItem('user');
 
       if (!token || !userData) {
-        // Rediriger vers auth avec redirect vers profile
         window.location.href = 'auth.html?redirect=profile.html';
         return;
       }
@@ -536,14 +606,15 @@
     function renderProfile() {
       document.getElementById('profileAvatar').textContent = currentUser.name.substring(0, 2).toUpperCase();
       document.getElementById('profileName').textContent = currentUser.name;
-      document.getElementById('profileEmail').textContent = currentUser.email;
+      document.getElementById('emailText').textContent = currentUser.email;
 
-      // Badges
       const badges = currentUser.badges || [];
       document.getElementById('profileBadges').innerHTML = badges.map(b => 
         BADGE_PATHS[b] ? `<img src="${BADGE_PATHS[b]}" class="badge-img" title="${b}">` : ''
       ).join('');
       document.getElementById('statBadges').textContent = badges.length;
+      
+      lucide.createIcons();
     }
 
     async function loadMyWebapps() {
@@ -555,7 +626,6 @@
         const data = await res.json();
 
         if (data.success) {
-          // Filter only user's webapps
           myWebapps = data.data.webapps.filter(w => w.creator_id === currentUser.id);
           document.getElementById('statWebapps').textContent = myWebapps.length;
           renderMyWebapps();
@@ -572,6 +642,7 @@
       if (myWebapps.length === 0) {
         list.innerHTML = '';
         empty.classList.remove('hidden');
+        lucide.createIcons();
         return;
       }
 
@@ -583,27 +654,35 @@
             <div class="webapp-item-info">
               <div class="webapp-item-name">${w.name}</div>
               <div class="webapp-item-meta">
-                <span>⭐ ${(w.avg_rating || 0).toFixed(1)}</span>
-                <span>👁️ ${w.views_count || 0}</span>
-                <span>💬 ${w.reviews_count || 0}</span>
+                <span><i data-lucide="star" width="14" height="14" style="display:inline;vertical-align:middle;"></i> ${(w.avg_rating || 0).toFixed(1)}</span>
+                <span><i data-lucide="eye" width="14" height="14" style="display:inline;vertical-align:middle;"></i> ${w.views_count || 0}</span>
+                <span><i data-lucide="message-circle" width="14" height="14" style="display:inline;vertical-align:middle;"></i> ${w.reviews_count || 0}</span>
               </div>
             </div>
           </div>
           <div class="webapp-item-actions">
             <div class="webapp-item-actions-row">
-              <a href="webapp.html?id=${w.id}" class="btn btn-secondary btn-small">Voir</a>
-              <a href="submit.html?edit=${w.id}" class="btn btn-secondary btn-small">Modifier</a>
+              <a href="webapp.html?id=${w.id}" class="btn btn-secondary btn-small">
+                <i data-lucide="eye" width="14" height="14"></i> Voir
+              </a>
+              <a href="submit.html?edit=${w.id}" class="btn btn-secondary btn-small">
+                <i data-lucide="edit" width="14" height="14"></i> Modifier
+              </a>
             </div>
-            <button class="btn btn-danger btn-small btn-delete" onclick="openDeleteModal('${w.id}')">Supprimer</button>
+            <button class="btn btn-danger btn-small btn-delete" onclick="openDeleteModal('${w.id}')">
+              <i data-lucide="trash-2" width="14" height="14"></i> Supprimer
+            </button>
           </div>
         </div>
       `).join('');
+      
+      lucide.createIcons();
     }
 
     function filterMyWebapps() {
       const search = document.getElementById('searchWebapps').value.toLowerCase();
       const filtered = myWebapps.filter(w => w.name.toLowerCase().includes(search));
-      
+
       const list = document.getElementById('myWebappsList');
       if (filtered.length === 0) {
         list.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:2rem;">Aucune webapp trouvée</p>';
@@ -615,37 +694,45 @@
               <div class="webapp-item-info">
                 <div class="webapp-item-name">${w.name}</div>
                 <div class="webapp-item-meta">
-                  <span>⭐ ${(w.avg_rating || 0).toFixed(1)}</span>
-                  <span>👁️ ${w.views_count || 0}</span>
-                  <span>💬 ${w.reviews_count || 0}</span>
+                  <span><i data-lucide="star" width="14" height="14" style="display:inline;vertical-align:middle;"></i> ${(w.avg_rating || 0).toFixed(1)}</span>
+                  <span><i data-lucide="eye" width="14" height="14" style="display:inline;vertical-align:middle;"></i> ${w.views_count || 0}</span>
+                  <span><i data-lucide="message-circle" width="14" height="14" style="display:inline;vertical-align:middle;"></i> ${w.reviews_count || 0}</span>
                 </div>
               </div>
             </div>
             <div class="webapp-item-actions">
               <div class="webapp-item-actions-row">
-                <a href="webapp.html?id=${w.id}" class="btn btn-secondary btn-small">Voir</a>
-                <a href="submit.html?edit=${w.id}" class="btn btn-secondary btn-small">Modifier</a>
+                <a href="webapp.html?id=${w.id}" class="btn btn-secondary btn-small">
+                  <i data-lucide="eye" width="14" height="14"></i> Voir
+                </a>
+                <a href="submit.html?edit=${w.id}" class="btn btn-secondary btn-small">
+                  <i data-lucide="edit" width="14" height="14"></i> Modifier
+                </a>
               </div>
-              <button class="btn btn-danger btn-small btn-delete" onclick="openDeleteModal('${w.id}')">Supprimer</button>
+              <button class="btn btn-danger btn-small btn-delete" onclick="openDeleteModal('${w.id}')">
+                <i data-lucide="trash-2" width="14" height="14"></i> Supprimer
+              </button>
             </div>
           </div>
         `).join('');
+        
+        lucide.createIcons();
       }
     }
 
     function switchTab(tab) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-      
+
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.getElementById(`section-${tab}`).classList.add('active');
     }
 
-    // DELETE
     function openDeleteModal(id) {
       webappToDelete = id;
       document.getElementById('deleteModal').classList.add('active');
       document.getElementById('deletePassword').value = '';
+      lucide.createIcons();
     }
 
     function closeDeleteModal() {
@@ -660,7 +747,6 @@
         return;
       }
 
-      // Verify password by trying to login
       try {
         const loginRes = await fetch('/api/auth/login', {
           method: 'POST',
@@ -674,7 +760,6 @@
           return;
         }
 
-        // Delete webapp
         const token = localStorage.getItem('token');
         const deleteRes = await fetch(`/api/webapps/${webappToDelete}`, {
           method: 'DELETE',
@@ -695,7 +780,6 @@
       }
     }
 
-    // NOTIFICATIONS
     function checkNotificationStatus() {
       if ('Notification' in window && Notification.permission === 'granted') {
         document.getElementById('notifBtn').classList.add('active');
@@ -710,7 +794,6 @@
       }
 
       if (Notification.permission === 'granted') {
-        // Déjà activé, informer l'utilisateur
         alert('Pour désactiver les notifications, allez dans les paramètres de votre navigateur');
       } else {
         const permission = await Notification.requestPermission();
