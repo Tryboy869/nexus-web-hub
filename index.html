@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nexus Web Hub - Le store communautaire pour webapps</title>
   <link rel="icon" href="assets/logos/logo-nwh.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -15,28 +14,14 @@
     :root {
       --bg-deep-space: #0a0e27;
       --bg-card: #1a1f3a;
-      --bg-card-hover: #252b4a;
       --text-primary: #E0E6ED;
       --text-secondary: #a0aec0;
       --accent-cyan: #00d9ff;
       --accent-purple: #8b5cf6;
-      --accent-green: #10b981;
       --accent-gold: #fbbf24;
-      --accent-red: #ef4444;
       --border-glow: rgba(0, 217, 255, 0.15);
       --font-body: 'Inter', sans-serif;
       --font-heading: 'Space Grotesk', sans-serif;
-    }
-
-    @media (prefers-color-scheme: light) {
-      :root {
-        --bg-deep-space: #f5f7fa;
-        --bg-card: #ffffff;
-        --bg-card-hover: #f0f4f8;
-        --text-primary: #1a202c;
-        --text-secondary: #4a5568;
-        --border-glow: rgba(0, 0, 0, 0.1);
-      }
     }
 
     body {
@@ -49,29 +34,19 @@
 
     a { color: inherit; text-decoration: none; }
 
-    /* ========== WELCOME MODAL ========== */
+    /* WELCOME MODAL */
     .welcome-modal {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       z-index: 9999;
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .welcome-overlay {
-      position: absolute;
-      inset: 0;
       background: rgba(10, 14, 39, 0.95);
       backdrop-filter: blur(10px);
     }
 
     .welcome-content {
-      position: relative;
       background: var(--bg-card);
       border: 1px solid var(--border-glow);
       border-radius: 24px;
@@ -81,7 +56,6 @@
       overflow-y: auto;
       padding: 3rem 2.5rem;
       box-shadow: 0 20px 60px rgba(0, 217, 255, 0.2);
-      animation: slideUp 0.4s ease;
     }
 
     .welcome-header {
@@ -89,11 +63,7 @@
       margin-bottom: 2.5rem;
     }
 
-    .welcome-logo {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 1.5rem;
-    }
+    .welcome-logo { width: 80px; margin-bottom: 1.5rem; }
 
     .welcome-header h1 {
       font-family: var(--font-heading);
@@ -102,97 +72,54 @@
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .welcome-tagline {
-      color: var(--text-secondary);
-      font-size: 1rem;
-    }
-
-    .welcome-body {
-      margin-bottom: 2rem;
     }
 
     .welcome-feature {
       display: flex;
       gap: 1rem;
       margin-bottom: 1.5rem;
-      align-items: flex-start;
     }
 
-    .welcome-icon {
-      font-size: 2rem;
-      flex-shrink: 0;
-    }
-
-    .welcome-feature h3 {
-      font-size: 1.1rem;
-      margin-bottom: 0.25rem;
-      color: var(--accent-cyan);
-    }
-
-    .welcome-feature p {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
+    .welcome-feature i { color: var(--accent-cyan); width: 24px; height: 24px; }
+    .welcome-feature h3 { font-size: 1.1rem; color: var(--accent-cyan); margin-bottom: 0.25rem; }
 
     .welcome-disclaimer {
       background: rgba(239, 68, 68, 0.1);
-      border-left: 3px solid var(--accent-red);
+      border-left: 3px solid #ef4444;
       padding: 1rem;
       border-radius: 8px;
-      margin-bottom: 2rem;
-    }
-
-    .welcome-disclaimer p {
+      margin: 2rem 0;
       font-size: 0.9rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
     }
 
-    .welcome-disclaimer strong {
-      color: var(--text-primary);
-    }
-
-    .welcome-actions {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-    }
-
-    .welcome-checkbox {
-      display: flex;
+    .btn {
+      padding: 0.9rem 2rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: #fff;
+      width: 100%;
       justify-content: center;
     }
 
-    .welcome-checkbox input {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-glow);
     }
 
-    .welcome-checkbox label {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      cursor: pointer;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    /* ========== HEADER ========== */
+    /* HEADER */
     header {
       position: sticky;
       top: 0;
@@ -222,7 +149,7 @@
       color: var(--accent-cyan);
     }
 
-    .logo img { width: 36px; height: 36px; }
+    .logo img { width: 36px; }
 
     .stats {
       display: flex;
@@ -232,41 +159,9 @@
     }
 
     .stat { display: flex; align-items: center; gap: 0.4rem; }
-    .stat-value { font-weight: 600; color: var(--text-primary); }
+    .stat i { width: 16px; height: 16px; }
 
     .header-actions { display: flex; gap: 1rem; align-items: center; }
-
-    .btn {
-      padding: 0.7rem 1.4rem;
-      border: none;
-      border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-family: var(--font-body);
-      font-size: 0.9rem;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      color: #fff;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--text-primary);
-      border: 1px solid var(--border-glow);
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--accent-cyan);
-      color: var(--accent-cyan);
-    }
 
     .user-avatar {
       width: 40px;
@@ -277,18 +172,11 @@
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 0.9rem;
       color: #fff;
       cursor: pointer;
-      transition: all 0.3s;
     }
 
-    .user-avatar:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
-    }
-
-    /* ========== HERO ========== */
+    /* HERO */
     .hero {
       text-align: center;
       padding: 5rem 2rem 3rem;
@@ -303,18 +191,9 @@
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
 
-    .hero p {
-      font-size: 1.2rem;
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-    }
-
-    .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-
-    /* ========== SEARCH & FILTERS ========== */
+    /* SEARCH & FILTERS */
     .search-section {
       max-width: 1400px;
       margin: 0 auto;
@@ -326,6 +205,16 @@
       margin-bottom: 1.5rem;
     }
 
+    .search-bar i {
+      position: absolute;
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      color: var(--text-secondary);
+    }
+
     .search-bar input {
       width: 100%;
       padding: 1rem 1rem 1rem 3.5rem;
@@ -334,29 +223,17 @@
       border-radius: 12px;
       color: var(--text-primary);
       font-size: 1rem;
-      font-family: var(--font-body);
-      transition: all 0.3s;
     }
 
     .search-bar input:focus {
       outline: none;
       border-color: var(--accent-cyan);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 1.2rem;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.2rem;
     }
 
     .filters {
       display: flex;
       gap: 0.75rem;
       flex-wrap: wrap;
-      align-items: center;
       margin-bottom: 1.5rem;
     }
 
@@ -365,22 +242,16 @@
       background: var(--bg-card);
       border: 1px solid var(--border-glow);
       border-radius: 8px;
-      color: var(--text-primary);
       cursor: pointer;
-      transition: all 0.3s;
-      font-family: var(--font-body);
       font-size: 0.85rem;
       display: flex;
       align-items: center;
       gap: 0.4rem;
     }
 
-    .filter-btn img { width: 18px; height: 18px; }
-
-    .filter-btn:hover, .filter-btn.active {
+    .filter-btn.active {
       background: var(--accent-cyan);
       color: #000;
-      border-color: var(--accent-cyan);
     }
 
     .tabs {
@@ -395,17 +266,12 @@
       border: none;
       color: var(--text-secondary);
       cursor: pointer;
-      font-family: var(--font-body);
-      font-size: 0.9rem;
-      font-weight: 500;
       border-bottom: 2px solid transparent;
-      transition: all 0.3s;
     }
 
-    .tab:hover { color: var(--text-primary); }
     .tab.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
 
-    /* ========== CATALOG ========== */
+    /* CATALOG */
     .catalog {
       max-width: 1400px;
       margin: 0 auto;
@@ -423,8 +289,8 @@
       border: 1px solid var(--border-glow);
       border-radius: 16px;
       overflow: hidden;
-      transition: all 0.3s;
       cursor: pointer;
+      transition: all 0.3s;
     }
 
     .webapp-card:hover {
@@ -444,7 +310,7 @@
     }
 
     .webapp-image img { width: 100%; height: 100%; object-fit: cover; }
-    .webapp-image .default-logo { width: 80px; height: 80px; opacity: 0.8; }
+    .webapp-image .default-logo { width: 80px; opacity: 0.8; }
 
     .webapp-badges {
       position: absolute;
@@ -454,21 +320,11 @@
       gap: 0.25rem;
     }
 
-    .badge-icon { width: 28px; height: 28px; }
+    .badge-icon { width: 28px; }
 
     .webapp-content { padding: 1.25rem; }
-
-    .webapp-title {
-      font-weight: 600;
-      font-size: 1.1rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .webapp-developer {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      margin-bottom: 0.75rem;
-    }
+    .webapp-title { font-weight: 600; font-size: 1.1rem; margin-bottom: 0.25rem; }
+    .webapp-developer { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
 
     .webapp-rating {
       display: flex;
@@ -490,11 +346,7 @@
       overflow: hidden;
     }
 
-    .webapp-tags {
-      display: flex;
-      gap: 0.4rem;
-      flex-wrap: wrap;
-    }
+    .webapp-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
     .tag {
       padding: 0.2rem 0.6rem;
@@ -504,11 +356,9 @@
       color: var(--accent-cyan);
     }
 
-    /* ========== LOADING & EMPTY ========== */
-    .loading, .empty-state {
+    .loading {
       text-align: center;
       padding: 4rem 2rem;
-      color: var(--text-secondary);
     }
 
     .loading-spinner {
@@ -523,86 +373,60 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .empty-state-icon { font-size: 4rem; margin-bottom: 1rem; }
+    .hidden { display: none !important; }
 
-    /* ========== FOOTER ========== */
-    footer {
-      border-top: 1px solid var(--border-glow);
-      padding: 3rem 2rem;
-      margin-top: 4rem;
-      text-align: center;
-    }
-
-    .footer-intro { max-width: 500px; margin: 0 auto 2rem; }
-    .footer-intro img { width: 100%; height: auto; }
-
-    footer p { color: var(--text-secondary); font-size: 0.9rem; }
-    footer a { color: var(--accent-cyan); }
-    footer a:hover { text-decoration: underline; }
-
-    /* ========== RESPONSIVE ========== */
     @media (max-width: 768px) {
       .stats { display: none; }
       .hero h1 { font-size: 2.2rem; }
-      .hero p { font-size: 1rem; }
       .webapp-grid { grid-template-columns: 1fr; }
-      .welcome-content { padding: 2rem 1.5rem; }
-      .welcome-actions { flex-direction: column; }
     }
-
-    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
   <!-- WELCOME MODAL -->
   <div id="welcomeModal" class="welcome-modal hidden">
-    <div class="welcome-overlay"></div>
     <div class="welcome-content">
       <div class="welcome-header">
         <img src="assets/logos/logo-nwh.svg" alt="NWH" class="welcome-logo">
         <h1>Bienvenue sur Nexus Web Hub</h1>
-        <p class="welcome-tagline">Le catalogue communautaire des meilleures webapps</p>
+        <p style="color:var(--text-secondary)">Le catalogue communautaire des meilleures webapps</p>
       </div>
       
-      <div class="welcome-body">
-        <div class="welcome-feature">
-          <span class="welcome-icon">🔍</span>
-          <div>
-            <h3>Découvrez</h3>
-            <p>Explorez des webapps innovantes soumises par la communauté mondiale</p>
-          </div>
+      <div class="welcome-feature">
+        <i data-lucide="search"></i>
+        <div>
+          <h3>Découvrez</h3>
+          <p style="color:var(--text-secondary);font-size:0.95rem">Explorez des webapps innovantes</p>
         </div>
-        
-        <div class="welcome-feature">
-          <span class="welcome-icon">⭐</span>
-          <div>
-            <h3>Évaluez</h3>
-            <p>Partagez vos avis et aidez les autres à trouver les meilleures applications</p>
-          </div>
+      </div>
+      
+      <div class="welcome-feature">
+        <i data-lucide="star"></i>
+        <div>
+          <h3>Évaluez</h3>
+          <p style="color:var(--text-secondary);font-size:0.95rem">Partagez vos avis</p>
         </div>
-        
-        <div class="welcome-feature">
-          <span class="welcome-icon">🚀</span>
-          <div>
-            <h3>Partagez</h3>
-            <p>Soumettez vos propres créations et gagnez en visibilité gratuitement</p>
-          </div>
+      </div>
+      
+      <div class="welcome-feature">
+        <i data-lucide="rocket"></i>
+        <div>
+          <h3>Partagez</h3>
+          <p style="color:var(--text-secondary);font-size:0.95rem">Soumettez vos créations</p>
         </div>
       </div>
       
       <div class="welcome-disclaimer">
-        <p>⚠️ <strong>Important :</strong> Nexus Web Hub est un annuaire communautaire. Les webapps listées sont hébergées par leurs créateurs respectifs. Nous ne garantissons pas leur accessibilité permanente ni leur contenu. En cliquant sur "Ouvrir", vous serez redirigé vers des sites externes.</p>
+        <p><strong>⚠️ Important :</strong> Nexus Web Hub est un annuaire. Les webapps sont hébergées par leurs créateurs. Nous ne garantissons pas leur disponibilité.</p>
       </div>
 
-      <div class="welcome-checkbox">
+      <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.5rem;justify-content:center;cursor:pointer">
         <input type="checkbox" id="dontShowAgain">
-        <label for="dontShowAgain">Ne plus afficher ce message</label>
-      </div>
+        <span style="font-size:0.9rem;color:var(--text-secondary)">Ne plus afficher</span>
+      </label>
       
-      <div class="welcome-actions">
-        <button class="btn btn-primary" onclick="closeWelcomeModal()">Compris, explorer !</button>
-      </div>
+      <button class="btn btn-primary" onclick="closeWelcomeModal()">Compris, explorer !</button>
     </div>
   </div>
 
@@ -615,13 +439,22 @@
       </a>
 
       <div class="stats">
-        <div class="stat">📱 <span class="stat-value" id="statWebapps">0</span> webapps</div>
-        <div class="stat">👥 <span class="stat-value" id="statCreators">0</span> créateurs</div>
-        <div class="stat">⭐ <span class="stat-value" id="statReviews">0</span> avis</div>
+        <div class="stat">
+          <i data-lucide="smartphone"></i>
+          <span class="stat-value" id="statWebapps">0</span> webapps
+        </div>
+        <div class="stat">
+          <i data-lucide="users"></i>
+          <span class="stat-value" id="statCreators">0</span> créateurs
+        </div>
+        <div class="stat">
+          <i data-lucide="star"></i>
+          <span class="stat-value" id="statReviews">0</span> avis
+        </div>
       </div>
 
       <div class="header-actions">
-        <a href="submit.html" class="btn btn-primary">✨ Soumettre</a>
+        <a href="submit.html" class="btn btn-primary"><i data-lucide="plus"></i> Soumettre</a>
         <div id="authArea"></div>
       </div>
     </div>
@@ -630,38 +463,38 @@
   <!-- HERO -->
   <section class="hero">
     <h1>Découvrez le meilleur du Web</h1>
-    <p>Le store communautaire pour webapps, outils et jeux évalués par la communauté</p>
-    <div class="hero-cta">
-      <button class="btn btn-primary" onclick="scrollToCatalog()">Explorer le Catalogue</button>
-      <a href="submit.html" class="btn btn-secondary">Publier votre webapp</a>
+    <p style="font-size:1.2rem;color:var(--text-secondary);margin-bottom:2rem">Le store communautaire pour webapps évalués par la communauté</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="scrollToCatalog()"><i data-lucide="grid"></i> Explorer</button>
+      <a href="submit.html" class="btn btn-secondary"><i data-lucide="upload"></i> Publier</a>
     </div>
   </section>
 
-  <!-- SEARCH & FILTERS -->
+  <!-- SEARCH -->
   <section class="search-section">
     <div class="search-bar">
-      <span class="search-icon">🔍</span>
+      <i data-lucide="search"></i>
       <input type="text" id="searchInput" placeholder="Rechercher webapp, tag, créateur..." oninput="handleSearch()">
     </div>
 
     <div class="filters">
       <button class="filter-btn active" data-category="all" onclick="filterCategory('all')">Toutes</button>
       <button class="filter-btn" data-category="productivity" onclick="filterCategory('productivity')">
-        <img src="assets/icons/icon-tools.svg" alt=""> Productivité
+        <img src="assets/icons/icon-tools.svg" width="18"> Productivité
       </button>
       <button class="filter-btn" data-category="design" onclick="filterCategory('design')">
-        <img src="assets/icons/icon-ui-kits.svg" alt=""> Design
+        <img src="assets/icons/icon-ui-kits.svg" width="18"> Design
       </button>
       <button class="filter-btn" data-category="game" onclick="filterCategory('game')">
-        <img src="assets/icons/icon-games.svg" alt=""> Jeux
+        <img src="assets/icons/icon-games.svg" width="18"> Jeux
       </button>
       <button class="filter-btn" data-category="api" onclick="filterCategory('api')">
-        <img src="assets/icons/icon-apis.svg" alt=""> API
+        <img src="assets/icons/icon-apis.svg" width="18"> API
       </button>
       <button class="filter-btn" data-category="nocode" onclick="filterCategory('nocode')">
-        <img src="assets/icons/icon-websites.svg" alt=""> No-Code
+        <img src="assets/icons/icon-websites.svg" width="18"> No-Code
       </button>
-      <button class="btn btn-secondary" onclick="surpriseMe()">🎲 Surprenez-moi</button>
+      <button class="btn btn-secondary" onclick="surpriseMe()"><i data-lucide="shuffle"></i> Surprenez-moi</button>
     </div>
 
     <div class="tabs">
@@ -677,92 +510,74 @@
     <div id="webappGrid" class="webapp-grid"></div>
     <div id="loadingState" class="loading">
       <div class="loading-spinner"></div>
-      <p>Chargement des webapps...</p>
+      <p style="color:var(--text-secondary)">Chargement...</p>
     </div>
-    <div id="emptyState" class="empty-state hidden">
-      <div class="empty-state-icon">📭</div>
+    <div id="emptyState" class="hidden" style="text-align:center;padding:4rem 2rem">
+      <i data-lucide="inbox" style="width:64px;height:64px;margin:0 auto 1rem;color:var(--text-secondary)"></i>
       <h3>Aucune webapp trouvée</h3>
-      <p>Essayez de modifier vos filtres ou soyez le premier à soumettre !</p>
+      <p style="color:var(--text-secondary);margin:1rem 0">Essayez d'autres filtres</p>
       <a href="submit.html" class="btn btn-primary">Soumettre une webapp</a>
     </div>
   </section>
 
   <!-- FOOTER -->
-  <footer>
-    <div class="footer-intro">
-      <img src="assets/storyline/nexus-web-hub-intro.svg" alt="Nexus Web Hub">
+  <footer style="border-top:1px solid var(--border-glow);padding:3rem 2rem;margin-top:4rem;text-align:center">
+    <div style="max-width:500px;margin:0 auto 2rem">
+      <img src="assets/storyline/nexus-web-hub-intro.svg" alt="NWH" style="width:100%">
     </div>
-    <p>🌌 Créé par <a href="https://github.com/Tryboy869">Daouda Abdoul Anzize</a> - <strong>Nexus Studio</strong></p>
-    <p style="margin-top: 0.5rem;"><a href="mailto:nexusstudio100@gmail.com">Contact</a> · <a href="https://github.com/Tryboy869/nexus-web-hub">GitHub</a> · NEXUS AXION 3.5</p>
+    <p style="color:var(--text-secondary);font-size:0.9rem">🌌 Créé par <a href="https://github.com/Tryboy869" style="color:var(--accent-cyan)">Daouda Abdoul Anzize</a> - <strong>Nexus Studio</strong></p>
   </footer>
 
   <script>
-    // ========== WELCOME MODAL ==========
-    function showWelcomeModal() {
-      const hasSeenWelcome = localStorage.getItem('nwh_welcome_seen');
-      if (!hasSeenWelcome) {
-        document.getElementById('welcomeModal').classList.remove('hidden');
-      }
-    }
-
-    function closeWelcomeModal() {
-      const dontShow = document.getElementById('dontShowAgain').checked;
-      if (dontShow) {
-        localStorage.setItem('nwh_welcome_seen', 'true');
-      }
-      document.getElementById('welcomeModal').classList.add('hidden');
-    }
-
-    // ========== STATE ==========
     let currentUser = null;
     let webapps = [];
     let filters = { category: 'all', sort: 'all', search: '' };
 
-    // ========== BADGE PATHS ==========
     const BADGES = {
-      'trending': 'assets/badges/system/badge-trending.svg',
-      'featured': 'assets/badges/system/badge-featured.svg',
-      'new': 'assets/badges/system/badge-new.svg'
+      trending: 'assets/badges/system/badge-trending.svg',
+      featured: 'assets/badges/system/badge-featured.svg',
+      new: 'assets/badges/system/badge-new.svg'
     };
 
-    // ========== INIT ==========
     document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
       showWelcomeModal();
       checkAuth();
       loadStats();
       loadWebapps();
     });
 
-    // ========== AUTH ==========
+    function showWelcomeModal() {
+      if (!localStorage.getItem('nwh_welcome_seen')) {
+        document.getElementById('welcomeModal').classList.remove('hidden');
+        lucide.createIcons();
+      }
+    }
+
+    function closeWelcomeModal() {
+      if (document.getElementById('dontShowAgain').checked) {
+        localStorage.setItem('nwh_welcome_seen', 'true');
+      }
+      document.getElementById('welcomeModal').classList.add('hidden');
+    }
+
     function checkAuth() {
       const token = localStorage.getItem('token');
       const userData = localStorage.getItem('user');
-      
       if (token && userData) {
         try {
           currentUser = JSON.parse(userData);
-          renderAuthUI(true);
+          const initials = currentUser.name.substring(0, 2).toUpperCase();
+          document.getElementById('authArea').innerHTML = `<a href="profile.html" class="user-avatar">${initials}</a>`;
         } catch (e) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          renderAuthUI(false);
+          localStorage.clear();
+          document.getElementById('authArea').innerHTML = `<a href="auth.html" class="btn btn-secondary">Connexion</a>`;
         }
       } else {
-        renderAuthUI(false);
+        document.getElementById('authArea').innerHTML = `<a href="auth.html" class="btn btn-secondary">Connexion</a>`;
       }
     }
 
-    function renderAuthUI(loggedIn) {
-      const area = document.getElementById('authArea');
-      if (loggedIn) {
-        const initials = currentUser.name.substring(0, 2).toUpperCase();
-        area.innerHTML = `<a href="profile.html" class="user-avatar" title="Mon Profil">${initials}</a>`;
-      } else {
-        area.innerHTML = `<a href="auth.html" class="btn btn-secondary">Connexion</a>`;
-      }
-    }
-
-    // ========== STATS ==========
     async function loadStats() {
       try {
         const res = await fetch('/api/stats');
@@ -772,10 +587,9 @@
           document.getElementById('statCreators').textContent = data.data.creators;
           document.getElementById('statReviews').textContent = data.data.reviews;
         }
-      } catch (e) { console.error('Stats error:', e); }
+      } catch (e) {}
     }
 
-    // ========== WEBAPPS ==========
     async function loadWebapps() {
       document.getElementById('loadingState').classList.remove('hidden');
       document.getElementById('emptyState').classList.add('hidden');
@@ -787,7 +601,7 @@
         if (filters.sort !== 'all') params.append('sort', filters.sort);
         if (filters.search) params.append('search', filters.search);
 
-        const res = await fetch('/api/webapps?' + params.toString());
+        const res = await fetch('/api/webapps?' + params);
         const data = await res.json();
 
         document.getElementById('loadingState').classList.add('hidden');
@@ -797,9 +611,9 @@
           renderWebapps();
         } else {
           document.getElementById('emptyState').classList.remove('hidden');
+          lucide.createIcons();
         }
       } catch (e) {
-        console.error('Load error:', e);
         document.getElementById('loadingState').classList.add('hidden');
         document.getElementById('emptyState').classList.remove('hidden');
       }
@@ -809,21 +623,18 @@
       const grid = document.getElementById('webappGrid');
       grid.innerHTML = webapps.map(w => {
         let badges = '';
-        if (w.is_trending) badges += `<img src="${BADGES.trending}" class="badge-icon" title="Trending">`;
-        if (w.is_featured) badges += `<img src="${BADGES.featured}" class="badge-icon" title="Featured">`;
-        if (w.is_new) badges += `<img src="${BADGES.new}" class="badge-icon" title="Nouveau">`;
+        if (w.is_trending) badges += `<img src="${BADGES.trending}" class="badge-icon">`;
+        if (w.is_featured) badges += `<img src="${BADGES.featured}" class="badge-icon">`;
+        if (w.is_new) badges += `<img src="${BADGES.new}" class="badge-icon">`;
 
         const image = w.image_url 
           ? `<img src="${w.image_url}" alt="${w.name}">`
-          : `<img src="assets/logos/logo-nwh.svg" class="default-logo" alt="NWH">`;
+          : `<img src="assets/logos/logo-nwh.svg" class="default-logo">`;
 
         let tags = [];
         try {
           tags = typeof w.tags === 'string' ? JSON.parse(w.tags) : (w.tags || []);
-        } catch (e) {
-          tags = [];
-        }
-        const tagsHTML = tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('');
+        } catch (e) {}
 
         return `
           <article class="webapp-card" onclick="window.location.href='webapp.html?id=${w.id}'">
@@ -835,27 +646,18 @@
               <h3 class="webapp-title">${w.name}</h3>
               <p class="webapp-developer">par ${w.developer}</p>
               <div class="webapp-rating">
-                <span class="stars">${renderStars(w.avg_rating)}</span>
+                <span class="stars">${'⭐'.repeat(Math.floor(w.avg_rating || 0))}</span>
                 <span>${(w.avg_rating || 0).toFixed(1)}</span>
                 <span style="color:var(--text-secondary)">(${w.reviews_count || 0})</span>
               </div>
               <p class="webapp-description">${w.description_short}</p>
-              <div class="webapp-tags">${tagsHTML}</div>
+              <div class="webapp-tags">${tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('')}</div>
             </div>
           </article>
         `;
       }).join('');
-      
-      lucide.createIcons();
     }
 
-    function renderStars(r) {
-      const full = Math.floor(r || 0);
-      const half = (r % 1 >= 0.5) ? 1 : 0;
-      return '⭐'.repeat(full) + (half ? '✨' : '') + '☆'.repeat(5 - full - half);
-    }
-
-    // ========== FILTERS ==========
     function filterCategory(cat) {
       filters.category = cat;
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -880,116 +682,7 @@
     }
 
     function surpriseMe() {
-      if (webapps.length === 0) return alert('Aucune webapp disponible');
-      const r = webapps[Math.floor(Math.random() * webapps.length)];
-      window.location.href = `webapp.html?id=${r.id}`;
-    }
-
-    function scrollToCatalog() {
-      document.querySelector('.catalog').scrollIntoView({ behavior: 'smooth' });
-    }
-  </script>
-</body>
-</html>appGrid').innerHTML = '';
-
-      try {
-        const params = new URLSearchParams();
-        if (filters.category !== 'all') params.append('category', filters.category);
-        if (filters.sort !== 'all') params.append('sort', filters.sort);
-        if (filters.search) params.append('search', filters.search);
-
-        const res = await fetch('/api/webapps?' + params.toString());
-        const data = await res.json();
-
-        document.getElementById('loadingState').classList.add('hidden');
-
-        if (data.success && data.data.webapps.length > 0) {
-          webapps = data.data.webapps;
-          renderWebapps();
-        } else {
-          document.getElementById('emptyState').classList.remove('hidden');
-        }
-      } catch (e) {
-        console.error('Load error:', e);
-        document.getElementById('loadingState').classList.add('hidden');
-        document.getElementById('emptyState').classList.remove('hidden');
-      }
-    }
-
-    function renderWebapps() {
-      const grid = document.getElementById('webappGrid');
-      grid.innerHTML = webapps.map(w => {
-        let badges = '';
-        if (w.is_trending) badges += `<img src="${BADGES.trending}" class="badge-icon" title="Trending">`;
-        if (w.is_featured) badges += `<img src="${BADGES.featured}" class="badge-icon" title="Featured">`;
-        if (w.is_new) badges += `<img src="${BADGES.new}" class="badge-icon" title="Nouveau">`;
-
-        const image = w.image_url 
-          ? `<img src="${w.image_url}" alt="${w.name}">`
-          : `<img src="assets/logos/logo-nwh.svg" class="default-logo" alt="NWH">`;
-
-        let tags = [];
-        try {
-          tags = typeof w.tags === 'string' ? JSON.parse(w.tags) : (w.tags || []);
-        } catch (e) {
-          tags = [];
-        }
-        const tagsHTML = tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('');
-
-        return `
-          <article class="webapp-card" onclick="window.location.href='webapp.html?id=${w.id}'">
-            <div class="webapp-image">
-              ${image}
-              <div class="webapp-badges">${badges}</div>
-            </div>
-            <div class="webapp-content">
-              <h3 class="webapp-title">${w.name}</h3>
-              <p class="webapp-developer">par ${w.developer}</p>
-              <div class="webapp-rating">
-                <span class="stars">${renderStars(w.avg_rating)}</span>
-                <span>${(w.avg_rating || 0).toFixed(1)}</span>
-                <span style="color:var(--text-secondary)">(${w.reviews_count || 0})</span>
-              </div>
-              <p class="webapp-description">${w.description_short}</p>
-              <div class="webapp-tags">${tagsHTML}</div>
-            </div>
-          </article>
-        `;
-      }).join('');
-    }
-
-    function renderStars(r) {
-      const full = Math.floor(r || 0);
-      const half = (r % 1 >= 0.5) ? 1 : 0;
-      return '⭐'.repeat(full) + (half ? '✨' : '') + '☆'.repeat(5 - full - half);
-    }
-
-    // ========== FILTERS ==========
-    function filterCategory(cat) {
-      filters.category = cat;
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      document.querySelector(`[data-category="${cat}"]`).classList.add('active');
-      loadWebapps();
-    }
-
-    function filterSort(sort) {
-      filters.sort = sort;
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelector(`[data-sort="${sort}"]`).classList.add('active');
-      loadWebapps();
-    }
-
-    let searchTimeout;
-    function handleSearch() {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        filters.search = document.getElementById('searchInput').value;
-        loadWebapps();
-      }, 300);
-    }
-
-    function surpriseMe() {
-      if (webapps.length === 0) return alert('Aucune webapp disponible');
+      if (webapps.length === 0) return;
       const r = webapps[Math.floor(Math.random() * webapps.length)];
       window.location.href = `webapp.html?id=${r.id}`;
     }
