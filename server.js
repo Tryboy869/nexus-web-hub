@@ -1,69 +1,78 @@
-// server.js - Backend Service avec Admin Methods
-// NEXUS WEB HUB - Nexus Studio
-
+// server.js - Backend Service for Nexus Web Hub
 import { createClient } from '@libsql/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 import {
-  validateEmail,
-  validatePassword,
-  validateURL,
-  validateWebappName,
-  validateDescription,
   generateId,
-  sanitizeInput,
-  calculateBadges,
-  ERRORS,
-  SUCCESS,
-  successResponse,
-  errorResponse
+  isValidEmail,
+  validateWebappData,
+  calculateTrustScore,
+  checkBadgeEligibility,
+  sanitizeText
 } from './utils.js';
+
+dotenv.config();
 
 export class BackendService {
   constructor() {
     this.db = null;
-    this.JWT_SECRET = process.env.JWT_SECRET || 'nexus-web-hub-secret-change-in-production';
+    this.initialized = false;
   }
 
-  // ========== INITIALIZATION ==========
-
   async init() {
-    console.log('✅ [BACKEND] Initializing...');
-
     try {
+      // Connect to Turso
       this.db = createClient({
-        url: process.env.DATABASE_URL || 'file:local.db',
+        url: process.env.DATABASE_URL,
         authToken: process.env.DATABASE_AUTH_TOKEN
       });
 
-      console.log('✅ [BACKEND] Database connected');
+      console.log('[Backend] Connected to database');
 
+      // Reset DB if flag set (DANGER!)
       if (process.env.RESET_DB === 'true') {
-        console.log('🔥 [BACKEND] RESET_DB=true detected - Dropping all tables...');
+        console.log('[Backend] RESET_DB flag detected - Recreating tables...');
         await this.resetDatabase();
       }
 
+      // Create tables
       await this.createTables();
-      console.log('✅ [BACKEND] Backend ready');
+      
+      this.initialized = true;
+      console.log('[Backend] Service initialized successfully');
     } catch (error) {
-      console.error('❌ [BACKEND] Initialization failed:', error);
+      console.error('[Backend] Initialization failed:', error);
       throw error;
     }
   }
 
   async resetDatabase() {
-    const tables = ['reports', 'reviews', 'webapps', 'users'];
+    const tables = [
+      'webapp_shares',
+      'webapp_versions',
+      'follows',
+      'notifications',
+      'webapp_clicks',
+      'review_votes',
+      'review_replies',
+      'webapp_views',
+      'reports',
+      'reviews',
+      'collection_items',
+      'collections',
+      'webapps',
+      'users'
+    ];
 
     for (const table of tables) {
       try {
         await this.db.execute(`DROP TABLE IF EXISTS ${table}`);
-        console.log(`   ✅ Dropped table: ${table}`);
+        console.log(`[Backend] Dropped table: ${table}`);
       } catch (error) {
-        console.log(`   ⚠️ Could not drop ${table}:`, error.message);
+        console.log(`[Backend] Could not drop ${table}:`, error.message);
       }
     }
-
-    console.log('✅ [BACKEND] Database reset complete');
   }
 
   async createTables() {
@@ -74,15 +83,19 @@ export class BackendService {
         email TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
         name TEXT NOT NULL,
-        username TEXT UNIQUE,
-        github_username TEXT,
-        avatar_url TEXT,
+        username TEXT,
         role TEXT DEFAULT 'user',
-        is_verified INTEGER DEFAULT 0,
         badges TEXT DEFAULT '[]',
-        created_at INTEGER DEFAULT (strftime('%s', 'now'))
+        followers_count INTEGER DEFAULT 0,
+        following_count INTEGER DEFAULT 0,
+        last_login_at INTEGER,
+        is_banned INTEGER DEFAULT 0,
+        ban_reason TEXT,
+        created_at INTEGER NOT NULL
       )
     `);
+
+    await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
 
     // Webapps
     await this.db.execute(`
@@ -93,7 +106,7 @@ export class BackendService {
         creator_id TEXT NOT NULL,
         description_short TEXT NOT NULL,
         description_long TEXT,
-        url TEXT UNIQUE NOT NULL,
+        url TEXT NOT NULL UNIQUE,
         github_url TEXT,
         video_url TEXT,
         image_url TEXT,
@@ -107,10 +120,49 @@ export class BackendService {
         is_featured INTEGER DEFAULT 0,
         is_new INTEGER DEFAULT 1,
         status TEXT DEFAULT 'approved',
-        created_at INTEGER DEFAULT (strftime('%s', 'now')),
-        updated_at INTEGER DEFAULT (strftime('%s', 'now'))
+        trust_score INTEGER DEFAULT 50,
+        last_verified_at INTEGER,
+        admin_notes TEXT,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+
+    await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_webapps_category ON webapps(category)`);
+    await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_webapps_rating ON webapps(avg_rating DESC)`);
+    await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_webapps_created ON webapps(created_at DESC)`);
+    await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_webapps_creator ON webapps(creator_id)`);
+    await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_webapps_trending ON webapps(is_trending, views_count DESC)`);
+
+    // Webapp Views (unique)
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS webapp_views (
+        id TEXT PRIMARY KEY,
+        webapp_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        viewed_at INTEGER NOT NULL,
+        FOREIGN KEY (webapp_id) REFERENCES webapps(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE(webapp_id, user_id)
+      )
+    `);
+
+    await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_webapp_views_webapp ON webapp_views(webapp_id)`);
+
+    // Webapp Clicks
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS webapp_clicks (
+        id TEXT PRIMARY KEY,
+        webapp_id TEXT NOT NULL,
+        user_id TEXT,
+        source TEXT NOT NULL,
+        clicked_at INTEGER NOT NULL,
+        FOREIGN KEY (webapp_id) REFERENCES webapps(id) ON DELETE CASCADE
+      )
+    `);
+
+    await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_webapp_clicks_webapp ON webapp_clicks(webapp_id, clicked_at DESC)`);
 
     // Reviews
     await this.db.execute(`
@@ -120,12 +172,41 @@ export class BackendService {
         user_id TEXT NOT NULL,
         rating INTEGER NOT NULL,
         comment TEXT,
-        helpful_votes INTEGER DEFAULT 0,
-        is_flagged INTEGER DEFAULT 0,
-        created_at INTEGER DEFAULT (strftime('%s', 'now')),
-        FOREIGN KEY (webapp_id) REFERENCES webapps(id),
-        FOREIGN KEY (user_id) REFERENCES users(id),
+        helpful_count INTEGER DEFAULT 0,
+        not_helpful_count INTEGER DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (webapp_id) REFERENCES webapps(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         UNIQUE(webapp_id, user_id)
+      )
+    `);
+
+    await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_reviews_webapp ON reviews(webapp_id, created_at DESC)`);
+
+    // Review Replies
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS review_replies (
+        id TEXT PRIMARY KEY,
+        review_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // Review Votes
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS review_votes (
+        id TEXT PRIMARY KEY,
+        review_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        vote_type TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE(review_id, user_id)
       )
     `);
 
@@ -139,705 +220,513 @@ export class BackendService {
         reason TEXT NOT NULL,
         status TEXT DEFAULT 'pending',
         admin_notes TEXT,
-        created_at INTEGER DEFAULT (strftime('%s', 'now')),
+        created_at INTEGER NOT NULL,
         resolved_at INTEGER,
-        FOREIGN KEY (reporter_id) REFERENCES users(id)
+        FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
 
-    // Webapp Views (pour tracking vues uniques)
+    await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status, created_at DESC)`);
+
+    // Collections
     await this.db.execute(`
-      CREATE TABLE IF NOT EXISTS webapp_views (
+      CREATE TABLE IF NOT EXISTS collections (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        is_public INTEGER DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS collection_items (
+        id TEXT PRIMARY KEY,
+        collection_id TEXT NOT NULL,
+        webapp_id TEXT NOT NULL,
+        added_at INTEGER NOT NULL,
+        FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE,
+        FOREIGN KEY (webapp_id) REFERENCES webapps(id) ON DELETE CASCADE,
+        UNIQUE(collection_id, webapp_id)
+      )
+    `);
+
+    // Notifications
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        message TEXT NOT NULL,
+        data TEXT,
+        read INTEGER DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, read, created_at DESC)`);
+
+    // Follows
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS follows (
+        id TEXT PRIMARY KEY,
+        follower_id TEXT NOT NULL,
+        following_id TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (following_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE(follower_id, following_id)
+      )
+    `);
+
+    // Webapp Versions
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS webapp_versions (
         id TEXT PRIMARY KEY,
         webapp_id TEXT NOT NULL,
-        user_id TEXT NOT NULL,
-        viewed_at INTEGER DEFAULT (strftime('%s', 'now')),
-        FOREIGN KEY (webapp_id) REFERENCES webapps(id),
-        FOREIGN KEY (user_id) REFERENCES users(id),
-        UNIQUE(webapp_id, user_id)
+        version TEXT NOT NULL,
+        changelog TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (webapp_id) REFERENCES webapps(id) ON DELETE CASCADE
       )
     `);
 
-    console.log('✅ [BACKEND] Tables created/verified');
+    // Webapp Shares
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS webapp_shares (
+        id TEXT PRIMARY KEY,
+        webapp_id TEXT NOT NULL,
+        user_id TEXT,
+        method TEXT NOT NULL,
+        shared_at INTEGER NOT NULL,
+        FOREIGN KEY (webapp_id) REFERENCES webapps(id) ON DELETE CASCADE
+      )
+    `);
+
+    console.log('[Backend] All tables created successfully');
   }
 
-  // ========== AUTH ==========
+  // Auth Methods
+  async signup(data) {
+    const { email, password, name } = data;
 
-  async signup(body) {
-    const { email, password, name } = body;
-
-    if (!validateEmail(email)) {
-      return errorResponse(ERRORS.INVALID_EMAIL);
+    if (!isValidEmail(email)) {
+      throw new Error('Invalid email format');
     }
 
-    if (!validatePassword(password)) {
-      return errorResponse(ERRORS.INVALID_PASSWORD);
+    if (password.length < 6) {
+      throw new Error('Password must be at least 6 characters');
     }
 
-    if (!name || name.length < 2) {
-      return errorResponse('Le nom doit contenir au moins 2 caractères');
+    const existingUser = await this.db.execute('SELECT id FROM users WHERE email = ?', [email]);
+    if (existingUser.rows.length > 0) {
+      throw new Error('Email already registered');
     }
 
-    const existing = await this.db.execute({
-      sql: 'SELECT id FROM users WHERE email = ?',
-      args: [email]
-    });
+    const passwordHash = await bcrypt.hash(password, 10);
+    const userId = generateId('user');
 
-    if (existing.rows.length > 0) {
-      return errorResponse(ERRORS.EMAIL_ALREADY_EXISTS);
-    }
+    await this.db.execute(
+      'INSERT INTO users (id, email, password_hash, name, created_at) VALUES (?, ?, ?, ?, ?)',
+      [userId, email, passwordHash, sanitizeText(name), Date.now()]
+    );
 
-    const password_hash = await bcrypt.hash(password, 10);
-    const userId = generateId();
+    const token = jwt.sign({ userId, email }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
-    await this.db.execute({
-      sql: `INSERT INTO users (id, email, password_hash, name) 
-            VALUES (?, ?, ?, ?)`,
-      args: [userId, email, password_hash, sanitizeInput(name)]
-    });
-
-    const token = jwt.sign({ userId, email }, this.JWT_SECRET, { expiresIn: '30d' });
-
-    return successResponse({
+    return {
+      success: true,
       token,
-      user: {
-        id: userId,
-        email,
-        name: sanitizeInput(name),
-        role: 'user',
-        badges: []
-      }
-    }, SUCCESS.ACCOUNT_CREATED);
+      user: { id: userId, email, name }
+    };
   }
 
-  async login(body) {
-    const { email, password } = body;
+  async login(data) {
+    const { email, password } = data;
 
-    if (!validateEmail(email) || !password) {
-      return errorResponse(ERRORS.INVALID_CREDENTIALS);
-    }
-
-    const result = await this.db.execute({
-      sql: 'SELECT * FROM users WHERE email = ?',
-      args: [email]
-    });
+    const result = await this.db.execute(
+      'SELECT id, email, name, password_hash, role, badges FROM users WHERE email = ?',
+      [email]
+    );
 
     if (result.rows.length === 0) {
-      return errorResponse(ERRORS.INVALID_CREDENTIALS);
+      throw new Error('Invalid credentials');
     }
 
     const user = result.rows[0];
-    const valid = await bcrypt.compare(password, user.password_hash);
+    const validPassword = await bcrypt.compare(password, user.password_hash);
 
-    if (!valid) {
-      return errorResponse(ERRORS.INVALID_CREDENTIALS);
+    if (!validPassword) {
+      throw new Error('Invalid credentials');
     }
 
-    const token = jwt.sign({ userId: user.id, email: user.email }, this.JWT_SECRET, { expiresIn: '30d' });
+    await this.db.execute('UPDATE users SET last_login_at = ? WHERE id = ?', [Date.now(), user.id]);
 
-    return successResponse({
+    const token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '30d' });
+
+    return {
+      success: true,
       token,
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
-        username: user.username,
-        avatar_url: user.avatar_url,
         role: user.role,
         badges: JSON.parse(user.badges || '[]')
       }
-    }, SUCCESS.LOGIN_SUCCESS);
+    };
   }
 
-  async getMe(headers) {
-    const userId = headers['x-user-id'];
-
-    if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
-    }
-
-    const result = await this.db.execute({
-      sql: 'SELECT id, email, name, username, avatar_url, role, badges FROM users WHERE id = ?',
-      args: [userId]
-    });
+  async getUser(userId) {
+    const result = await this.db.execute(
+      'SELECT id, email, name, username, role, badges, followers_count, following_count, created_at FROM users WHERE id = ?',
+      [userId]
+    );
 
     if (result.rows.length === 0) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
+      throw new Error('User not found');
     }
 
     const user = result.rows[0];
-
-    return successResponse({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      username: user.username,
-      avatar_url: user.avatar_url,
-      role: user.role,
-      badges: JSON.parse(user.badges || '[]')
-    });
+    return {
+      success: true,
+      user: {
+        ...user,
+        badges: JSON.parse(user.badges || '[]')
+      }
+    };
   }
 
-  // ========== WEBAPPS ==========
+  // Webapp Methods
+  async getWebapps(filters = {}) {
+    let query = 'SELECT * FROM webapps WHERE status = "approved"';
+    const params = [];
 
-  async getWebapps(query) {
-    const { category, search, sort = 'recent', page = 1, limit = 12 } = query;
-
-    let sql = 'SELECT * FROM webapps WHERE status = ?';
-    let args = ['approved'];
-
-    if (category && category !== 'all') {
-      sql += ' AND category = ?';
-      args.push(category);
+    if (filters.category && filters.category !== 'all') {
+      query += ' AND category = ?';
+      params.push(filters.category);
     }
 
-    if (search) {
-      sql += ' AND (name LIKE ? OR description_short LIKE ? OR tags LIKE ?)';
-      const searchTerm = `%${search}%`;
-      args.push(searchTerm, searchTerm, searchTerm);
+    if (filters.search) {
+      query += ' AND (name LIKE ? OR description_short LIKE ?)';
+      params.push(`%${filters.search}%`, `%${filters.search}%`);
     }
 
-    switch (sort) {
-      case 'trending':
-        sql += ' ORDER BY is_trending DESC, views_count DESC';
-        break;
-      case 'top':
-        sql += ' ORDER BY avg_rating DESC, reviews_count DESC';
-        break;
-      case 'new':
-        sql += ' ORDER BY created_at DESC';
-        break;
-      default:
-        sql += ' ORDER BY created_at DESC';
+    if (filters.sort === 'trending') {
+      query += ' AND is_trending = 1 ORDER BY views_count DESC';
+    } else if (filters.sort === 'new') {
+      query += ' ORDER BY created_at DESC';
+    } else if (filters.sort === 'top') {
+      query += ' ORDER BY avg_rating DESC, reviews_count DESC';
+    } else {
+      query += ' ORDER BY created_at DESC';
     }
 
-    const offset = (page - 1) * limit;
-    sql += ' LIMIT ? OFFSET ?';
-    args.push(limit, offset);
+    query += ' LIMIT 100';
 
-    const result = await this.db.execute({ sql, args });
+    const result = await this.db.execute(query, params);
 
-    const webapps = result.rows.map(row => ({
-      ...row,
-      tags: JSON.parse(row.tags || '[]'),
-      is_trending: Boolean(row.is_trending),
-      is_featured: Boolean(row.is_featured),
-      is_new: Boolean(row.is_new)
-    }));
-
-    return successResponse({ webapps, total: result.rows.length });
+    return {
+      success: true,
+      webapps: result.rows.map(w => ({
+        ...w,
+        tags: JSON.parse(w.tags || '[]')
+      }))
+    };
   }
 
-  async getWebapp(id, headers) {
-    const result = await this.db.execute({
-      sql: 'SELECT * FROM webapps WHERE id = ?',
-      args: [id]
-    });
+  async getWebapp(id, userId = null) {
+    const result = await this.db.execute('SELECT * FROM webapps WHERE id = ?', [id]);
 
     if (result.rows.length === 0) {
-      return errorResponse(ERRORS.WEBAPP_NOT_FOUND, 404);
+      throw new Error('Webapp not found');
     }
 
     const webapp = result.rows[0];
 
-    // Système de vues uniques : 1 user = 1 vue max
-    const userId = headers['x-user-id'];
+    // Track unique view if user connected
     if (userId) {
       try {
-        // Vérifier si déjà vu
-        const viewCheck = await this.db.execute({
-          sql: 'SELECT id FROM webapp_views WHERE webapp_id = ? AND user_id = ?',
-          args: [id, userId]
-        });
+        await this.db.execute(
+          'INSERT OR IGNORE INTO webapp_views (id, webapp_id, user_id, viewed_at) VALUES (?, ?, ?, ?)',
+          [generateId(), id, userId, Date.now()]
+        );
 
-        // Si pas encore vu, enregistrer
-        if (viewCheck.rows.length === 0) {
-          await this.db.execute({
-            sql: 'INSERT INTO webapp_views (id, webapp_id, user_id) VALUES (?, ?, ?)',
-            args: [generateId(), id, userId]
-          });
-
-          // Incrémenter compteur
-          await this.db.execute({
-            sql: 'UPDATE webapps SET views_count = views_count + 1 WHERE id = ?',
-            args: [id]
-          });
-
-          console.log(`   └─ Vue comptée pour user ${userId}`);
-        } else {
-          console.log(`   └─ Vue déjà comptée pour user ${userId}`);
-        }
+        // Update view count
+        const viewCount = await this.db.execute('SELECT COUNT(*) as count FROM webapp_views WHERE webapp_id = ?', [id]);
+        await this.db.execute('UPDATE webapps SET views_count = ? WHERE id = ?', [viewCount.rows[0].count, id]);
       } catch (error) {
-        console.error('Error tracking view:', error);
+        console.log('[Backend] View tracking error:', error.message);
       }
     }
 
     // Get reviews
-    const reviewsResult = await this.db.execute({
-      sql: `SELECT r.*, u.name as user_name, u.avatar_url as user_avatar 
-            FROM reviews r 
-            JOIN users u ON r.user_id = u.id 
-            WHERE r.webapp_id = ? 
-            ORDER BY r.created_at DESC`,
-      args: [id]
-    });
+    const reviews = await this.db.execute(
+      `SELECT r.*, u.name as user_name FROM reviews r 
+       INNER JOIN users u ON r.user_id = u.id 
+       WHERE r.webapp_id = ? 
+       ORDER BY r.created_at DESC`,
+      [id]
+    );
 
-    return successResponse({
+    return {
+      success: true,
       webapp: {
         ...webapp,
-        tags: JSON.parse(webapp.tags || '[]'),
-        is_trending: Boolean(webapp.is_trending),
-        is_featured: Boolean(webapp.is_featured),
-        is_new: Boolean(webapp.is_new)
+        tags: JSON.parse(webapp.tags || '[]')
       },
-      reviews: reviewsResult.rows
-    });
+      reviews: reviews.rows
+    };
   }
 
-  async createWebapp(body, headers) {
-    const userId = headers['x-user-id'];
-
-    if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
+  async createWebapp(data, userId) {
+    const validation = validateWebappData(data);
+    if (!validation.valid) {
+      throw new Error(validation.errors.join(', '));
     }
 
-    const { name, url, description_short, description_long, category, tags, github_url, video_url, image_url } = body;
-
-    if (!validateWebappName(name)) {
-      return errorResponse(ERRORS.INVALID_NAME);
+    const user = await this.db.execute('SELECT * FROM users WHERE id = ?', [userId]);
+    if (user.rows.length === 0) {
+      throw new Error('User not found');
     }
 
-    if (!validateURL(url)) {
-      return errorResponse(ERRORS.INVALID_URL);
-    }
+    const trustScore = calculateTrustScore(data, user.rows[0]);
+    const status = trustScore < 30 ? 'pending_review' : 'approved';
 
-    if (!validateDescription(description_short, 200)) {
-      return errorResponse('La description courte doit contenir entre 1 et 200 caractères');
-    }
+    const webappId = generateId('webapp');
+    const now = Date.now();
 
-    if (!category) {
-      return errorResponse(ERRORS.INVALID_CATEGORY);
-    }
-
-    const existing = await this.db.execute({
-      sql: 'SELECT id FROM webapps WHERE url = ?',
-      args: [url]
-    });
-
-    if (existing.rows.length > 0) {
-      return errorResponse(ERRORS.URL_ALREADY_EXISTS);
-    }
-
-    const userResult = await this.db.execute({
-      sql: 'SELECT name FROM users WHERE id = ?',
-      args: [userId]
-    });
-
-    const developer = userResult.rows[0].name;
-    const webappId = generateId();
-
-    await this.db.execute({
-      sql: `INSERT INTO webapps 
-            (id, name, developer, creator_id, description_short, description_long, 
-             url, category, tags, github_url, video_url, image_url, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      args: [
+    await this.db.execute(
+      `INSERT INTO webapps (
+        id, name, developer, creator_id, description_short, description_long,
+        url, github_url, video_url, image_url, category, tags,
+        status, trust_score, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
         webappId,
-        sanitizeInput(name),
-        developer,
+        sanitizeText(data.name),
+        sanitizeText(data.developer || user.rows[0].name),
         userId,
-        sanitizeInput(description_short),
-        sanitizeInput(description_long || ''),
-        url,
-        category,
-        JSON.stringify(tags || []),
-        github_url || null,
-        video_url || null,
-        image_url || null,
-        'approved'
+        sanitizeText(data.description_short),
+        sanitizeText(data.description_long || ''),
+        data.url,
+        data.github_url || null,
+        data.video_url || null,
+        data.image_url || null,
+        data.category,
+        JSON.stringify(data.tags || []),
+        status,
+        trustScore,
+        now,
+        now
       ]
-    });
+    );
 
-    await this.updateUserBadges(userId);
-
-    return successResponse({ id: webappId }, SUCCESS.WEBAPP_CREATED);
+    return {
+      success: true,
+      webapp: { id: webappId, status, trust_score: trustScore }
+    };
   }
 
-  async updateWebapp(id, body, headers) {
-    const userId = headers['x-user-id'];
-
-    if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
+  async updateWebapp(id, data, userId) {
+    const webapp = await this.db.execute('SELECT creator_id FROM webapps WHERE id = ?', [id]);
+    
+    if (webapp.rows.length === 0) {
+      throw new Error('Webapp not found');
     }
 
-    const webappResult = await this.db.execute({
-      sql: 'SELECT creator_id FROM webapps WHERE id = ?',
-      args: [id]
-    });
-
-    if (webappResult.rows.length === 0) {
-      return errorResponse(ERRORS.WEBAPP_NOT_FOUND, 404);
+    if (webapp.rows[0].creator_id !== userId) {
+      throw new Error('Unauthorized');
     }
 
-    if (webappResult.rows[0].creator_id !== userId) {
-      return errorResponse(ERRORS.NOT_OWNER, 403);
+    const validation = validateWebappData(data);
+    if (!validation.valid) {
+      throw new Error(validation.errors.join(', '));
     }
 
-    const { name, description_short, description_long, tags, github_url, video_url, image_url } = body;
-
-    await this.db.execute({
-      sql: `UPDATE webapps SET 
-            name = ?, description_short = ?, description_long = ?, 
-            tags = ?, github_url = ?, video_url = ?, image_url = ?,
-            updated_at = strftime('%s', 'now')
-            WHERE id = ?`,
-      args: [
-        sanitizeInput(name),
-        sanitizeInput(description_short),
-        sanitizeInput(description_long || ''),
-        JSON.stringify(tags || []),
-        github_url || null,
-        video_url || null,
-        image_url || null,
+    await this.db.execute(
+      `UPDATE webapps SET 
+        name = ?, description_short = ?, description_long = ?,
+        url = ?, github_url = ?, video_url = ?, image_url = ?,
+        category = ?, tags = ?, updated_at = ?
+      WHERE id = ?`,
+      [
+        sanitizeText(data.name),
+        sanitizeText(data.description_short),
+        sanitizeText(data.description_long || ''),
+        data.url,
+        data.github_url || null,
+        data.video_url || null,
+        data.image_url || null,
+        data.category,
+        JSON.stringify(data.tags || []),
+        Date.now(),
         id
       ]
-    });
+    );
 
-    return successResponse({ id }, SUCCESS.WEBAPP_UPDATED);
+    // Save version if provided
+    if (data.version && data.changelog) {
+      await this.db.execute(
+        'INSERT INTO webapp_versions (id, webapp_id, version, changelog, created_at) VALUES (?, ?, ?, ?, ?)',
+        [generateId(), id, data.version, sanitizeText(data.changelog), Date.now()]
+      );
+    }
+
+    return { success: true };
   }
 
-  async deleteWebapp(id, headers) {
-    const userId = headers['x-user-id'];
-
-    if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
+  async deleteWebapp(id, userId, password) {
+    const webapp = await this.db.execute('SELECT creator_id FROM webapps WHERE id = ?', [id]);
+    
+    if (webapp.rows.length === 0) {
+      throw new Error('Webapp not found');
     }
 
-    const webappResult = await this.db.execute({
-      sql: 'SELECT creator_id FROM webapps WHERE id = ?',
-      args: [id]
-    });
-
-    if (webappResult.rows.length === 0) {
-      return errorResponse(ERRORS.WEBAPP_NOT_FOUND, 404);
+    if (webapp.rows[0].creator_id !== userId) {
+      throw new Error('Unauthorized');
     }
 
-    if (webappResult.rows[0].creator_id !== userId) {
-      return errorResponse(ERRORS.NOT_OWNER, 403);
+    // Verify password
+    const user = await this.db.execute('SELECT password_hash FROM users WHERE id = ?', [userId]);
+    const validPassword = await bcrypt.compare(password, user.rows[0].password_hash);
+
+    if (!validPassword) {
+      throw new Error('Invalid password');
     }
 
-    await this.db.execute({
-      sql: 'DELETE FROM webapps WHERE id = ?',
-      args: [id]
-    });
+    await this.db.execute('DELETE FROM webapps WHERE id = ?', [id]);
 
-    await this.db.execute({
-      sql: 'DELETE FROM reviews WHERE webapp_id = ?',
-      args: [id]
-    });
-
-    return successResponse({ id }, SUCCESS.WEBAPP_DELETED);
+    return { success: true };
   }
 
-  // ========== REVIEWS ==========
+  async trackClick(webappId, userId, source) {
+    await this.db.execute(
+      'INSERT INTO webapp_clicks (id, webapp_id, user_id, source, clicked_at) VALUES (?, ?, ?, ?, ?)',
+      [generateId(), webappId, userId, source, Date.now()]
+    );
 
-  async createReview(webappId, body, headers) {
-    const userId = headers['x-user-id'];
+    await this.db.execute(
+      'UPDATE webapps SET clicks_count = clicks_count + 1 WHERE id = ?',
+      [webappId]
+    );
 
-    if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
-    }
-
-    const { rating, comment } = body;
-
-    if (!rating || rating < 1 || rating > 5) {
-      return errorResponse(ERRORS.INVALID_RATING);
-    }
-
-    const webappResult = await this.db.execute({
-      sql: 'SELECT creator_id FROM webapps WHERE id = ?',
-      args: [webappId]
-    });
-
-    if (webappResult.rows.length === 0) {
-      return errorResponse(ERRORS.WEBAPP_NOT_FOUND, 404);
-    }
-
-    if (webappResult.rows[0].creator_id === userId) {
-      return errorResponse(ERRORS.CANNOT_REVIEW_OWN);
-    }
-
-    const existingReview = await this.db.execute({
-      sql: 'SELECT id FROM reviews WHERE webapp_id = ? AND user_id = ?',
-      args: [webappId, userId]
-    });
-
-    if (existingReview.rows.length > 0) {
-      return errorResponse(ERRORS.ALREADY_REVIEWED);
-    }
-
-    const reviewId = generateId();
-
-    await this.db.execute({
-      sql: `INSERT INTO reviews (id, webapp_id, user_id, rating, comment) 
-            VALUES (?, ?, ?, ?, ?)`,
-      args: [reviewId, webappId, userId, rating, sanitizeInput(comment || '')]
-    });
-
-    await this.updateWebappRating(webappId);
-    await this.updateUserBadges(userId);
-
-    return successResponse({ id: reviewId }, SUCCESS.REVIEW_CREATED);
+    return { success: true };
   }
 
-  async updateWebappRating(webappId) {
-    const result = await this.db.execute({
-      sql: 'SELECT AVG(rating) as avg_rating, COUNT(*) as count FROM reviews WHERE webapp_id = ?',
-      args: [webappId]
-    });
-
-    const avgRating = result.rows[0].avg_rating || 0;
-    const count = result.rows[0].count || 0;
-
-    await this.db.execute({
-      sql: 'UPDATE webapps SET avg_rating = ?, reviews_count = ? WHERE id = ?',
-      args: [Math.round(avgRating * 10) / 10, count, webappId]
-    });
-  }
-
-  // ========== BADGES ==========
-
-  async updateUserBadges(userId) {
-    const webappsCount = await this.db.execute({
-      sql: 'SELECT COUNT(*) as count FROM webapps WHERE creator_id = ? AND status = ?',
-      args: [userId, 'approved']
-    });
-
-    const reviewsCount = await this.db.execute({
-      sql: 'SELECT COUNT(*) as count FROM reviews WHERE user_id = ?',
-      args: [userId]
-    });
-
-    const userResult = await this.db.execute({
-      sql: 'SELECT created_at FROM users WHERE id = ?',
-      args: [userId]
-    });
-
-    const accountAgeDays = Math.floor((Date.now() / 1000 - userResult.rows[0].created_at) / 86400);
-
-    const stats = {
-      webapps_count: webappsCount.rows[0].count,
-      reviews_count: reviewsCount.rows[0].count,
-      account_age_days: accountAgeDays,
-      helpful_percentage: 75,
-      has_github_contribution: false
-    };
-
-    const badges = calculateBadges(stats);
-
-    await this.db.execute({
-      sql: 'UPDATE users SET badges = ? WHERE id = ?',
-      args: [JSON.stringify(badges), userId]
-    });
-  }
-
-  // ========== REPORTS ==========
-
-  async createReport(body, headers) {
-    const userId = headers['x-user-id'];
-
-    if (!userId) {
-      return errorResponse(ERRORS.UNAUTHORIZED, 401);
+  // Review Methods
+  async createReview(webappId, data, userId) {
+    if (data.rating < 1 || data.rating > 5) {
+      throw new Error('Rating must be between 1 and 5');
     }
 
-    const { target_type, target_id, reason } = body;
+    const reviewId = generateId('review');
 
-    if (!reason || reason.length < 10) {
-      return errorResponse(ERRORS.INVALID_REASON);
-    }
+    await this.db.execute(
+      'INSERT OR REPLACE INTO reviews (id, webapp_id, user_id, rating, comment, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+      [reviewId, webappId, userId, data.rating, sanitizeText(data.comment || ''), Date.now()]
+    );
 
-    const existing = await this.db.execute({
-      sql: 'SELECT id FROM reports WHERE reporter_id = ? AND target_type = ? AND target_id = ?',
-      args: [userId, target_type, target_id]
-    });
+    // Recalculate average rating
+    const avgResult = await this.db.execute(
+      'SELECT AVG(rating) as avg, COUNT(*) as count FROM reviews WHERE webapp_id = ?',
+      [webappId]
+    );
 
-    if (existing.rows.length > 0) {
-      return errorResponse(ERRORS.ALREADY_REPORTED);
-    }
+    await this.db.execute(
+      'UPDATE webapps SET avg_rating = ?, reviews_count = ? WHERE id = ?',
+      [avgResult.rows[0].avg, avgResult.rows[0].count, webappId]
+    );
 
-    const reportId = generateId();
-
-    await this.db.execute({
-      sql: `INSERT INTO reports (id, reporter_id, target_type, target_id, reason) 
-            VALUES (?, ?, ?, ?, ?)`,
-      args: [reportId, userId, target_type, target_id, sanitizeInput(reason)]
-    });
-
-    return successResponse({ id: reportId }, SUCCESS.REPORT_CREATED);
+    return { success: true, review: { id: reviewId } };
   }
 
-  // ========== ADMIN METHODS ==========
+  // Report Methods
+  async createReport(data, userId) {
+    const reportId = generateId('report');
+
+    await this.db.execute(
+      'INSERT INTO reports (id, reporter_id, target_type, target_id, reason, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+      [reportId, userId, data.target_type, data.target_id, sanitizeText(data.reason), Date.now()]
+    );
+
+    return { success: true, report: { id: reportId } };
+  }
+
+  // Admin Methods
+  async adminLogin(email, password) {
+    if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
+      throw new Error('Invalid admin credentials');
+    }
+
+    return { success: true, message: 'Admin authenticated' };
+  }
 
   async getReports() {
-    console.log('[BACKEND] getReports (admin) called');
+    const result = await this.db.execute(
+      `SELECT r.*, u.name as reporter_name, w.name as webapp_name 
+       FROM reports r 
+       LEFT JOIN users u ON r.reporter_id = u.id 
+       LEFT JOIN webapps w ON r.target_id = w.id AND r.target_type = 'webapp'
+       ORDER BY r.created_at DESC`
+    );
 
-    const result = await this.db.execute({
-      sql: `SELECT r.*, 
-                   u.name as reporter_name, u.email as reporter_email,
-                   w.name as webapp_name, w.url as webapp_url
-            FROM reports r
-            LEFT JOIN users u ON r.reporter_id = u.id
-            LEFT JOIN webapps w ON r.target_id = w.id AND r.target_type = 'webapp'
-            ORDER BY 
-              CASE WHEN r.status = 'pending' THEN 0 ELSE 1 END,
-              r.created_at DESC`
-    });
-
-    return successResponse({ reports: result.rows });
+    return { success: true, reports: result.rows };
   }
 
-  async getAllWebapps() {
-    console.log('[BACKEND] getAllWebapps (admin) called');
+  async resolveReport(reportId, adminNotes) {
+    await this.db.execute(
+      'UPDATE reports SET status = "resolved", admin_notes = ?, resolved_at = ? WHERE id = ?',
+      [adminNotes, Date.now(), reportId]
+    );
 
-    const result = await this.db.execute({
-      sql: `SELECT w.*, u.email as creator_email
-            FROM webapps w
-            LEFT JOIN users u ON w.creator_id = u.id
-            ORDER BY w.created_at DESC`
-    });
-
-    const webapps = result.rows.map(row => ({
-      ...row,
-      tags: JSON.parse(row.tags || '[]'),
-      is_trending: Boolean(row.is_trending),
-      is_featured: Boolean(row.is_featured),
-      is_new: Boolean(row.is_new)
-    }));
-
-    return successResponse({ webapps });
+    return { success: true };
   }
 
   async adminDeleteWebapp(id) {
-    console.log('[BACKEND] adminDeleteWebapp called:', id);
-
-    const webappResult = await this.db.execute({
-      sql: 'SELECT * FROM webapps WHERE id = ?',
-      args: [id]
-    });
-
-    if (webappResult.rows.length === 0) {
-      return errorResponse(ERRORS.WEBAPP_NOT_FOUND, 404);
-    }
-
-    // Supprimer webapp
-    await this.db.execute({
-      sql: 'DELETE FROM webapps WHERE id = ?',
-      args: [id]
-    });
-
-    // Supprimer reviews associées
-    await this.db.execute({
-      sql: 'DELETE FROM reviews WHERE webapp_id = ?',
-      args: [id]
-    });
-
-    // Supprimer reports associés
-    await this.db.execute({
-      sql: 'DELETE FROM reports WHERE target_type = ? AND target_id = ?',
-      args: ['webapp', id]
-    });
-
-    console.log('✅ [BACKEND] Admin deleted webapp:', id);
-
-    return successResponse({ id }, 'Webapp supprimée avec succès');
+    await this.db.execute('DELETE FROM webapps WHERE id = ?', [id]);
+    return { success: true };
   }
 
-  async updateReportStatus(id, body) {
-    console.log('[BACKEND] updateReportStatus called:', id);
+  async getAllWebapps() {
+    const result = await this.db.execute(
+      'SELECT w.*, u.name as creator_name FROM webapps w INNER JOIN users u ON w.creator_id = u.id ORDER BY w.created_at DESC'
+    );
 
-    const { status, admin_notes } = body;
-
-    await this.db.execute({
-      sql: `UPDATE reports SET 
-            status = ?, 
-            admin_notes = ?,
-            resolved_at = CASE WHEN ? = 'resolved' THEN strftime('%s', 'now') ELSE resolved_at END
-            WHERE id = ?`,
-      args: [status, admin_notes || null, status, id]
-    });
-
-    return successResponse({ id }, 'Signalement mis à jour');
+    return {
+      success: true,
+      webapps: result.rows.map(w => ({
+        ...w,
+        tags: JSON.parse(w.tags || '[]')
+      }))
+    };
   }
 
-  // ========== WEBAPP CLICKS ==========
-
-  async trackWebappClick(id, headers) {
-    console.log('[BACKEND] trackWebappClick called:', id);
-
-    const userId = headers['x-user-id'];
-
-    // Toujours incrémenter les clics, même pour utilisateurs non connectés
-    await this.db.execute({
-      sql: 'UPDATE webapps SET clicks_count = clicks_count + 1 WHERE id = ?',
-      args: [id]
-    });
-
-    console.log(`   └─ Click compté (user: ${userId || 'anonymous'})`);
-
-    return successResponse({ success: true });
-  }
-
-  // ========== STATS ==========
-
+  // Stats
   async getStats() {
-    try {
-      const webappsCount = await this.db.execute({
-        sql: 'SELECT COUNT(*) as count FROM webapps WHERE status = ?',
-        args: ['approved']
-      });
+    const webappsCount = await this.db.execute('SELECT COUNT(*) as count FROM webapps WHERE status = "approved"');
+    const usersCount = await this.db.execute('SELECT COUNT(*) as count FROM users');
+    const reviewsCount = await this.db.execute('SELECT COUNT(*) as count FROM reviews');
 
-      const usersCount = await this.db.execute({
-        sql: 'SELECT COUNT(*) as count FROM users',
-        args: []
-      });
-
-      const reviewsCount = await this.db.execute({
-        sql: 'SELECT COUNT(*) as count FROM reviews',
-        args: []
-      });
-
-      return successResponse({
-        webapps: webappsCount.rows[0].count || 0,
-        creators: usersCount.rows[0].count || 0,
-        reviews: reviewsCount.rows[0].count || 0
-      });
-    } catch (error) {
-      console.error('[BACKEND] getStats error:', error);
-      return successResponse({
-        webapps: 0,
-        creators: 0,
-        reviews: 0
-      });
-    }
+    return {
+      success: true,
+      stats: {
+        webapps: webappsCount.rows[0].count,
+        creators: usersCount.rows[0].count,
+        reviews: reviewsCount.rows[0].count
+      }
+    };
   }
-
-  // ========== HEALTH CHECK ==========
 
   async healthCheck() {
-    const checks = {
-      timestamp: new Date().toISOString(),
-      status: 'ok',
-      services: {}
+    return {
+      success: true,
+      status: 'healthy',
+      timestamp: Date.now()
     };
-
-    try {
-      await this.db.execute('SELECT 1');
-      checks.services.database = 'connected';
-    } catch (error) {
-      checks.services.database = 'offline';
-      checks.status = 'degraded';
-    }
-
-    return checks;
   }
 }
