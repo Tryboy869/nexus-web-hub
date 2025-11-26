@@ -1,0 +1,181 @@
+{
+  "nav": {
+    "home": "Home",
+    "explore": "Explore",
+    "submit": "Submit",
+    "login": "Login",
+    "profile": "Profile",
+    "admin": "Admin"
+  },
+  "hero": {
+    "title": "Discover the Best of the Web",
+    "subtitle": "Thousands of webapps created by the community",
+    "cta_explore": "Explore Catalog",
+    "cta_submit": "Publish your webapp"
+  },
+  "search": {
+    "placeholder": "Search for a webapp...",
+    "surprise": "Surprise me",
+    "no_results": "No webapps found",
+    "results_count": "{count} webapp(s) found"
+  },
+  "categories": {
+    "all": "All",
+    "productivity": "Productivity",
+    "design": "Design",
+    "games": "Games",
+    "api": "API",
+    "nocode": "No-Code",
+    "other": "Other"
+  },
+  "sort": {
+    "all": "All",
+    "trending": "Trending",
+    "new": "New",
+    "top": "Top Rated"
+  },
+  "webapp": {
+    "views": "Unique views",
+    "clicks": "Clicks",
+    "rating": "Average rating",
+    "reviews": "Reviews",
+    "open": "Open Webapp",
+    "source_code": "Source Code",
+    "report": "Report an issue",
+    "created_by": "Created by",
+    "category": "Category",
+    "tags": "Tags",
+    "description": "Description",
+    "see_more": "See more",
+    "see_less": "See less",
+    "add_to_collection": "Add to collection",
+    "share": "Share",
+    "leave_review": "Leave a review",
+    "login_to_review": "Login to leave a review"
+  },
+  "review": {
+    "your_review": "Your review",
+    "rating_label": "Rating",
+    "comment_placeholder": "Share your experience...",
+    "submit": "Submit review",
+    "helpful": "Helpful",
+    "not_helpful": "Not helpful",
+    "reply": "Reply",
+    "creator_response": "Creator's response"
+  },
+  "redirect": {
+    "title": "Leaving Nexus Web Hub",
+    "message": "You will be redirected to",
+    "warning": "This webapp is hosted outside NWH. We do not control its content, availability or security.",
+    "countdown": "Redirecting in {seconds} seconds...",
+    "continue": "Continue to webapp",
+    "back": "Back to catalog"
+  },
+  "auth": {
+    "login_title": "Login",
+    "signup_title": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "name": "Full name",
+    "login_button": "Login",
+    "signup_button": "Create account",
+    "switch_to_signup": "No account yet? Sign up",
+    "switch_to_login": "Already registered? Login"
+  },
+  "profile": {
+    "my_webapps": "My Webapps",
+    "my_reviews": "My Reviews",
+    "my_collections": "My Collections",
+    "settings": "Settings",
+    "badges": "Badges",
+    "stats": "Statistics",
+    "logout": "Logout",
+    "new_webapp": "New Webapp",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "confirm_delete": "Are you sure you want to delete this webapp? This action is irreversible.",
+    "enter_password": "Enter your password to confirm"
+  },
+  "submit": {
+    "title_create": "Publish a Webapp",
+    "title_edit": "Edit Webapp",
+    "name": "Webapp name",
+    "name_placeholder": "e.g: My Awesome Tool",
+    "url": "Webapp URL",
+    "url_placeholder": "https://example.com",
+    "category": "Category",
+    "description_short": "Short description",
+    "description_short_placeholder": "Describe your webapp briefly (max 200 characters)",
+    "description_long": "Detailed description",
+    "description_long_placeholder": "Full description...",
+    "tags": "Tags",
+    "tags_placeholder": "Separate tags with commas",
+    "github_url": "GitHub URL",
+    "github_placeholder": "https://github.com/user/repo (optional)",
+    "video_url": "YouTube Video URL",
+    "video_placeholder": "https://youtube.com/watch?v=... (optional)",
+    "image_url": "Screenshot URL",
+    "image_placeholder": "https://example.com/screenshot.png (optional)",
+    "version": "Version",
+    "version_placeholder": "e.g: 2.0.0",
+    "changelog": "Changelog",
+    "changelog_placeholder": "- New feature X\n- Bug fix Y",
+    "publish": "Publish",
+    "save": "Save changes",
+    "cancel": "Cancel"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "login_title": "Admin Login",
+    "dashboard": "Dashboard",
+    "reports": "Reports",
+    "webapps": "All Webapps",
+    "users": "Users",
+    "stats": "Statistics",
+    "logs": "Logs",
+    "pending_reports": "Pending reports",
+    "resolved": "Resolved",
+    "ignore": "Ignore",
+    "delete_webapp": "Delete webapp",
+    "admin_notes": "Admin notes",
+    "resolve": "Mark resolved"
+  },
+  "notifications": {
+    "success": "Success!",
+    "error": "Error",
+    "warning": "Warning",
+    "webapp_published": "Webapp published successfully",
+    "review_submitted": "Review submitted successfully",
+    "report_submitted": "Report sent",
+    "login_success": "Login successful",
+    "logout_success": "Logged out"
+  },
+  "footer": {
+    "created_by": "Created by Daouda Abdoul Anzize - Nexus Studio",
+    "contact": "Contact",
+    "github": "GitHub",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
+  "badges_names": {
+    "verified-creator": "Verified Creator",
+    "beginner-tester": "Beginner Tester",
+    "pro-tester": "Pro Tester",
+    "legendary-tester": "Legendary Tester",
+    "admin": "Administrator",
+    "supporter": "Supporter",
+    "contributor": "Contributor",
+    "trending": "Trending",
+    "featured": "Featured",
+    "new": "New"
+  },
+  "modal": {
+    "welcome_title": "Welcome to Nexus Web Hub!",
+    "welcome_message": "Discover thousands of webapps created by the community. Nexus Web Hub is a community directory.",
+    "disclaimer": "Webapps are hosted by their creators. We do not guarantee their permanent availability.",
+    "dont_show_again": "Don't show this message again",
+    "close": "Close",
+    "understand": "I understand"
+  }
+}
