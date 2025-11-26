@@ -1,33 +1,31 @@
+# Logs - NEVER COMMIT
+logs/
+*.log
+
+# Environment Variables - CRITICAL
+.env
+
 # Dependencies
 node_modules/
 
-# Environment variables
-.env
-.env.local
-
-# Database local
-local.db
-*.db
-*.db-shm
-*.db-wal
-
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# OS files
+# System Files
 .DS_Store
 Thumbs.db
 
-# Editor
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# Build (si ajouté plus tard)
+# Build outputs
 dist/
 build/
+
+# Temporary files
+tmp/
+temp/
+
+# Database backups (if local)
+*.db
+*.sqlite
