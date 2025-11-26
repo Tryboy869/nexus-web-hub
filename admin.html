@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel - Nexus Web Hub</title>
-  <link rel="icon" href="assets/logos/logo-nwh.svg" type="image/svg+xml">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-
+  <title>Admin Panel | Nexus Web Hub</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    
     :root {
       --bg-deep-space: #0a0e27;
       --bg-card: #1a1f3a;
@@ -20,21 +19,17 @@
       --accent-green: #10b981;
       --accent-gold: #fbbf24;
       --accent-red: #ef4444;
-      --border-glow: rgba(0, 217, 255, 0.15);
-      --font-body: 'Inter', sans-serif;
-      --font-heading: 'Space Grotesk', sans-serif;
     }
-
+    
     body {
-      font-family: var(--font-body);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg-deep-space);
       color: var(--text-primary);
       line-height: 1.6;
-      min-height: 100vh;
     }
 
-    /* LOGIN SCREEN */
-    .login-screen {
+    /* Login Screen */
+    .login-container {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -42,140 +37,139 @@
       padding: 2rem;
     }
 
-    .login-card {
+    .login-box {
       background: var(--bg-card);
-      border: 1px solid var(--border-glow);
       border-radius: 20px;
       padding: 3rem;
       max-width: 400px;
       width: 100%;
-      box-shadow: 0 20px 60px rgba(0, 217, 255, 0.15);
+      border: 2px solid var(--accent-red);
+      box-shadow: 0 20px 60px rgba(239, 68, 68, 0.3);
     }
 
-    .login-logo {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 2rem;
-      display: block;
-    }
-
-    .login-card h1 {
-      font-family: var(--font-heading);
+    .login-box h1 {
       text-align: center;
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .login-card p {
-      text-align: center;
-      color: var(--text-secondary);
       margin-bottom: 2rem;
+      color: var(--accent-red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
     .form-group {
       margin-bottom: 1.5rem;
     }
 
-    .form-group label {
+    label {
       display: block;
       margin-bottom: 0.5rem;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
+      font-weight: 600;
     }
 
-    .form-group input {
+    input {
       width: 100%;
       padding: 1rem;
       background: var(--bg-deep-space);
-      border: 1px solid var(--border-glow);
-      border-radius: 10px;
+      border: 2px solid var(--accent-purple);
+      border-radius: 12px;
       color: var(--text-primary);
-      font-family: var(--font-body);
       font-size: 1rem;
     }
 
-    .form-group input:focus {
+    input:focus {
       outline: none;
       border-color: var(--accent-cyan);
     }
 
     .btn {
       width: 100%;
-      padding: 1rem 2rem;
+      padding: 1rem;
+      border-radius: 12px;
       border: none;
-      border-radius: 10px;
-      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s;
-      font-family: var(--font-body);
+      font-weight: 600;
       font-size: 1rem;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      color: #fff;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 217, 255, 0.4);
-    }
-
-    .btn-secondary {
-      background: var(--bg-deep-space);
-      color: var(--text-primary);
-      border: 1px solid var(--border-glow);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
     .btn-danger {
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--accent-red);
-      border: 1px solid var(--accent-red);
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
+      background: var(--accent-red);
+      color: white;
     }
 
     .btn-danger:hover {
-      background: var(--accent-red);
-      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
     }
 
-    /* ADMIN DASHBOARD */
-    .admin-dashboard {
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    /* Admin Panel */
+    #admin-panel {
+      display: none;
+    }
+
+    nav {
+      background: var(--bg-card);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--accent-red);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      height: 40px;
+    }
+
+    .container {
       max-width: 1400px;
       margin: 0 auto;
       padding: 2rem;
     }
 
-    .admin-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .dashboard-header {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 2rem;
       margin-bottom: 2rem;
-      flex-wrap: wrap;
-      gap: 1rem;
+      border: 2px solid var(--accent-red);
     }
 
-    .admin-header h1 {
-      font-family: var(--font-heading);
+    .dashboard-title {
       font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--accent-red);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    .admin-stats {
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1.5rem;
-      margin-bottom: 3rem;
+      margin-top: 1.5rem;
     }
 
     .stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-glow);
-      border-radius: 12px;
+      background: var(--bg-deep-space);
       padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
     }
 
     .stat-value {
@@ -191,26 +185,28 @@
 
     .tabs {
       display: flex;
-      gap: 0;
-      border-bottom: 1px solid var(--border-glow);
+      gap: 1rem;
+      border-bottom: 2px solid var(--bg-card);
       margin-bottom: 2rem;
     }
 
     .tab {
-      padding: 1rem 1.5rem;
+      padding: 1rem 2rem;
       background: transparent;
       border: none;
       color: var(--text-secondary);
       cursor: pointer;
-      font-family: var(--font-body);
-      font-size: 0.9rem;
-      font-weight: 500;
-      border-bottom: 2px solid transparent;
-      transition: all 0.3s;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    .tab:hover { color: var(--text-primary); }
-    .tab.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
+    .tab:hover, .tab.active {
+      color: var(--accent-red);
+      border-bottom-color: var(--accent-red);
+    }
 
     .tab-content {
       display: none;
@@ -220,59 +216,60 @@
       display: block;
     }
 
-    /* TABLES */
-    .table-container {
+    table {
+      width: 100%;
       background: var(--bg-card);
-      border: 1px solid var(--border-glow);
       border-radius: 12px;
       overflow: hidden;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    thead {
+      background: var(--bg-deep-space);
     }
 
     th, td {
       padding: 1rem;
       text-align: left;
-      border-bottom: 1px solid var(--border-glow);
     }
 
     th {
-      background: var(--bg-deep-space);
       font-weight: 600;
       color: var(--accent-cyan);
     }
 
-    tr:last-child td {
-      border-bottom: none;
+    tbody tr {
+      border-bottom: 1px solid var(--bg-deep-space);
     }
 
-    tr:hover {
+    tbody tr:hover {
       background: rgba(0, 217, 255, 0.05);
     }
 
-    .badge {
+    .status-badge {
       padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 500;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
     }
 
-    .badge-pending {
-      background: rgba(251, 191, 36, 0.1);
+    .status-pending {
+      background: rgba(251, 191, 36, 0.2);
       color: var(--accent-gold);
     }
 
-    .badge-resolved {
-      background: rgba(16, 185, 129, 0.1);
+    .status-resolved {
+      background: rgba(16, 185, 129, 0.2);
       color: var(--accent-green);
     }
 
-    .actions {
+    .action-btns {
       display: flex;
       gap: 0.5rem;
+    }
+
+    .btn-small {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
     }
 
     .empty-state {
@@ -281,391 +278,447 @@
       color: var(--text-secondary);
     }
 
-    .empty-state-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 14, 39, 0.95);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
     }
 
-    .hidden { display: none !important; }
+    .modal-content {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+      border: 2px solid var(--accent-cyan);
+    }
 
-    /* RESPONSIVE */
+    .modal-header {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--accent-cyan);
+    }
+
+    .modal-body {
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 1rem;
+      background: var(--bg-deep-space);
+      border: 2px solid var(--accent-purple);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-family: inherit;
+      resize: vertical;
+      min-height: 100px;
+    }
+
     @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
       table {
         font-size: 0.85rem;
       }
-      
-      th, td {
-        padding: 0.75rem;
-      }
-      
-      .actions {
+      .action-btns {
         flex-direction: column;
       }
     }
   </style>
 </head>
 <body>
-
-  <!-- LOGIN SCREEN -->
-  <div id="loginScreen" class="login-screen">
-    <div class="login-card">
-      <img src="assets/logos/logo-nwh.svg" alt="NWH" class="login-logo">
-      <h1>Admin Panel</h1>
-      <p>Nexus Web Hub - Administration</p>
-
-      <form id="loginForm" onsubmit="login(event)">
+  <!-- Login Screen -->
+  <div class="login-container" id="login-screen">
+    <div class="login-box">
+      <h1><i class="fa-solid fa-shield-halved"></i> Admin Login</h1>
+      <form onsubmit="handleLogin(event)">
         <div class="form-group">
-          <label for="email">Email Admin</label>
-          <input type="email" id="email" required autocomplete="username">
+          <label>Email</label>
+          <input type="email" id="admin-email" required placeholder="admin@nexusstudio.com">
         </div>
-
         <div class="form-group">
-          <label for="password">Mot de passe</label>
-          <input type="password" id="password" required autocomplete="current-password">
+          <label>Password</label>
+          <input type="password" id="admin-password" required placeholder="••••••••">
         </div>
-
-        <button type="submit" class="btn btn-primary">Se connecter</button>
+        <button type="submit" class="btn btn-danger">
+          <i class="fa-solid fa-right-to-bracket"></i>
+          Login as Admin
+        </button>
       </form>
-
-      <div style="margin-top: 1.5rem; text-align: center;">
-        <a href="/" class="btn btn-secondary">← Retour au site</a>
+      <div style="text-align: center; margin-top: 2rem;">
+        <a href="/" style="color: var(--accent-cyan); text-decoration: none;">
+          <i class="fa-solid fa-arrow-left"></i> Back to Home
+        </a>
       </div>
     </div>
   </div>
 
-  <!-- ADMIN DASHBOARD -->
-  <div id="adminDashboard" class="admin-dashboard hidden">
-    <div class="admin-header">
-      <h1>🛡️ Admin Panel</h1>
-      <button class="btn btn-secondary" onclick="logout()">Déconnexion</button>
-    </div>
+  <!-- Admin Panel -->
+  <div id="admin-panel">
+    <nav>
+      <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub" class="logo">
+      <button class="btn btn-danger" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Logout
+      </button>
+    </nav>
 
-    <!-- STATS -->
-    <div class="admin-stats">
-      <div class="stat-card">
-        <div class="stat-value" id="statWebapps">0</div>
-        <div class="stat-label">Webapps totales</div>
+    <div class="container">
+      <div class="dashboard-header">
+        <h1 class="dashboard-title">
+          <i class="fa-solid fa-gauge-high"></i>
+          Admin Dashboard
+        </h1>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="total-webapps">0</div>
+            <div class="stat-label">Total Webapps</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="pending-reports">0</div>
+            <div class="stat-label">Pending Reports</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="total-users">0</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="total-reviews">0</div>
+            <div class="stat-label">Total Reviews</div>
+          </div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value" id="statReports">0</div>
-        <div class="stat-label">Signalements</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="statPending">0</div>
-        <div class="stat-label">En attente</div>
-      </div>
-    </div>
 
-    <!-- TABS -->
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('reports')">🚨 Signalements</button>
-      <button class="tab" onclick="switchTab('webapps')">📱 Toutes les Webapps</button>
-    </div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('reports')">
+          <i class="fa-solid fa-flag"></i>
+          Reports
+        </button>
+        <button class="tab" onclick="switchTab('webapps')">
+          <i class="fa-solid fa-grid-2"></i>
+          All Webapps
+        </button>
+      </div>
 
-    <!-- TAB: REPORTS -->
-    <div id="reportsTab" class="tab-content active">
-      <div class="table-container">
-        <table>
+      <!-- Reports Tab -->
+      <div class="tab-content active" id="tab-reports">
+        <table id="reports-table">
           <thead>
             <tr>
               <th>Webapp</th>
-              <th>Signalé par</th>
-              <th>Raison</th>
+              <th>Reported By</th>
+              <th>Reason</th>
               <th>Date</th>
-              <th>Statut</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="reportsTableBody"></tbody>
+          <tbody id="reports-tbody"></tbody>
         </table>
+        <div class="empty-state" id="reports-empty" style="display: none;">
+          <i class="fa-solid fa-check-circle" style="font-size: 4rem; color: var(--accent-green);"></i>
+          <h2>No pending reports</h2>
+          <p>All caught up!</p>
+        </div>
       </div>
 
-      <div id="reportsEmpty" class="empty-state hidden">
-        <div class="empty-state-icon">✅</div>
-        <h3>Aucun signalement</h3>
-        <p>Tout est en ordre !</p>
-      </div>
-    </div>
-
-    <!-- TAB: WEBAPPS -->
-    <div id="webappsTab" class="tab-content">
-      <div class="table-container">
-        <table>
+      <!-- Webapps Tab -->
+      <div class="tab-content" id="tab-webapps">
+        <table id="webapps-table">
           <thead>
             <tr>
-              <th>Nom</th>
-              <th>Créateur</th>
-              <th>URL</th>
-              <th>Note</th>
-              <th>Vues</th>
+              <th>Name</th>
+              <th>Creator</th>
+              <th>Category</th>
+              <th>Rating</th>
+              <th>Views</th>
+              <th>Reviews</th>
               <th>Date</th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="webappsTableBody"></tbody>
+          <tbody id="webapps-tbody"></tbody>
         </table>
       </div>
+    </div>
+  </div>
 
-      <div id="webappsEmpty" class="empty-state hidden">
-        <div class="empty-state-icon">📭</div>
-        <h3>Aucune webapp</h3>
-        <p>Le catalogue est vide</p>
+  <!-- Resolve Report Modal -->
+  <div class="modal" id="resolve-modal">
+    <div class="modal-content">
+      <div class="modal-header">Resolve Report</div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Admin Notes</label>
+          <textarea id="admin-notes" placeholder="Add any notes about this resolution..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeResolveModal()">Cancel</button>
+        <button class="btn btn-danger" onclick="confirmResolve()">
+          <i class="fa-solid fa-check"></i>
+          Mark as Resolved
+        </button>
       </div>
     </div>
   </div>
 
   <script>
-    let isAdmin = false;
-    let adminCredentials = null;
-    let reports = [];
-    let webapps = [];
+    let adminKey = null;
+    let currentReportId = null;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      checkAdminSession();
-    });
-
-    function checkAdminSession() {
-      const session = sessionStorage.getItem('admin_session');
-      if (session) {
-        adminCredentials = JSON.parse(session);
-        showDashboard();
-      }
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      event.target.closest('.tab').classList.add('active');
+      document.getElementById(`tab-${tab}`).classList.add('active');
     }
 
-    async function login(event) {
-      event.preventDefault();
-
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+    async function handleLogin(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('admin-email').value;
+      const password = document.getElementById('admin-password').value;
 
       try {
-        const res = await fetch('/api/admin/login', {
+        const response = await fetch('/api/admin/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
         if (data.success) {
-          adminCredentials = { email, password };
-          sessionStorage.setItem('admin_session', JSON.stringify(adminCredentials));
-          showDashboard();
+          adminKey = btoa(`${email}:${password}`); // Simple encoding
+          sessionStorage.setItem('adminKey', adminKey);
+          
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('admin-panel').style.display = 'block';
+          
+          loadDashboard();
         } else {
-          alert('Identifiants invalides');
+          alert('Invalid credentials');
         }
       } catch (error) {
-        console.error(error);
-        alert('Erreur de connexion');
+        console.error('Login error:', error);
+        alert('Login failed');
       }
     }
 
-    function logout() {
-      sessionStorage.removeItem('admin_session');
-      adminCredentials = null;
-      document.getElementById('loginScreen').classList.remove('hidden');
-      document.getElementById('adminDashboard').classList.add('hidden');
+    async function loadDashboard() {
+      await loadStats();
+      await loadReports();
+      await loadWebapps();
     }
 
-    async function showDashboard() {
-      document.getElementById('loginScreen').classList.add('hidden');
-      document.getElementById('adminDashboard').classList.remove('hidden');
-      await loadData();
-    }
+    async function loadStats() {
+      try {
+        const response = await fetch('/api/stats');
+        const data = await response.json();
 
-    async function loadData() {
-      await Promise.all([
-        loadReports(),
-        loadWebapps()
-      ]);
-      updateStats();
+        if (data.success) {
+          document.getElementById('total-webapps').textContent = data.stats.webapps;
+          document.getElementById('total-users').textContent = data.stats.creators;
+          document.getElementById('total-reviews').textContent = data.stats.reviews;
+        }
+
+        // Load reports count
+        const reportsResponse = await fetch('/api/admin/reports', {
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        const reportsData = await reportsResponse.json();
+        
+        if (reportsData.success) {
+          const pending = reportsData.reports.filter(r => r.status === 'pending').length;
+          document.getElementById('pending-reports').textContent = pending;
+        }
+      } catch (error) {
+        console.error('Stats load error:', error);
+      }
     }
 
     async function loadReports() {
       try {
-        const res = await fetch('/api/admin/reports');
-        const data = await res.json();
+        const response = await fetch('/api/admin/reports', {
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        const data = await response.json();
 
         if (data.success) {
-          reports = data.data.reports;
-          renderReports();
+          const tbody = document.getElementById('reports-tbody');
+          const empty = document.getElementById('reports-empty');
+
+          if (data.reports.length === 0) {
+            document.getElementById('reports-table').style.display = 'none';
+            empty.style.display = 'block';
+            return;
+          }
+
+          document.getElementById('reports-table').style.display = 'table';
+          empty.style.display = 'none';
+
+          tbody.innerHTML = data.reports.map(report => `
+            <tr>
+              <td><a href="/webapp.html?id=${report.target_id}" style="color: var(--accent-cyan);">${report.webapp_name || report.target_id}</a></td>
+              <td>${report.reporter_name}</td>
+              <td>${report.reason.substring(0, 100)}${report.reason.length > 100 ? '...' : ''}</td>
+              <td>${new Date(report.created_at).toLocaleDateString()}</td>
+              <td><span class="status-badge status-${report.status}">${report.status}</span></td>
+              <td>
+                <div class="action-btns">
+                  ${report.status === 'pending' ? `
+                    <button class="btn btn-secondary btn-small" onclick="resolveReport('${report.id}')">
+                      <i class="fa-solid fa-check"></i> Resolve
+                    </button>
+                    <button class="btn btn-danger btn-small" onclick="deleteWebappFromReport('${report.target_id}', '${report.webapp_name}')">
+                      <i class="fa-solid fa-trash"></i> Delete
+                    </button>
+                  ` : `
+                    <span style="color: var(--accent-green);">Resolved</span>
+                  `}
+                </div>
+              </td>
+            </tr>
+          `).join('');
         }
       } catch (error) {
-        console.error('Error loading reports:', error);
+        console.error('Reports load error:', error);
       }
     }
 
     async function loadWebapps() {
       try {
-        const res = await fetch('/api/admin/webapps');
-        const data = await res.json();
-
-        if (data.success) {
-          webapps = data.data.webapps;
-          renderWebapps();
-        }
-      } catch (error) {
-        console.error('Error loading webapps:', error);
-      }
-    }
-
-    function updateStats() {
-      document.getElementById('statWebapps').textContent = webapps.length;
-      document.getElementById('statReports').textContent = reports.length;
-      document.getElementById('statPending').textContent = reports.filter(r => r.status === 'pending').length;
-    }
-
-    function renderReports() {
-      const tbody = document.getElementById('reportsTableBody');
-      const empty = document.getElementById('reportsEmpty');
-
-      if (reports.length === 0) {
-        tbody.innerHTML = '';
-        empty.classList.remove('hidden');
-        return;
-      }
-
-      empty.classList.add('hidden');
-
-      tbody.innerHTML = reports.map(r => `
-        <tr>
-          <td>
-            <strong>${r.webapp_name || 'Webapp supprimée'}</strong><br>
-            <small style="color:var(--text-secondary)">${r.webapp_url || ''}</small>
-          </td>
-          <td>
-            ${r.reporter_name}<br>
-            <small style="color:var(--text-secondary)">${r.reporter_email}</small>
-          </td>
-          <td style="max-width: 300px;">${r.reason}</td>
-          <td>${new Date(r.created_at * 1000).toLocaleDateString('fr-FR')}</td>
-          <td>
-            <span class="badge ${r.status === 'pending' ? 'badge-pending' : 'badge-resolved'}">
-              ${r.status === 'pending' ? 'En attente' : 'Résolu'}
-            </span>
-          </td>
-          <td>
-            <div class="actions">
-              ${r.webapp_name ? `<button class="btn btn-secondary" onclick="viewWebapp('${r.target_id}')">Voir</button>` : ''}
-              ${r.webapp_name && r.status === 'pending' ? `<button class="btn btn-danger" onclick="deleteWebapp('${r.target_id}', '${r.id}')">Supprimer</button>` : ''}
-              ${r.status === 'pending' ? `<button class="btn btn-secondary" onclick="ignoreReport('${r.id}')">Ignorer</button>` : ''}
-            </div>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function renderWebapps() {
-      const tbody = document.getElementById('webappsTableBody');
-      const empty = document.getElementById('webappsEmpty');
-
-      if (webapps.length === 0) {
-        tbody.innerHTML = '';
-        empty.classList.remove('hidden');
-        return;
-      }
-
-      empty.classList.add('hidden');
-
-      tbody.innerHTML = webapps.map(w => `
-        <tr>
-          <td>
-            <strong>${w.name}</strong><br>
-            <small style="color:var(--text-secondary)">${w.category}</small>
-          </td>
-          <td>
-            ${w.developer}<br>
-            <small style="color:var(--text-secondary)">${w.creator_email || ''}</small>
-          </td>
-          <td style="max-width: 300px;">
-            <a href="${w.url}" target="_blank" rel="noopener" style="color:var(--accent-cyan)">${w.url}</a>
-          </td>
-          <td>⭐ ${(w.avg_rating || 0).toFixed(1)}</td>
-          <td>${w.views_count || 0}</td>
-          <td>${new Date(w.created_at * 1000).toLocaleDateString('fr-FR')}</td>
-          <td>
-            <div class="actions">
-              <button class="btn btn-secondary" onclick="viewWebapp('${w.id}')">Voir</button>
-              <button class="btn btn-danger" onclick="confirmDeleteWebapp('${w.id}', '${w.name}')">Supprimer</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function switchTab(tab) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-      if (tab === 'reports') {
-        document.querySelector('.tab:nth-child(1)').classList.add('active');
-        document.getElementById('reportsTab').classList.add('active');
-      } else {
-        document.querySelector('.tab:nth-child(2)').classList.add('active');
-        document.getElementById('webappsTab').classList.add('active');
-      }
-    }
-
-    function viewWebapp(id) {
-      window.open(`/webapp.html?id=${id}`, '_blank');
-    }
-
-    async function deleteWebapp(webappId, reportId = null) {
-      if (!confirm('Confirmer la suppression de cette webapp ?')) return;
-
-      try {
-        const res = await fetch(`/api/admin/webapps/${webappId}`, {
-          method: 'DELETE'
+        const response = await fetch('/api/admin/webapps', {
+          headers: { 'X-Admin-Key': adminKey }
         });
-
-        const data = await res.json();
+        const data = await response.json();
 
         if (data.success) {
-          alert('Webapp supprimée');
-          if (reportId) {
-            await markReportResolved(reportId);
-          }
-          await loadData();
-        } else {
-          alert(data.message);
+          const tbody = document.getElementById('webapps-tbody');
+
+          tbody.innerHTML = data.webapps.map(webapp => `
+            <tr>
+              <td><a href="/webapp.html?id=${webapp.id}" style="color: var(--accent-cyan);">${webapp.name}</a></td>
+              <td>${webapp.creator_name}</td>
+              <td>${webapp.category}</td>
+              <td>${webapp.avg_rating.toFixed(1)} ⭐</td>
+              <td>${webapp.views_count}</td>
+              <td>${webapp.reviews_count}</td>
+              <td>${new Date(webapp.created_at).toLocaleDateString()}</td>
+              <td>
+                <button class="btn btn-danger btn-small" onclick="deleteWebapp('${webapp.id}', '${webapp.name}')">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          `).join('');
         }
       } catch (error) {
-        console.error(error);
-        alert('Erreur lors de la suppression');
+        console.error('Webapps load error:', error);
       }
     }
 
-    function confirmDeleteWebapp(id, name) {
-      if (confirm(`Supprimer la webapp "${name}" ?`)) {
-        deleteWebapp(id);
-      }
+    function resolveReport(reportId) {
+      currentReportId = reportId;
+      document.getElementById('resolve-modal').style.display = 'flex';
     }
 
-    async function ignoreReport(reportId) {
-      if (!confirm('Marquer ce signalement comme résolu (ignoré) ?')) return;
-
-      await markReportResolved(reportId);
+    function closeResolveModal() {
+      document.getElementById('resolve-modal').style.display = 'none';
+      currentReportId = null;
+      document.getElementById('admin-notes').value = '';
     }
 
-    async function markReportResolved(reportId) {
+    async function confirmResolve() {
+      const notes = document.getElementById('admin-notes').value;
+
       try {
-        const res = await fetch(`/api/admin/reports/${reportId}`, {
+        const response = await fetch(`/api/admin/reports/${currentReportId}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            status: 'resolved',
-            admin_notes: 'Traité'
-          })
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': adminKey
+          },
+          body: JSON.stringify({ admin_notes: notes })
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
         if (data.success) {
-          await loadData();
+          alert('Report marked as resolved');
+          closeResolveModal();
+          loadDashboard();
         }
       } catch (error) {
-        console.error(error);
+        console.error('Resolve error:', error);
+        alert('Error resolving report');
       }
+    }
+
+    async function deleteWebapp(id, name) {
+      if (!confirm(`Delete webapp "${name}"? This action is irreversible.`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/admin/webapps/${id}`, {
+          method: 'DELETE',
+          headers: { 'X-Admin-Key': adminKey }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert('Webapp deleted');
+          loadDashboard();
+        }
+      } catch (error) {
+        console.error('Delete error:', error);
+        alert('Error deleting webapp');
+      }
+    }
+
+    async function deleteWebappFromReport(id, name) {
+      if (!confirm(`Delete webapp "${name}" due to report? This action is irreversible.`)) {
+        return;
+      }
+
+      await deleteWebapp(id, name);
+    }
+
+    function logout() {
+      if (confirm('Logout from admin panel?')) {
+        sessionStorage.removeItem('adminKey');
+        window.location.reload();
+      }
+    }
+
+    // Check if already logged in
+    const savedKey = sessionStorage.getItem('adminKey');
+    if (savedKey) {
+      adminKey = savedKey;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
+      loadDashboard();
     }
   </script>
 </body>
