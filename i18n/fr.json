@@ -1,0 +1,181 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "explore": "Explorer",
+    "submit": "Soumettre",
+    "login": "Connexion",
+    "profile": "Profil",
+    "admin": "Admin"
+  },
+  "hero": {
+    "title": "Découvrez le meilleur du Web",
+    "subtitle": "Des milliers de webapps créées par la communauté",
+    "cta_explore": "Explorer le Catalogue",
+    "cta_submit": "Publier votre webapp"
+  },
+  "search": {
+    "placeholder": "Rechercher une webapp...",
+    "surprise": "Surprenez-moi",
+    "no_results": "Aucune webapp trouvée",
+    "results_count": "{count} webapp(s) trouvée(s)"
+  },
+  "categories": {
+    "all": "Toutes",
+    "productivity": "Productivité",
+    "design": "Design",
+    "games": "Jeux",
+    "api": "API",
+    "nocode": "No-Code",
+    "other": "Autre"
+  },
+  "sort": {
+    "all": "Toutes",
+    "trending": "Tendances",
+    "new": "Nouveautés",
+    "top": "Mieux notées"
+  },
+  "webapp": {
+    "views": "Vues uniques",
+    "clicks": "Clics",
+    "rating": "Note moyenne",
+    "reviews": "Avis",
+    "open": "Ouvrir la Webapp",
+    "source_code": "Code Source",
+    "report": "Signaler un problème",
+    "created_by": "Créé par",
+    "category": "Catégorie",
+    "tags": "Tags",
+    "description": "Description",
+    "see_more": "Voir plus",
+    "see_less": "Voir moins",
+    "add_to_collection": "Ajouter à une collection",
+    "share": "Partager",
+    "leave_review": "Laisser un avis",
+    "login_to_review": "Connectez-vous pour laisser un avis"
+  },
+  "review": {
+    "your_review": "Votre avis",
+    "rating_label": "Note",
+    "comment_placeholder": "Partagez votre expérience...",
+    "submit": "Publier l'avis",
+    "helpful": "Utile",
+    "not_helpful": "Pas utile",
+    "reply": "Répondre",
+    "creator_response": "Réponse du créateur"
+  },
+  "redirect": {
+    "title": "Vous quittez Nexus Web Hub",
+    "message": "Vous allez être redirigé vers",
+    "warning": "Cette webapp est hébergée en dehors de NWH. Nous ne contrôlons pas son contenu, sa disponibilité ou sa sécurité.",
+    "countdown": "Redirection dans {seconds} secondes...",
+    "continue": "Continuer vers la webapp",
+    "back": "Retour au catalogue"
+  },
+  "auth": {
+    "login_title": "Connexion",
+    "signup_title": "Inscription",
+    "email": "Email",
+    "password": "Mot de passe",
+    "name": "Nom complet",
+    "login_button": "Se connecter",
+    "signup_button": "Créer mon compte",
+    "switch_to_signup": "Pas encore de compte ? Inscrivez-vous",
+    "switch_to_login": "Déjà inscrit ? Connectez-vous"
+  },
+  "profile": {
+    "my_webapps": "Mes Webapps",
+    "my_reviews": "Mes Avis",
+    "my_collections": "Mes Collections",
+    "settings": "Paramètres",
+    "badges": "Badges",
+    "stats": "Statistiques",
+    "logout": "Déconnexion",
+    "new_webapp": "Nouvelle Webapp",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "view": "Voir",
+    "confirm_delete": "Êtes-vous sûr de vouloir supprimer cette webapp ? Cette action est irréversible.",
+    "enter_password": "Entrez votre mot de passe pour confirmer"
+  },
+  "submit": {
+    "title_create": "Publier une Webapp",
+    "title_edit": "Modifier la Webapp",
+    "name": "Nom de la webapp",
+    "name_placeholder": "ex: Mon Outil Génial",
+    "url": "URL de la webapp",
+    "url_placeholder": "https://exemple.com",
+    "category": "Catégorie",
+    "description_short": "Description courte",
+    "description_short_placeholder": "Décrivez votre webapp en quelques mots (max 200 caractères)",
+    "description_long": "Description détaillée",
+    "description_long_placeholder": "Description complète...",
+    "tags": "Tags",
+    "tags_placeholder": "Séparez les tags par des virgules",
+    "github_url": "URL GitHub",
+    "github_placeholder": "https://github.com/user/repo (optionnel)",
+    "video_url": "URL Vidéo YouTube",
+    "video_placeholder": "https://youtube.com/watch?v=... (optionnel)",
+    "image_url": "URL Screenshot",
+    "image_placeholder": "https://exemple.com/screenshot.png (optionnel)",
+    "version": "Version",
+    "version_placeholder": "ex: 2.0.0",
+    "changelog": "Changelog",
+    "changelog_placeholder": "- Nouvelle fonctionnalité X\n- Correction bug Y",
+    "publish": "Publier",
+    "save": "Enregistrer les modifications",
+    "cancel": "Annuler"
+  },
+  "admin": {
+    "title": "Panel Administration",
+    "login_title": "Connexion Admin",
+    "dashboard": "Tableau de bord",
+    "reports": "Signalements",
+    "webapps": "Toutes les Webapps",
+    "users": "Utilisateurs",
+    "stats": "Statistiques",
+    "logs": "Logs",
+    "pending_reports": "Signalements en attente",
+    "resolved": "Résolu",
+    "ignore": "Ignorer",
+    "delete_webapp": "Supprimer la webapp",
+    "admin_notes": "Notes admin",
+    "resolve": "Marquer résolu"
+  },
+  "notifications": {
+    "success": "Succès !",
+    "error": "Erreur",
+    "warning": "Attention",
+    "webapp_published": "Webapp publiée avec succès",
+    "review_submitted": "Avis soumis avec succès",
+    "report_submitted": "Signalement envoyé",
+    "login_success": "Connexion réussie",
+    "logout_success": "Déconnexion réussie"
+  },
+  "footer": {
+    "created_by": "Créé par Daouda Abdoul Anzize - Nexus Studio",
+    "contact": "Contact",
+    "github": "GitHub",
+    "privacy": "Confidentialité",
+    "terms": "Conditions"
+  },
+  "badges_names": {
+    "verified-creator": "Créateur Vérifié",
+    "beginner-tester": "Testeur Débutant",
+    "pro-tester": "Testeur Pro",
+    "legendary-tester": "Testeur Légendaire",
+    "admin": "Administrateur",
+    "supporter": "Supporter",
+    "contributor": "Contributeur",
+    "trending": "Tendance",
+    "featured": "Mis en avant",
+    "new": "Nouveau"
+  },
+  "modal": {
+    "welcome_title": "Bienvenue sur Nexus Web Hub !",
+    "welcome_message": "Découvrez des milliers de webapps créées par la communauté. Nexus Web Hub est un annuaire communautaire.",
+    "disclaimer": "Les webapps sont hébergées par leurs créateurs. Nous ne garantissons pas leur disponibilité permanente.",
+    "dont_show_again": "Ne plus afficher ce message",
+    "close": "Fermer",
+    "understand": "J'ai compris"
+  }
+}
