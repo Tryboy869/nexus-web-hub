@@ -1,288 +1,426 @@
-# 🌌 Nexus Web Hub
+# 🚀 NEXUS WEB HUB
 
-<p align="center">
-  <img src="assets/storyline/nexus-web-hub-intro.svg" alt="Nexus Web Hub - Animation Intro" width="600">
-</p>
-
-<p align="center">
-  <strong>Le store communautaire pour webapps, outils et jeux évalués par la communauté</strong>
-</p>
-
-<p align="center">
-  <a href="https://github.com/Tryboy869/nexus-web-hub">
-    <img src="https://img.shields.io/badge/Nexus%20Axion-3.5-00d9ff?style=for-the-badge" alt="Nexus Axion 3.5">
-  </a>
-  <a href="LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License">
-  </a>
-</p>
-
-<p align="center">
-  <img src="assets/logos/logo-nwh.svg" alt="Nexus Web Hub Logo" width="80">
-</p>
+**The Play Store for Webapps** - A community-driven webapp directory where creators share their projects and users discover amazing web tools.
 
 ---
 
-<p align="center">
-  <img src="assets/contributors/contributor-anzize.svg" alt="Créé par Daouda Abdoul Anzize" width="400">
-</p>
+## 📋 PROJECT OVERVIEW
+
+Nexus Web Hub is a free, open platform that allows developers to publish their webapps and receive community feedback through reviews and ratings. Think of it as "Google Play Store" but for web applications.
+
+### ✨ Key Features
+
+- **Free Publishing**: No fees, no commissions (0% vs 30% on App Store)
+- **Instant Approval**: Auto-published with trust score system
+- **Community Reviews**: User ratings and feedback
+- **Advanced Analytics**: Views, clicks, conversion tracking
+- **Multilingual**: English, French, Spanish (more coming)
+- **SEO Optimized**: Big Tech level optimization
+- **Moderation System**: Community-driven reports
+- **Badges System**: Gamification for creators and testers
 
 ---
 
-## 🏆 Système de Badges
+## 🏗️ TECH STACK
 
-Nexus Web Hub utilise un système de badges animés SVG pour reconnaître les contributions :
+### Frontend
+- **Pure HTML/CSS/JavaScript** (No framework, ultra-lightweight)
+- **Font Awesome** for icons
+- **Responsive Design** (Mobile-first)
 
-### Badges Système
+### Backend
+- **Node.js** + Express
+- **Turso** (SQLite) for database
+- **JWT** for authentication
+- **bcrypt** for password hashing
 
-<p align="center">
-  <img src="assets/badges/system/badge-verified-creator.svg" width="80" title="Créateur Vérifié">
-  <img src="assets/badges/system/badge-beginner-tester.svg" width="80" title="Testeur Débutant">
-  <img src="assets/badges/system/badge-pro-tester.svg" width="80" title="Testeur Pro">
-  <img src="assets/badges/system/badge-legendary-tester.svg" width="80" title="Testeur Légendaire">
-  <img src="assets/badges/system/badge-admin.svg" width="80" title="Admin">
-  <img src="assets/badges/system/badge-supporter.svg" width="80" title="Supporter">
-  <img src="assets/badges/system/badge-contributor.svg" width="80" title="Contributeur">
-</p>
-
-### Badges Webapp
-
-<p align="center">
-  <img src="assets/badges/system/badge-trending.svg" width="60" title="Trending">
-  <img src="assets/badges/system/badge-featured.svg" width="60" title="Featured">
-  <img src="assets/badges/system/badge-new.svg" width="60" title="Nouveau">
-</p>
-
-### Icônes Catégories
-
-<p align="center">
-  <img src="assets/icons/icon-tools.svg" width="50" title="Productivité">
-  <img src="assets/icons/icon-ui-kits.svg" width="50" title="Design">
-  <img src="assets/icons/icon-games.svg" width="50" title="Jeu">
-  <img src="assets/icons/icon-apis.svg" width="50" title="API">
-  <img src="assets/icons/icon-websites.svg" width="50" title="No-Code">
-  <img src="assets/icons/icon-other.svg" width="50" title="Autre">
-</p>
+### Architecture
+- **NEXUS AXION Pattern**: API Gateway + Backend Service separation
+- **Security Layer**: SQL injection protection, XSS prevention, rate limiting
+- **Logging System**: Comprehensive security and API logging
 
 ---
 
-## 🎯 Vision
+## 🚀 QUICK START
 
-Nexus Web Hub est le "Google Play Store du Web" avec :
-- ✅ **Visibilité méritocratique** : Qualité > Budget publicitaire
-- 🏆 **Système de badges** : Créateurs vérifiés, testeurs professionnels
-- 🌍 **Communauté auto-régulée** : Avis authentiques, signalements
-- 💎 **100% gratuit** (MVP) : Pas de paywall, pas de pub
+### Prerequisites
 
----
+- Node.js 18+
+- Turso account (free tier available)
 
-## 🏗️ Architecture NEXUS AXION 3.5
+### Installation
 
-### Structure (4 fichiers code)
-
-```
-nexus-web-hub/
-├── index.html          # Frontend complet (HTML + CSS + JS)
-├── api.js              # API Gateway (Point d'entrée)
-├── server.js           # Backend Service (Logique métier)
-├── utils.js            # Fonctions utilitaires
-├── package.json        # Dépendances
-├── .env                # Variables (PAS dans Git)
-└── assets/             # SVG badges, logos
-```
-
-### Stack Technique
-
-- **Frontend** : HTML5 + CSS3 + JavaScript Vanilla (onclick direct)
-- **Gateway** : Node.js + Express
-- **Backend** : Node.js + @libsql/client
-- **Database** : Turso (LibSQL - SQLite distribué)
-- **Auth** : JWT + bcrypt
-
-**Aucun framework frontend** = Zéro build step, deploy instantané
-
----
-
-## 🚀 Installation Locale
-
-### Prérequis
-
-- Node.js >= 18
-- npm ou yarn
-- Compte Turso (gratuit)
-
-### Étapes
-
-1. **Clone le repo**
+1. **Clone the repository**
 ```bash
-git clone https://github.com/Tryboy869/nexus-web-hub.git
+git clone https://github.com/your-username/nexus-web-hub.git
 cd nexus-web-hub
 ```
 
-2. **Installe les dépendances**
+2. **Install dependencies**
 ```bash
 npm install
 ```
 
-3. **Configure l'environnement**
+3. **Configure environment variables**
 ```bash
 cp .env.example .env
-# Édite .env avec tes identifiants Turso
+# Edit .env with your credentials
 ```
 
-4. **Crée une base Turso**
-```bash
-# Installe Turso CLI
-curl -sSfL https://get.tur.so/install.sh | bash
-
-# Crée une DB
-turso db create nexus-web-hub
-
-# Obtiens l'URL et le token
-turso db show nexus-web-hub
-```
-
-5. **Lance le serveur**
+4. **Start the server**
 ```bash
 npm start
-# Ou en mode dev (auto-reload)
-npm run dev
 ```
 
-6. **Ouvre le navigateur**
+5. **Open in browser**
 ```
 http://localhost:3000
 ```
 
 ---
 
-## 📊 Base de Données
+## 🔧 ENVIRONMENT VARIABLES
 
-### Tables
+Create a `.env` file at the root:
 
-- **users** : Comptes utilisateurs (auth, profil, badges)
-- **webapps** : Catalogue de webapps
-- **reviews** : Avis et notes
-- **reports** : Signalements communautaires
+```env
+# Database (Turso)
+DATABASE_URL=libsql://your-database.turso.io
+DATABASE_AUTH_TOKEN=your_turso_auth_token
 
-### Reset DB (développement)
+# JWT
+JWT_SECRET=your_super_secret_jwt_key_32_chars_min
 
-```bash
-# Via l'API (si admin)
-curl -X POST http://localhost:3000/api/admin/reset-database \
-  -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+# Admin
+ADMIN_EMAIL=admin@nexusstudio.com
+ADMIN_PASSWORD=YourSecurePassword123!
+ADMIN_KEY=your_admin_api_key
+
+# Server
+PORT=3000
+NODE_ENV=production
+APP_URL=https://nexuswebhub.com
+
+# Rate Limiting (optional)
+RATE_LIMIT_REQUESTS=100
+RATE_LIMIT_WINDOW_MS=900000
+
+# Reset DB (DANGER)
+RESET_DB=false
 ```
 
 ---
 
-## 🎨 Fonctionnalités MVP
+## 📁 PROJECT STRUCTURE
 
-### ✅ Implémentées
+```
+nexus-web-hub/
+├── assets/                  # Static assets
+│   ├── logos/              # Logo files
+│   ├── badges/system/      # Badge SVGs
+│   ├── icons/              # Category icons
+│   └── contributors/       # Contributor badges
+├── i18n/                   # Translations
+│   ├── fr.json            # French
+│   ├── en.json            # English
+│   └── es.json            # Spanish
+├── logs/                   # Auto-generated logs
+│   ├── api-*.log          # API logs
+│   ├── security-*.log     # Security logs
+│   └── errors-*.log       # Error logs
+├── index.html             # Homepage
+├── webapp.html            # Webapp detail page
+├── redirect.html          # External redirection page
+├── auth.html              # Login/Signup page
+├── profile.html           # User profile page
+├── submit.html            # Submit/Edit webapp page
+├── admin.html             # Admin panel
+├── 404.html               # Error page
+├── api.js                 # API Gateway (entry point)
+├── server.js              # Backend Service
+├── utils.js               # Backend utilities
+├── package.json           # Dependencies
+├── robots.txt             # SEO configuration
+└── README.md              # This file
+```
 
-- [x] Auth (inscription/connexion)
-- [x] Soumission webapp
-- [x] Catalogue avec recherche + filtres
-- [x] Page détails webapp
-- [x] Système reviews (1-5 étoiles)
-- [x] Badges automatiques
-- [x] Signalements
-- [x] Responsive mobile-first
-- [x] i18n FR/EN (structure)
+---
 
-### 🔜 Phase 2 (Post-MVP)
+## 🎯 API ENDPOINTS
 
-- [ ] Profil utilisateur éditable
-- [ ] Collections curées
-- [ ] Panel admin modération
-- [ ] Analytics avancées
+### Public Endpoints
+
+- `GET /api/health` - Health check
+- `GET /api/stats` - Global statistics
+- `GET /api/webapps` - List webapps (with filters)
+- `GET /api/webapps/:id` - Get webapp details
+- `POST /api/auth/signup` - Create account
+- `POST /api/auth/login` - Login
+- `GET /sitemap.xml` - SEO sitemap
+
+### Protected Endpoints (require authentication)
+
+- `GET /api/auth/me` - Get current user
+- `POST /api/webapps` - Create webapp
+- `PUT /api/webapps/:id` - Update webapp
+- `DELETE /api/webapps/:id` - Delete webapp
+- `POST /api/webapps/:id/reviews` - Create review
+- `POST /api/webapps/:id/click` - Track click
+- `POST /api/reports` - Report webapp
+
+### Admin Endpoints (require admin key)
+
+- `POST /api/admin/login` - Admin login
+- `GET /api/admin/reports` - Get all reports
+- `GET /api/admin/webapps` - Get all webapps
+- `PUT /api/admin/reports/:id` - Resolve report
+- `DELETE /api/admin/webapps/:id` - Delete webapp (admin)
+- `GET /api/admin/logs` - View logs
+- `GET /api/admin/stats` - Security statistics
+
+---
+
+## 🔒 SECURITY FEATURES
+
+### Implemented Protections
+
+✅ **SQL Injection Prevention**: Pattern detection and sanitization  
+✅ **XSS Protection**: Input sanitization and validation  
+✅ **Rate Limiting**: Per-IP and per-user limits  
+✅ **HTTPS Enforcement**: Only HTTPS URLs accepted  
+✅ **Password Hashing**: bcrypt with salt rounds  
+✅ **JWT Authentication**: Secure token-based auth  
+✅ **CORS Protection**: Configured CORS policy  
+✅ **Request Validation**: Size limits and format checks  
+
+### Security Logging
+
+All security events are logged:
+- Failed login attempts
+- SQL injection attempts
+- XSS attempts
+- Rate limit violations
+- Blocked IPs
+- Admin access attempts
+
+Logs location: `logs/security-YYYY-MM-DD.log`
+
+---
+
+## 🎨 CUSTOMIZATION
+
+### Adding a New Language
+
+1. Create translation file: `i18n/de.json` (German example)
+2. Copy structure from `i18n/en.json`
+3. Translate all keys
+4. Add language option in `index.html`:
+```html
+<option value="de">🇩🇪 Deutsch</option>
+```
+
+### Adding a New Category
+
+1. Add icon SVG to `assets/icons/icon-newcategory.svg`
+2. Update category validation in `utils.js`:
+```javascript
+const validCategories = [..., 'newcategory'];
+```
+3. Add category option in `submit.html`
+4. Add translation keys in all `i18n/*.json` files
+
+### Customizing Design
+
+All CSS is inline in HTML files. Main color variables:
+
+```css
+:root {
+  --bg-deep-space: #0a0e27;
+  --bg-card: #1a1f3a;
+  --text-primary: #E0E6ED;
+  --text-secondary: #a0aec0;
+  --accent-cyan: #00d9ff;
+  --accent-purple: #8b5cf6;
+  --accent-green: #10b981;
+  --accent-gold: #fbbf24;
+  --accent-red: #ef4444;
+}
+```
+
+---
+
+## 🚢 DEPLOYMENT
+
+### Render (Recommended)
+
+1. Create new Web Service
+2. Connect GitHub repository
+3. Build Command: `npm install`
+4. Start Command: `node api.js`
+5. Add environment variables
+6. Deploy
+
+### Railway
+
+1. Create new project
+2. Connect repository
+3. Add environment variables
+4. Deploy automatically
+
+### Vercel
+
+1. Import project
+2. Framework: Other
+3. Build: `npm install`
+4. Output: `./`
+5. Install command: `npm install`
+6. Start: `node api.js`
+
+---
+
+## 📊 ANALYTICS & MONITORING
+
+### Built-in Analytics
+
+- **Webapp Views**: Unique views per user
+- **Webapp Clicks**: Total clicks on "Open Webapp"
+- **Click Sources**: Track where clicks come from (catalog, detail, search)
+- **Review Stats**: Average ratings, review counts
+- **User Badges**: Automatic badge awarding based on activity
+
+### Admin Dashboard
+
+Access at `/admin.html`:
+- View all reports
+- Moderate webapps
+- Delete inappropriate content
+- View security logs
+- Monitor system health
+
+### Log Analysis
+
+```bash
+# View recent API calls
+tail -f logs/api-$(date +%Y-%m-%d).log
+
+# View security events
+tail -f logs/security-$(date +%Y-%m-%d).log
+
+# Count errors today
+grep ERROR logs/errors-$(date +%Y-%m-%d).log | wc -l
+```
+
+---
+
+## 🐛 TROUBLESHOOTING
+
+### Database Connection Error
+
+```
+Error: Failed to connect to database
+```
+
+**Solution**: Check `DATABASE_URL` and `DATABASE_AUTH_TOKEN` in `.env`
+
+### Rate Limit Exceeded
+
+```
+Error: Rate limit exceeded
+```
+
+**Solution**: Wait 15 minutes or adjust `RATE_LIMIT_*` in `.env`
+
+### Webapp Not Displaying
+
+**Possible causes**:
+1. Database not initialized - Set `RESET_DB=true` temporarily
+2. Wrong category selected
+3. Trust score too low (< 30) - Check admin panel
+
+### Admin Login Fails
+
+**Solution**: Verify `ADMIN_EMAIL` and `ADMIN_PASSWORD` match `.env` values
+
+---
+
+## 🤝 CONTRIBUTING
+
+We welcome contributions! Here's how:
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+### Contribution Guidelines
+
+- Follow existing code style
+- Add comments for complex logic
+- Test thoroughly before submitting
+- Update README if needed
+
+---
+
+## 📝 LICENSE
+
+MIT License - feel free to use this project for personal or commercial purposes.
+
+---
+
+## 👨‍💻 AUTHOR
+
+**Daouda Abdoul Anzize**  
+Nexus Studio
+
+- Email: contact@nexusstudio.com
+- GitHub: [@anzize](https://github.com/anzize)
+
+---
+
+## 🙏 ACKNOWLEDGMENTS
+
+- Font Awesome for icons
+- Turso for database
+- Render for hosting
+- The open-source community
+
+---
+
+## 🔮 ROADMAP
+
+### Phase 1 (MVP) ✅
+- [x] Basic CRUD operations
+- [x] Authentication system
+- [x] Review system
+- [x] Admin panel
+- [x] Security layer
+- [x] Multilingual support
+
+### Phase 2 (Q1 2025)
+- [ ] Collections/Favorites
+- [ ] Follow system
 - [ ] Notifications
-- [ ] Marketplace testeurs
-- [ ] Abonnements Pro
+- [ ] Advanced analytics
+- [ ] Email notifications
+- [ ] API webhooks
+
+### Phase 3 (Q2 2025)
+- [ ] Monetization (ads, premium)
+- [ ] Mobile app
+- [ ] Advanced search (AI)
+- [ ] Community forum
+- [ ] Creator dashboard
+- [ ] A/B testing
 
 ---
 
-## 🔐 Sécurité
+## 📞 SUPPORT
 
-- ✅ Mots de passe hashés (bcrypt)
-- ✅ JWT tokens (expiration 30 jours)
-- ✅ Rate limiting (100 req/15min)
-- ✅ Sanitization inputs
-- ✅ CORS configuré
-- ✅ HTTPS requis pour URLs webapps
+Need help? Contact us:
+- Email: contact@nexusstudio.com
+- GitHub Issues: [Create an issue](https://github.com/your-username/nexus-web-hub/issues)
 
 ---
 
-## 🚢 Déploiement Render
-
-### Configuration
-
-**Build Command**
-```
-npm install
-```
-
-**Start Command**
-```
-node api.js
-```
-
-### Variables d'Environnement (Render Dashboard)
-
-```
-DATABASE_URL = libsql://your-db.turso.io
-DATABASE_AUTH_TOKEN = your-token
-JWT_SECRET = your-secret-key-strong
-```
-
-**⚠️ Ne PAS ajouter PORT** (géré automatiquement)
-
----
-
-## 🧪 Tests
-
-### Test Backend (CLI)
-
-```bash
-# Health check
-curl http://localhost:3000/api/health
-
-# Stats
-curl http://localhost:3000/api/stats
-
-# Liste webapps
-curl http://localhost:3000/api/webapps
-```
-
-### Test Frontend
-
-1. Ouvre http://localhost:3000
-2. Vérifie Console (F12) : Pas d'erreurs rouges
-3. Teste chaque bouton
-4. Vérifie responsive (mode mobile)
-
----
-
-## 📞 Contact
-
-**Créateur** : Daouda Abdoul Anzize  
-**Email Pro** : nexusstudio100@gmail.com  
-**Email Perso** : anzizdaouda0@gmail.com  
-**GitHub** : [@Tryboy869](https://github.com/Tryboy869)
-
----
-
-## 📄 Licence
-
-MIT License - Libre d'utilisation pour projets personnels et commerciaux
-
----
-
-## 🙏 Remerciements
-
-- Architecture **NEXUS AXION 3.5** by Anzize Daouda
-- Assets SVG créés par Nexus Studio
-- Communauté open source
-
----
-
-**🌌 Construis l'impossible. Simplement.**
+**Made with ❤️ by Nexus Studio**
