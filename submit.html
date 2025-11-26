@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Soumettre une Webapp - Nexus Web Hub</title>
-  <link rel="icon" href="assets/logos/logo-nwh.svg" type="image/svg+xml">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <title>Submit Webapp | Nexus Web Hub</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    
     :root {
       --bg-deep-space: #0a0e27;
       --bg-card: #1a1f3a;
@@ -19,93 +18,96 @@
       --accent-purple: #8b5cf6;
       --accent-green: #10b981;
       --accent-red: #ef4444;
-      --border-glow: rgba(0, 217, 255, 0.15);
-      --font-body: 'Inter', sans-serif;
-      --font-heading: 'Space Grotesk', sans-serif;
     }
-
+    
     body {
-      font-family: var(--font-body);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg-deep-space);
       color: var(--text-primary);
-      min-height: 100vh;
+      line-height: 1.6;
     }
 
-    a { color: inherit; text-decoration: none; }
-
-    /* HEADER */
-    header {
-      background: rgba(26, 31, 58, 0.95);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border-glow);
+    nav {
+      background: var(--bg-card);
       padding: 1rem 2rem;
-    }
-
-    .header-content {
-      max-width: 800px;
-      margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-bottom: 2px solid var(--accent-cyan);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
-
-    .back-link {
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .back-link:hover { color: var(--accent-cyan); }
 
     .logo {
-      display: flex;
+      height: 40px;
+      cursor: pointer;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      font-family: var(--font-heading);
-      font-size: 1.2rem;
-      font-weight: 700;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 217, 255, 0.3);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid var(--accent-cyan);
       color: var(--accent-cyan);
     }
 
-    .logo img { width: 32px; height: 32px; }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
-    /* MAIN */
-    main {
+    .container {
       max-width: 800px;
       margin: 0 auto;
       padding: 2rem;
     }
 
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
     .page-title {
-      font-family: var(--font-heading);
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .page-subtitle {
       color: var(--text-secondary);
-      margin-bottom: 2rem;
+      font-size: 1.1rem;
     }
 
-    /* FORM */
-    .submit-form {
+    .form-container {
       background: var(--bg-card);
-      border: 1px solid var(--border-glow);
       border-radius: 16px;
       padding: 2rem;
-    }
-
-    .form-section {
-      margin-bottom: 2rem;
-    }
-
-    .form-section-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border-glow);
+      border: 2px solid var(--accent-purple);
     }
 
     .form-group {
@@ -115,477 +117,545 @@
     .form-group label {
       display: block;
       margin-bottom: 0.5rem;
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-    .form-group label .required {
-      color: var(--accent-red);
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.85rem 1rem;
-      background: var(--bg-deep-space);
-      border: 1px solid var(--border-glow);
-      border-radius: 10px;
+      font-weight: 600;
       color: var(--text-primary);
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-      transition: all 0.3s;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 15px rgba(0, 217, 255, 0.15);
-    }
-
-    .form-group textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    .form-hint {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      margin-top: 0.35rem;
-    }
-
-    .char-count {
-      text-align: right;
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-    }
-
-    /* CATEGORY SELECT */
-    .category-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 0.75rem;
-    }
-
-    .category-option {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.75rem 1rem;
-      background: var(--bg-deep-space);
-      border: 1px solid var(--border-glow);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
     }
 
-    .category-option:hover { border-color: var(--accent-cyan); }
+    .required {
+      color: var(--accent-red);
+    }
 
-    .category-option.active {
+    input, textarea, select {
+      width: 100%;
+      padding: 1rem;
+      background: var(--bg-deep-space);
+      border: 2px solid var(--accent-purple);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .helper-text {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .char-counter {
+      float: right;
+      color: var(--text-secondary);
+    }
+
+    .category-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .category-option {
+      padding: 1rem;
+      background: var(--bg-deep-space);
+      border: 2px solid var(--accent-purple);
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .category-option:hover, .category-option.selected {
       border-color: var(--accent-cyan);
       background: rgba(0, 217, 255, 0.1);
     }
 
-    .category-option img { width: 24px; height: 24px; }
+    .category-option img {
+      width: 32px;
+      height: 32px;
+    }
 
-    .category-option input { display: none; }
-
-    /* BUTTONS */
     .form-actions {
       display: flex;
       gap: 1rem;
       justify-content: flex-end;
       margin-top: 2rem;
       padding-top: 2rem;
-      border-top: 1px solid var(--border-glow);
+      border-top: 2px solid var(--bg-deep-space);
     }
 
-    .btn {
-      padding: 0.9rem 2rem;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: var(--font-body);
-      font-size: 1rem;
-      transition: all 0.3s;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      color: #fff;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 217, 255, 0.4);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--text-primary);
-      border: 1px solid var(--border-glow);
-    }
-
-    .btn-secondary:hover { border-color: var(--accent-cyan); }
-
-    /* MESSAGES */
-    .message {
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1.5rem;
-    }
-
-    .message.error {
+    .error-message {
       background: rgba(239, 68, 68, 0.1);
-      border: 1px solid var(--accent-red);
-      color: var(--accent-red);
-    }
-
-    .message.success {
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid var(--accent-green);
-      color: var(--accent-green);
-    }
-
-    /* PREVIEW */
-    .preview-section {
-      margin-top: 2rem;
-      padding: 1.5rem;
-      background: var(--bg-deep-space);
+      border: 2px solid var(--accent-red);
       border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      color: var(--accent-red);
+      display: none;
     }
 
-    .preview-title {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      margin-bottom: 1rem;
+    .error-message.show {
+      display: block;
     }
 
-    .preview-video {
-      width: 100%;
-      aspect-ratio: 16/9;
-      border-radius: 8px;
-      border: none;
+    .success-message {
+      background: rgba(16, 185, 129, 0.1);
+      border: 2px solid var(--accent-green);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      color: var(--accent-green);
+      display: none;
     }
 
-    .hidden { display: none !important; }
+    .success-message.show {
+      display: block;
+    }
+
+    .info-box {
+      background: rgba(139, 92, 246, 0.1);
+      border: 2px solid var(--accent-purple);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-box h3 {
+      color: var(--accent-purple);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .changelog-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .changelog-section.show {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .category-selector {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .form-actions {
+        flex-direction: column;
+      }
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
   </style>
 </head>
 <body>
-
-  <!-- HEADER -->
-  <header>
-    <div class="header-content">
-      <a href="/" class="back-link">← Retour</a>
-      <a href="/" class="logo">
-        <img src="assets/logos/logo-nwh.svg" alt="NWH">
-        Nexus Web Hub
-      </a>
+  <nav>
+    <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub" class="logo" onclick="window.location.href='/'">
+    <div style="display: flex; gap: 1rem;">
+      <button class="btn btn-secondary" onclick="window.location.href='/profile.html'">
+        <i class="fa-solid fa-user"></i>
+        Profile
+      </button>
     </div>
-  </header>
+  </nav>
 
-  <!-- MAIN -->
-  <main>
-    <h1 class="page-title" id="pageTitle">Soumettre une webapp</h1>
-    <p class="page-subtitle" id="pageSubtitle">Partagez votre création avec la communauté</p>
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title" id="page-title">Publish a Webapp</h1>
+      <p class="page-subtitle">Share your creation with the community</p>
+    </div>
 
-    <!-- MESSAGES -->
-    <div id="errorMessage" class="message error hidden"></div>
-    <div id="successMessage" class="message success hidden"></div>
+    <div class="info-box">
+      <h3><i class="fa-solid fa-circle-info"></i> Important Information</h3>
+      <p>Make sure your webapp is accessible via HTTPS. Include the full URL in the description if the main link has issues.</p>
+    </div>
 
-    <!-- FORM -->
-    <form class="submit-form" id="submitForm" onsubmit="handleSubmit(event)">
-      
-      <!-- BASIC INFO -->
-      <div class="form-section">
-        <h2 class="form-section-title">📝 Informations de base</h2>
-        
+    <div class="error-message" id="error-message"></div>
+    <div class="success-message" id="success-message"></div>
+
+    <div class="form-container">
+      <form id="webapp-form" onsubmit="handleSubmit(event)">
+        <!-- Name -->
         <div class="form-group">
-          <label>Nom du projet <span class="required">*</span></label>
-          <input type="text" id="name" required placeholder="Ex: Super Todo App" maxlength="100">
-        </div>
-
-        <div class="form-group">
-          <label>URL principale (HTTPS) <span class="required">*</span></label>
-          <input type="url" id="url" required placeholder="https://votre-webapp.com">
-          <div class="form-hint">L'URL doit commencer par https://</div>
-        </div>
-
-        <div class="form-group">
-          <label>Description courte <span class="required">*</span></label>
-          <textarea id="descriptionShort" required maxlength="200" placeholder="Décrivez votre webapp en quelques mots..." oninput="updateCharCount()"></textarea>
-          <div class="char-count"><span id="charCount">0</span>/200</div>
-        </div>
-
-        <div class="form-group">
-          <label>Description détaillée</label>
-          <textarea id="descriptionLong" maxlength="2000" placeholder="Décrivez en détail les fonctionnalités, l'utilisation, etc..."></textarea>
-        </div>
-      </div>
-
-      <!-- CATEGORY -->
-      <div class="form-section">
-        <h2 class="form-section-title">📁 Catégorie</h2>
-        
-        <div class="category-grid">
-          <label class="category-option" data-cat="productivity">
-            <input type="radio" name="category" value="productivity">
-            <img src="assets/icons/icon-tools.svg" alt="">
-            <span>Productivité</span>
+          <label>
+            <i class="fa-solid fa-signature"></i>
+            Webapp Name <span class="required">*</span>
+            <span class="char-counter" id="name-counter">0/100</span>
           </label>
-          <label class="category-option" data-cat="design">
-            <input type="radio" name="category" value="design">
-            <img src="assets/icons/icon-ui-kits.svg" alt="">
-            <span>Design</span>
-          </label>
-          <label class="category-option" data-cat="game">
-            <input type="radio" name="category" value="game">
-            <img src="assets/icons/icon-games.svg" alt="">
-            <span>Jeux</span>
-          </label>
-          <label class="category-option" data-cat="api">
-            <input type="radio" name="category" value="api">
-            <img src="assets/icons/icon-apis.svg" alt="">
-            <span>API / Dev</span>
-          </label>
-          <label class="category-option" data-cat="nocode">
-            <input type="radio" name="category" value="nocode">
-            <img src="assets/icons/icon-websites.svg" alt="">
-            <span>No-Code</span>
-          </label>
-          <label class="category-option" data-cat="other">
-            <input type="radio" name="category" value="other">
-            <img src="assets/icons/icon-other.svg" alt="">
-            <span>Autre</span>
-          </label>
+          <input type="text" id="name" required minlength="3" maxlength="100" placeholder="e.g: My Awesome Tool">
+          <div class="helper-text">
+            <i class="fa-solid fa-lightbulb"></i>
+            Choose a clear and descriptive name
+          </div>
         </div>
-      </div>
 
-      <!-- TAGS -->
-      <div class="form-section">
-        <h2 class="form-section-title">🏷️ Tags</h2>
-        
+        <!-- Developer Name -->
         <div class="form-group">
-          <input type="text" id="tags" placeholder="react, productivité, open-source (séparés par virgules)">
-          <div class="form-hint">Ajoutez des tags pour aider les utilisateurs à trouver votre webapp</div>
+          <label>
+            <i class="fa-solid fa-user"></i>
+            Developer/Creator Name
+          </label>
+          <input type="text" id="developer" placeholder="Your name or team name">
+          <div class="helper-text">
+            <i class="fa-solid fa-lightbulb"></i>
+            Leave empty to use your profile name
+          </div>
         </div>
-      </div>
 
-      <!-- MEDIA -->
-      <div class="form-section">
-        <h2 class="form-section-title">🎬 Médias (optionnel)</h2>
-        
+        <!-- URL -->
         <div class="form-group">
-          <label>URL GitHub</label>
-          <input type="url" id="githubUrl" placeholder="https://github.com/username/repo">
+          <label>
+            <i class="fa-solid fa-link"></i>
+            Webapp URL <span class="required">*</span>
+          </label>
+          <input type="url" id="url" required placeholder="https://example.com">
+          <div class="helper-text">
+            <i class="fa-solid fa-lock"></i>
+            Must use HTTPS protocol
+          </div>
         </div>
 
+        <!-- Category -->
         <div class="form-group">
-          <label>URL Vidéo YouTube</label>
-          <input type="url" id="videoUrl" placeholder="https://youtube.com/watch?v=..." oninput="previewVideo()">
-          <div class="form-hint">La vidéo sera intégrée directement sur la page de votre webapp</div>
+          <label>
+            <i class="fa-solid fa-layer-group"></i>
+            Category <span class="required">*</span>
+          </label>
+          <div class="category-selector">
+            <div class="category-option" onclick="selectCategory('productivity')" data-category="productivity">
+              <img src="/assets/icons/icon-tools.svg" alt="Productivity">
+              <span>Productivity</span>
+            </div>
+            <div class="category-option" onclick="selectCategory('design')" data-category="design">
+              <img src="/assets/icons/icon-ui-kits.svg" alt="Design">
+              <span>Design</span>
+            </div>
+            <div class="category-option" onclick="selectCategory('games')" data-category="games">
+              <img src="/assets/icons/icon-games.svg" alt="Games">
+              <span>Games</span>
+            </div>
+            <div class="category-option" onclick="selectCategory('api')" data-category="api">
+              <img src="/assets/icons/icon-apis.svg" alt="API">
+              <span>API</span>
+            </div>
+            <div class="category-option" onclick="selectCategory('nocode')" data-category="nocode">
+              <img src="/assets/icons/icon-websites.svg" alt="No-Code">
+              <span>No-Code</span>
+            </div>
+            <div class="category-option" onclick="selectCategory('other')" data-category="other">
+              <img src="/assets/icons/icon-other.svg" alt="Other">
+              <span>Other</span>
+            </div>
+          </div>
+          <input type="hidden" id="category" required>
         </div>
 
-        <div class="preview-section hidden" id="videoPreview">
-          <div class="preview-title">Aperçu vidéo</div>
-          <iframe id="previewFrame" class="preview-video" allowfullscreen></iframe>
-        </div>
-
+        <!-- Short Description -->
         <div class="form-group">
-          <label>URL Screenshot</label>
-          <input type="url" id="imageUrl" placeholder="https://exemple.com/screenshot.png">
-          <div class="form-hint">URL directe vers une image de votre webapp</div>
+          <label>
+            <i class="fa-solid fa-align-left"></i>
+            Short Description <span class="required">*</span>
+            <span class="char-counter" id="short-counter">0/200</span>
+          </label>
+          <textarea id="description_short" required minlength="20" maxlength="200" rows="3" placeholder="Describe your webapp briefly (20-200 characters)"></textarea>
+          <div class="helper-text">
+            <i class="fa-solid fa-circle-info"></i>
+            Include the URL here if the main link might have issues
+          </div>
         </div>
-      </div>
 
-      <!-- ACTIONS -->
-      <div class="form-actions">
-        <a href="/" class="btn btn-secondary">Annuler</a>
-        <button type="submit" class="btn btn-primary" id="submitBtn">Publier</button>
-      </div>
-    </form>
-  </main>
+        <!-- Long Description -->
+        <div class="form-group">
+          <label>
+            <i class="fa-solid fa-file-lines"></i>
+            Detailed Description (Optional)
+          </label>
+          <textarea id="description_long" rows="6" placeholder="Provide a detailed description of your webapp, its features, how to use it..."></textarea>
+        </div>
+
+        <!-- Tags -->
+        <div class="form-group">
+          <label>
+            <i class="fa-solid fa-tags"></i>
+            Tags (Optional)
+          </label>
+          <input type="text" id="tags" placeholder="javascript, productivity, free, open-source">
+          <div class="helper-text">
+            <i class="fa-solid fa-lightbulb"></i>
+            Separate tags with commas. Max 10 tags.
+          </div>
+        </div>
+
+        <!-- GitHub URL -->
+        <div class="form-group">
+          <label>
+            <i class="fa-brands fa-github"></i>
+            GitHub URL (Optional)
+          </label>
+          <input type="url" id="github_url" placeholder="https://github.com/username/repo">
+          <div class="helper-text">
+            <i class="fa-solid fa-code"></i>
+            Share your source code with the community
+          </div>
+        </div>
+
+        <!-- Video URL -->
+        <div class="form-group">
+          <label>
+            <i class="fa-brands fa-youtube"></i>
+            YouTube Video URL (Optional)
+          </label>
+          <input type="url" id="video_url" placeholder="https://youtube.com/watch?v=...">
+          <div class="helper-text">
+            <i class="fa-solid fa-video"></i>
+            Demo or tutorial video
+          </div>
+        </div>
+
+        <!-- Image URL -->
+        <div class="form-group">
+          <label>
+            <i class="fa-solid fa-image"></i>
+            Screenshot URL (Optional)
+          </label>
+          <input type="url" id="image_url" placeholder="https://example.com/screenshot.png">
+          <div class="helper-text">
+            <i class="fa-solid fa-camera"></i>
+            Direct link to a screenshot or logo
+          </div>
+        </div>
+
+        <!-- Changelog (Edit mode only) -->
+        <div class="changelog-section" id="changelog-section">
+          <div class="form-group">
+            <label>
+              <i class="fa-solid fa-code-branch"></i>
+              Version (Optional)
+            </label>
+            <input type="text" id="version" placeholder="e.g: 2.0.0">
+          </div>
+
+          <div class="form-group">
+            <label>
+              <i class="fa-solid fa-list"></i>
+              Changelog (Optional)
+            </label>
+            <textarea id="changelog" rows="5" placeholder="What's new in this version?&#10;- New feature X&#10;- Bug fix Y&#10;- Performance improvements"></textarea>
+            <div class="helper-text">
+              <i class="fa-solid fa-lightbulb"></i>
+              Let users know what changed
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="window.location.href='/profile.html'">
+            <i class="fa-solid fa-xmark"></i>
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" id="submit-btn">
+            <i class="fa-solid fa-rocket"></i>
+            <span id="submit-text">Publish</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
-    let editMode = false;
-    let editId = null;
-    let currentUser = null;
+    let isEditMode = false;
+    let editWebappId = null;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      checkAuth();
-      setupCategorySelection();
-      checkEditMode();
+    // Character counters
+    document.getElementById('name').addEventListener('input', (e) => {
+      document.getElementById('name-counter').textContent = `${e.target.value.length}/100`;
     });
 
-    function checkAuth() {
-      const token = localStorage.getItem('token');
-      const userData = localStorage.getItem('user');
+    document.getElementById('description_short').addEventListener('input', (e) => {
+      document.getElementById('short-counter').textContent = `${e.target.value.length}/200`;
+    });
 
-      if (!token || !userData) {
-        window.location.href = 'auth.html?redirect=submit.html';
-        return;
-      }
-
-      currentUser = JSON.parse(userData);
-    }
-
-    function setupCategorySelection() {
+    // Category selection
+    function selectCategory(category) {
       document.querySelectorAll('.category-option').forEach(opt => {
-        opt.addEventListener('click', () => {
-          document.querySelectorAll('.category-option').forEach(o => o.classList.remove('active'));
-          opt.classList.add('active');
-          opt.querySelector('input').checked = true;
-        });
+        opt.classList.remove('selected');
       });
+      event.target.closest('.category-option').classList.add('selected');
+      document.getElementById('category').value = category;
     }
 
-    function checkEditMode() {
-      const params = new URLSearchParams(window.location.search);
-      editId = params.get('edit');
-
-      if (editId) {
-        editMode = true;
-        document.getElementById('pageTitle').textContent = 'Modifier la webapp';
-        document.getElementById('pageSubtitle').textContent = 'Mettez à jour les informations de votre webapp';
-        document.getElementById('submitBtn').textContent = 'Enregistrer';
-        loadWebappData();
-      }
-    }
-
+    // Load webapp data if edit mode
     async function loadWebappData() {
-      try {
-        const res = await fetch(`/api/webapps/${editId}`);
-        const data = await res.json();
+      const urlParams = new URLSearchParams(window.location.search);
+      editWebappId = urlParams.get('edit');
 
-        if (data.success) {
-          const w = data.data.webapp;
-          document.getElementById('name').value = w.name;
-          document.getElementById('url').value = w.url;
-          document.getElementById('descriptionShort').value = w.description_short;
-          document.getElementById('descriptionLong').value = w.description_long || '';
-          document.getElementById('tags').value = (w.tags || []).join(', ');
-          document.getElementById('githubUrl').value = w.github_url || '';
-          document.getElementById('videoUrl').value = w.video_url || '';
-          document.getElementById('imageUrl').value = w.image_url || '';
+      if (editWebappId) {
+        isEditMode = true;
+        document.getElementById('page-title').textContent = 'Edit Webapp';
+        document.getElementById('submit-text').textContent = 'Save Changes';
+        document.getElementById('changelog-section').classList.add('show');
 
-          // Select category
-          const catOpt = document.querySelector(`[data-cat="${w.category}"]`);
-          if (catOpt) {
-            catOpt.classList.add('active');
-            catOpt.querySelector('input').checked = true;
+        try {
+          const response = await fetch(`/api/webapps/${editWebappId}`);
+          const data = await response.json();
+
+          if (data.success) {
+            const webapp = data.webapp;
+
+            // Fill form
+            document.getElementById('name').value = webapp.name;
+            document.getElementById('developer').value = webapp.developer;
+            document.getElementById('url').value = webapp.url;
+            document.getElementById('description_short').value = webapp.description_short;
+            document.getElementById('description_long').value = webapp.description_long || '';
+            document.getElementById('tags').value = JSON.parse(webapp.tags || '[]').join(', ');
+            document.getElementById('github_url').value = webapp.github_url || '';
+            document.getElementById('video_url').value = webapp.video_url || '';
+            document.getElementById('image_url').value = webapp.image_url || '';
+
+            // Select category
+            selectCategory(webapp.category);
+            document.querySelector(`[data-category="${webapp.category}"]`).classList.add('selected');
+
+            // Update counters
+            document.getElementById('name-counter').textContent = `${webapp.name.length}/100`;
+            document.getElementById('short-counter').textContent = `${webapp.description_short.length}/200`;
           }
-
-          updateCharCount();
-          previewVideo();
-        }
-      } catch (e) {
-        console.error(e);
-        showError('Impossible de charger les données');
-      }
-    }
-
-    function updateCharCount() {
-      const text = document.getElementById('descriptionShort').value;
-      document.getElementById('charCount').textContent = text.length;
-    }
-
-    function previewVideo() {
-      const url = document.getElementById('videoUrl').value;
-      const preview = document.getElementById('videoPreview');
-      const frame = document.getElementById('previewFrame');
-
-      if (url && url.includes('youtube')) {
-        const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
-        if (match) {
-          frame.src = `https://www.youtube.com/embed/${match[1]}`;
-          preview.classList.remove('hidden');
-          return;
+        } catch (error) {
+          showError('Error loading webapp data');
         }
       }
-      preview.classList.add('hidden');
-    }
-
-    function showError(msg) {
-      document.getElementById('errorMessage').textContent = msg;
-      document.getElementById('errorMessage').classList.remove('hidden');
-      document.getElementById('successMessage').classList.add('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function showSuccess(msg) {
-      document.getElementById('successMessage').textContent = msg;
-      document.getElementById('successMessage').classList.remove('hidden');
-      document.getElementById('errorMessage').classList.add('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function handleSubmit(e) {
       e.preventDefault();
 
-      const categoryInput = document.querySelector('input[name="category"]:checked');
-      if (!categoryInput) {
-        showError('Veuillez sélectionner une catégorie');
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        window.location.href = '/auth.html';
         return;
       }
 
-      const data = {
-        name: document.getElementById('name').value,
-        url: document.getElementById('url').value,
-        description_short: document.getElementById('descriptionShort').value,
-        description_long: document.getElementById('descriptionLong').value || null,
-        category: categoryInput.value,
-        tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t),
-        github_url: document.getElementById('githubUrl').value || null,
-        video_url: document.getElementById('videoUrl').value || null,
-        image_url: document.getElementById('imageUrl').value || null
+      // Get form data
+      const formData = {
+        name: document.getElementById('name').value.trim(),
+        developer: document.getElementById('developer').value.trim() || undefined,
+        url: document.getElementById('url').value.trim(),
+        category: document.getElementById('category').value,
+        description_short: document.getElementById('description_short').value.trim(),
+        description_long: document.getElementById('description_long').value.trim() || undefined,
+        tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(Boolean),
+        github_url: document.getElementById('github_url').value.trim() || undefined,
+        video_url: document.getElementById('video_url').value.trim() || undefined,
+        image_url: document.getElementById('image_url').value.trim() || undefined
       };
 
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      btn.textContent = editMode ? 'Enregistrement...' : 'Publication...';
+      // Changelog (edit mode only)
+      if (isEditMode) {
+        const version = document.getElementById('version').value.trim();
+        const changelog = document.getElementById('changelog').value.trim();
+        if (version && changelog) {
+          formData.version = version;
+          formData.changelog = changelog;
+        }
+      }
+
+      // Validate
+      if (!formData.category) {
+        showError('Please select a category');
+        return;
+      }
+
+      // Submit
+      document.getElementById('submit-btn').disabled = true;
 
       try {
-        const token = localStorage.getItem('token');
-        const method = editMode ? 'PUT' : 'POST';
-        const endpoint = editMode ? `/api/webapps/${editId}` : '/api/webapps';
+        const endpoint = isEditMode ? `/api/webapps/${editWebappId}` : '/api/webapps';
+        const method = isEditMode ? 'PUT' : 'POST';
 
-        const res = await fetch(endpoint, {
+        const response = await fetch(endpoint, {
           method,
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'X-User-Id': userId
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify(formData)
         });
 
-        const result = await res.json();
+        const data = await response.json();
 
-        if (result.success) {
-          showSuccess(editMode ? 'Webapp mise à jour !' : 'Webapp publiée avec succès !');
+        if (data.success) {
+          showSuccess(isEditMode ? 'Webapp updated successfully!' : 'Webapp published successfully!');
+          
           setTimeout(() => {
-            window.location.href = editMode ? 'profile.html' : `webapp.html?id=${result.data.id}`;
-          }, 1500);
+            window.location.href = '/profile.html';
+          }, 2000);
         } else {
-          showError(result.message);
-          btn.disabled = false;
-          btn.textContent = editMode ? 'Enregistrer' : 'Publier';
+          showError(data.message || 'Submission failed');
+          document.getElementById('submit-btn').disabled = false;
         }
-      } catch (err) {
-        console.error(err);
-        showError('Erreur lors de la soumission');
-        btn.disabled = false;
-        btn.textContent = editMode ? 'Enregistrer' : 'Publier';
+      } catch (error) {
+        console.error('Submit error:', error);
+        showError('Network error. Please try again.');
+        document.getElementById('submit-btn').disabled = false;
       }
     }
+
+    function showError(message) {
+      const errorEl = document.getElementById('error-message');
+      errorEl.textContent = message;
+      errorEl.classList.add('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      setTimeout(() => {
+        errorEl.classList.remove('show');
+      }, 5000);
+    }
+
+    function showSuccess(message) {
+      const successEl = document.getElementById('success-message');
+      successEl.textContent = message;
+      successEl.classList.add('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!localStorage.getItem('token')) {
+        window.location.href = '/auth.html';
+        return;
+      }
+      loadWebappData();
+    });
   </script>
 </body>
 </html>
