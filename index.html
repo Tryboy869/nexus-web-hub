@@ -48,7 +48,7 @@
     /* Navbar */
     nav {
       background: var(--bg-card);
-      padding: 1rem 2rem;
+      padding: 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -56,24 +56,34 @@
       position: sticky;
       top: 0;
       z-index: 1000;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
     
     .nav-left {
       display: flex;
       align-items: center;
-      gap: 2rem;
+      gap: 1rem;
+      flex: 1;
+      min-width: 0;
     }
     
     .logo {
-      height: 40px;
+      height: 35px;
       cursor: pointer;
+      flex-shrink: 0;
     }
     
     .stats {
       display: flex;
-      gap: 1.5rem;
+      gap: 1rem;
       color: var(--text-secondary);
-      font-size: 0.9rem;
+      font-size: 0.75rem;
+      flex-wrap: wrap;
+    }
+    
+    .stat-item {
+      white-space: nowrap;
     }
     
     .stat-item strong {
@@ -82,21 +92,23 @@
     
     .nav-right {
       display: flex;
-      gap: 1rem;
+      gap: 0.5rem;
       align-items: center;
+      flex-shrink: 0;
     }
     
     .lang-selector {
       background: transparent;
       border: 1px solid var(--accent-purple);
       color: var(--text-primary);
-      padding: 0.5rem 1rem;
+      padding: 0.5rem 0.75rem;
       border-radius: 8px;
       cursor: pointer;
+      font-size: 0.85rem;
     }
     
     .btn {
-      padding: 0.75rem 1.5rem;
+      padding: 0.6rem 1rem;
       border-radius: 8px;
       border: none;
       cursor: pointer;
@@ -106,6 +118,8 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      font-size: 0.85rem;
+      white-space: nowrap;
     }
     
     .btn-primary {
@@ -210,19 +224,29 @@
     
     .tabs {
       display: flex;
-      gap: 1rem;
+      gap: 0.5rem;
       border-bottom: 2px solid var(--bg-card);
       margin-bottom: 2rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; /* Firefox */
+    }
+    
+    .tabs::-webkit-scrollbar {
+      display: none; /* Chrome, Safari */
     }
     
     .tab {
-      padding: 1rem 2rem;
+      padding: 0.75rem 1.25rem;
       background: transparent;
       border: none;
       color: var(--text-secondary);
       cursor: pointer;
       border-bottom: 3px solid transparent;
       transition: all 0.3s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-size: 0.9rem;
     }
     
     .tab:hover, .tab.active {
@@ -445,10 +469,75 @@
     
     /* Responsive */
     @media (max-width: 768px) {
-      .hero h1 { font-size: 2rem; }
-      .catalog { grid-template-columns: 1fr; }
-      .filters { flex-direction: column; }
-      .stats { flex-direction: column; gap: 0.5rem; }
+      nav {
+        padding: 0.75rem;
+      }
+      
+      .stats {
+        display: none; /* Masquer stats sur mobile pour gagner de la place */
+      }
+      
+      .nav-right {
+        gap: 0.25rem;
+      }
+      
+      .lang-selector {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+      }
+      
+      .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+      }
+      
+      .btn span {
+        display: none; /* Masquer texte, garder icônes */
+      }
+      
+      .hero h1 { 
+        font-size: 1.8rem; 
+      }
+      
+      .hero p {
+        font-size: 1rem;
+      }
+      
+      .catalog { 
+        grid-template-columns: 1fr; 
+        padding: 1rem;
+      }
+      
+      .filters { 
+        flex-direction: column; 
+      }
+      
+      .search-section {
+        padding: 1rem;
+      }
+      
+      .tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .tab {
+        flex-shrink: 0;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .logo {
+        height: 30px;
+      }
+      
+      .hero {
+        padding: 2rem 1rem;
+      }
+      
+      .hero h1 {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
@@ -465,11 +554,14 @@
     </div>
     <div class="nav-right">
       <select class="lang-selector" id="language-selector" onchange="changeLanguage(this.value)">
-        <option value="en">🇬🇧 English</option>
-        <option value="fr">🇫🇷 Français</option>
-        <option value="es">🇪🇸 Español</option>
+        <option value="en">EN</option>
+        <option value="fr">FR</option>
+        <option value="es">ES</option>
       </select>
-      <a href="/submit.html" class="btn btn-primary" data-i18n="nav.submit">Submit</a>
+      <a href="/submit.html" class="btn btn-primary" data-i18n="nav.submit">
+        <i class="fa-solid fa-plus"></i>
+        <span>Submit</span>
+      </a>
       <button class="btn btn-secondary" id="auth-btn" onclick="handleAuth()">
         <i class="fa-solid fa-user"></i>
         <span id="auth-text" data-i18n="nav.login">Login</span>
