@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Submit Webapp | Nexus Web Hub</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+
     :root {
       --bg-deep-space: #0a0e27;
       --bg-card: #1a1f3a;
@@ -19,7 +19,7 @@
       --accent-green: #10b981;
       --accent-red: #ef4444;
     }
-    
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg-deep-space);
@@ -350,27 +350,27 @@
             Category <span class="required">*</span>
           </label>
           <div class="category-selector">
-            <div class="category-option" onclick="selectCategory('productivity')" data-category="productivity">
+            <div class="category-option" onclick="selectCategory('productivity', this)" data-category="productivity">
               <img src="/assets/icons/icon-tools.svg" alt="Productivity">
               <span>Productivity</span>
             </div>
-            <div class="category-option" onclick="selectCategory('design')" data-category="design">
+            <div class="category-option" onclick="selectCategory('design', this)" data-category="design">
               <img src="/assets/icons/icon-ui-kits.svg" alt="Design">
               <span>Design</span>
             </div>
-            <div class="category-option" onclick="selectCategory('games')" data-category="games">
+            <div class="category-option" onclick="selectCategory('games', this)" data-category="games">
               <img src="/assets/icons/icon-games.svg" alt="Games">
               <span>Games</span>
             </div>
-            <div class="category-option" onclick="selectCategory('api')" data-category="api">
+            <div class="category-option" onclick="selectCategory('api', this)" data-category="api">
               <img src="/assets/icons/icon-apis.svg" alt="API">
               <span>API</span>
             </div>
-            <div class="category-option" onclick="selectCategory('nocode')" data-category="nocode">
+            <div class="category-option" onclick="selectCategory('nocode', this)" data-category="nocode">
               <img src="/assets/icons/icon-websites.svg" alt="No-Code">
               <span>No-Code</span>
             </div>
-            <div class="category-option" onclick="selectCategory('other')" data-category="other">
+            <div class="category-option" onclick="selectCategory('other', this)" data-category="other">
               <img src="/assets/icons/icon-other.svg" alt="Other">
               <span>Other</span>
             </div>
@@ -504,13 +504,18 @@
       document.getElementById('short-counter').textContent = `${e.target.value.length}/200`;
     });
 
-    // Category selection
-    function selectCategory(category) {
+    // Category selection - CORRIGÉ
+    function selectCategory(category, element) {
+      console.log('Selecting category:', category);
+      
       document.querySelectorAll('.category-option').forEach(opt => {
         opt.classList.remove('selected');
       });
-      event.target.closest('.category-option').classList.add('selected');
+      
+      element.classList.add('selected');
       document.getElementById('category').value = category;
+      
+      console.log('Category set to:', document.getElementById('category').value);
     }
 
     // Load webapp data if edit mode
@@ -543,14 +548,17 @@
             document.getElementById('image_url').value = webapp.image_url || '';
 
             // Select category
-            selectCategory(webapp.category);
-            document.querySelector(`[data-category="${webapp.category}"]`).classList.add('selected');
+            const categoryElement = document.querySelector(`[data-category="${webapp.category}"]`);
+            if (categoryElement) {
+              selectCategory(webapp.category, categoryElement);
+            }
 
             // Update counters
             document.getElementById('name-counter').textContent = `${webapp.name.length}/100`;
             document.getElementById('short-counter').textContent = `${webapp.description_short.length}/200`;
           }
         } catch (error) {
+          console.error('Load error:', error);
           showError('Error loading webapp data');
         }
       }
@@ -559,7 +567,11 @@
     async function handleSubmit(e) {
       e.preventDefault();
 
+      console.log('Form submitted');
+
       const userId = localStorage.getItem('userId');
+      console.log('User ID:', userId);
+      
       if (!userId) {
         window.location.href = '/auth.html';
         return;
@@ -578,6 +590,8 @@
         video_url: document.getElementById('video_url').value.trim() || undefined,
         image_url: document.getElementById('image_url').value.trim() || undefined
       };
+
+      console.log('Form data:', formData);
 
       // Changelog (edit mode only)
       if (isEditMode) {
@@ -602,6 +616,13 @@
         const endpoint = isEditMode ? `/api/webapps/${editWebappId}` : '/api/webapps';
         const method = isEditMode ? 'PUT' : 'POST';
 
+        console.log('Sending request to:', endpoint);
+        console.log('Method:', method);
+        console.log('Headers:', {
+          'Content-Type': 'application/json',
+          'X-User-Id': userId
+        });
+
         const response = await fetch(endpoint, {
           method,
           headers: {
@@ -611,11 +632,14 @@
           body: JSON.stringify(formData)
         });
 
+        console.log('Response status:', response.status);
+
         const data = await response.json();
+        console.log('Response data:', data);
 
         if (data.success) {
           showSuccess(isEditMode ? 'Webapp updated successfully!' : 'Webapp published successfully!');
-          
+
           setTimeout(() => {
             window.location.href = '/profile.html';
           }, 2000);
