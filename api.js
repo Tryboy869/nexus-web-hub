@@ -1,4 +1,4 @@
-// api.js - API Gateway for Nexus Web Hub
+// api.js - API Gateway for Nexus Web Hub - DEBUG ULTRA MODE
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -17,17 +17,20 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
-// Security & Logging System
+// Security & Logging System - VERSION DEBUG ULTRA
 class SecurityLogger {
   constructor() {
     this.logs = [];
     this.maxLogsInMemory = 1000;
     this.rateLimits = new Map();
     this.blockedIPs = new Set();
+    this.debugMode = true; // MODE DEBUG ACTIVÉ
     
     if (!fs.existsSync('logs')) {
       fs.mkdirSync('logs');
     }
+    
+    this.info('SYSTEM', { message: 'Security Logger initialized in DEBUG MODE' });
   }
   
   log(level, type, data) {
@@ -43,7 +46,15 @@ class SecurityLogger {
       this.logs.shift();
     }
     
-    console.log(`[${level}] [${type}]`, JSON.stringify(data));
+    // Console avec TOUS les détails en mode debug
+    if (this.debugMode) {
+      console.log('\n' + '='.repeat(80));
+      console.log(`[${level}] [${type}] @ ${entry.timestamp}`);
+      console.log(JSON.stringify(data, null, 2));
+      console.log('='.repeat(80) + '\n');
+    } else {
+      console.log(`[${level}] [${type}]`, JSON.stringify(data));
+    }
     
     this.writeToFile(level, entry);
   }
@@ -61,25 +72,54 @@ class SecurityLogger {
     if (level === 'ERROR') {
       fs.appendFileSync(`logs/errors-${date}.log`, logLine);
     }
+    
+    // Log spécial pour DEBUG
+    if (this.debugMode) {
+      fs.appendFileSync(`logs/debug-${date}.log`, logLine);
+    }
   }
   
   info(type, data) { this.log('INFO', type, data); }
   warn(type, data) { this.log('WARN', type, data); }
   error(type, data) { this.log('ERROR', type, data); }
   security(type, data) { this.log('SECURITY', type, data); }
+  debug(type, data) { this.log('DEBUG', type, data); }
   
   checkRateLimit(identifier, limit = 100, windowMs = 15 * 60 * 1000) {
     const now = Date.now();
     
+    this.debug('RATE_LIMIT_CHECK_START', {
+      identifier,
+      limit,
+      windowMs,
+      currentTime: now
+    });
+    
     if (!this.rateLimits.has(identifier)) {
       this.rateLimits.set(identifier, []);
+      this.debug('RATE_LIMIT_NEW_IDENTIFIER', { identifier });
     }
     
     const requests = this.rateLimits.get(identifier);
     const validRequests = requests.filter(time => now - time < windowMs);
     
+    this.debug('RATE_LIMIT_VALIDATION', {
+      identifier,
+      totalRequests: requests.length,
+      validRequests: validRequests.length,
+      limit,
+      willBlock: validRequests.length >= limit
+    });
+    
     if (validRequests.length >= limit) {
-      this.security('RATE_LIMIT_EXCEEDED', { identifier, requests: validRequests.length, limit });
+      this.security('RATE_LIMIT_EXCEEDED', {
+        identifier,
+        requests: validRequests.length,
+        limit,
+        windowMs,
+        oldestRequest: new Date(Math.min(...validRequests)).toISOString(),
+        newestRequest: new Date(Math.max(...validRequests)).toISOString()
+      });
       return false;
     }
     
@@ -87,82 +127,174 @@ class SecurityLogger {
     this.rateLimits.set(identifier, validRequests);
     
     if (validRequests.length >= limit * 0.8) {
-      this.warn('RATE_LIMIT_WARNING', { identifier, requests: validRequests.length, limit });
+      this.warn('RATE_LIMIT_WARNING', {
+        identifier,
+        requests: validRequests.length,
+        limit,
+        percentage: (validRequests.length / limit * 100).toFixed(1)
+      });
     }
+    
+    this.debug('RATE_LIMIT_CHECK_PASSED', {
+      identifier,
+      currentRequests: validRequests.length,
+      limit
+    });
     
     return true;
   }
   
   detectSQLInjection(input) {
+    this.debug('SQL_INJECTION_CHECK', {
+      input: input.substring(0, 200),
+      inputLength: input.length
+    });
+    
     const sqlPatterns = [
-      /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b)/i,
-      /(--|\#|\/\*|\*\/)/,
-      /(\bOR\b.*=.*\bOR\b)/i,
-      /('|"|;|\)|\()/
+      { name: 'SQL_KEYWORDS', pattern: /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b)/i },
+      { name: 'SQL_COMMENTS', pattern: /(--|\#|\/\*|\*\/)/ },
+      { name: 'SQL_OR_CONDITION', pattern: /(\bOR\b.*=.*\bOR\b)/i },
+      { name: 'SQL_SPECIAL_CHARS', pattern: /('|"|;|\)|\()/ }
     ];
     
-    return sqlPatterns.some(pattern => pattern.test(input));
+    for (const { name, pattern } of sqlPatterns) {
+      if (pattern.test(input)) {
+        this.debug('SQL_INJECTION_PATTERN_MATCHED', {
+          patternName: name,
+          input: input.substring(0, 200)
+        });
+        return true;
+      }
+    }
+    
+    this.debug('SQL_INJECTION_CHECK_PASSED', { input: input.substring(0, 100) });
+    return false;
   }
   
   detectXSS(input) {
+    this.debug('XSS_CHECK', {
+      input: input.substring(0, 200),
+      inputLength: input.length
+    });
+    
     const xssPatterns = [
-      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-      /javascript:/gi,
-      /on\w+\s*=\s*["'][^"']*["']/gi,
-      /<iframe/gi
+      { name: 'SCRIPT_TAG', pattern: /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi },
+      { name: 'JAVASCRIPT_PROTOCOL', pattern: /javascript:/gi },
+      { name: 'EVENT_HANDLERS', pattern: /on\w+\s*=\s*["'][^"']*["']/gi },
+      { name: 'IFRAME_TAG', pattern: /<iframe/gi }
     ];
     
-    return xssPatterns.some(pattern => pattern.test(input));
+    for (const { name, pattern } of xssPatterns) {
+      if (pattern.test(input)) {
+        this.debug('XSS_PATTERN_MATCHED', {
+          patternName: name,
+          input: input.substring(0, 200)
+        });
+        return true;
+      }
+    }
+    
+    this.debug('XSS_CHECK_PASSED', { input: input.substring(0, 100) });
+    return false;
   }
   
   validateRequest(req) {
     const ip = req.ip || req.connection.remoteAddress;
+    const userId = req.headers['x-user-id'] || 'anonymous';
     
+    this.debug('REQUEST_VALIDATION_START', {
+      ip,
+      userId,
+      method: req.method,
+      path: req.path,
+      headers: req.headers,
+      bodySize: req.body ? JSON.stringify(req.body).length : 0
+    });
+    
+    // Vérifier IP bloquée
     if (this.blockedIPs.has(ip)) {
       this.security('BLOCKED_IP_ATTEMPT', { ip, endpoint: req.path });
-      return { valid: false, reason: 'IP blocked' };
+      return { valid: false, reason: 'IP blocked', step: 'IP_CHECK' };
     }
+    this.debug('IP_CHECK_PASSED', { ip });
     
+    // Rate limiting par IP
     if (!this.checkRateLimit(ip, 100, 15 * 60 * 1000)) {
-      return { valid: false, reason: 'Rate limit exceeded' };
+      return { valid: false, reason: 'Rate limit exceeded', step: 'RATE_LIMIT_IP' };
     }
+    this.debug('RATE_LIMIT_IP_PASSED', { ip });
     
-    if (req.body && JSON.stringify(req.body).length > 10 * 1024 * 1024) {
-      this.warn('LARGE_PAYLOAD', { ip, size: JSON.stringify(req.body).length });
-      return { valid: false, reason: 'Payload too large' };
+    // Vérifier taille du body
+    const bodySize = req.body ? JSON.stringify(req.body).length : 0;
+    if (bodySize > 10 * 1024 * 1024) {
+      this.warn('LARGE_PAYLOAD', { ip, size: bodySize });
+      return { valid: false, reason: 'Payload too large', step: 'PAYLOAD_SIZE' };
     }
+    this.debug('PAYLOAD_SIZE_CHECK_PASSED', { bodySize });
     
+    // Détecter injections dans tous les champs
     const checkObject = (obj, path = '') => {
+      this.debug('OBJECT_VALIDATION_START', {
+        path,
+        keysCount: Object.keys(obj).length
+      });
+      
       for (const [key, value] of Object.entries(obj)) {
+        const fullPath = `${path}${key}`;
+        
+        this.debug('FIELD_VALIDATION', {
+          field: fullPath,
+          type: typeof value,
+          valuePreview: typeof value === 'string' ? value.substring(0, 100) : value
+        });
+        
         if (typeof value === 'string') {
           if (this.detectSQLInjection(value)) {
-            this.security('SQL_INJECTION_ATTEMPT', { 
-              ip, 
-              field: `${path}${key}`, 
+            this.security('SQL_INJECTION_ATTEMPT', {
+              ip,
+              userId,
+              field: fullPath,
               value: value.substring(0, 200),
               endpoint: req.path
             });
-            return false;
+            return { valid: false, reason: 'SQL injection detected', field: fullPath, step: 'SQL_INJECTION' };
           }
+          
           if (this.detectXSS(value)) {
-            this.security('XSS_ATTEMPT', { 
-              ip, 
-              field: `${path}${key}`, 
+            this.security('XSS_ATTEMPT', {
+              ip,
+              userId,
+              field: fullPath,
               value: value.substring(0, 200),
               endpoint: req.path
             });
-            return false;
+            return { valid: false, reason: 'XSS detected', field: fullPath, step: 'XSS_DETECTION' };
           }
+          
+          this.debug('FIELD_VALIDATION_PASSED', { field: fullPath });
         } else if (typeof value === 'object' && value !== null) {
-          if (!checkObject(value, `${path}${key}.`)) return false;
+          const nestedCheck = checkObject(value, `${fullPath}.`);
+          if (!nestedCheck.valid) return nestedCheck;
         }
       }
-      return true;
+      
+      this.debug('OBJECT_VALIDATION_PASSED', { path });
+      return { valid: true };
     };
     
-    if (req.body && !checkObject(req.body)) {
-      return { valid: false, reason: 'Malicious content detected' };
+    if (req.body) {
+      const bodyValidation = checkObject(req.body);
+      if (!bodyValidation.valid) {
+        return bodyValidation;
+      }
     }
+    
+    this.debug('REQUEST_VALIDATION_SUCCESS', {
+      ip,
+      userId,
+      method: req.method,
+      path: req.path
+    });
     
     return { valid: true };
   }
@@ -182,7 +314,8 @@ class SecurityLogger {
         INFO: recentLogs.filter(l => l.level === 'INFO').length,
         WARN: recentLogs.filter(l => l.level === 'WARN').length,
         ERROR: recentLogs.filter(l => l.level === 'ERROR').length,
-        SECURITY: recentLogs.filter(l => l.level === 'SECURITY').length
+        SECURITY: recentLogs.filter(l => l.level === 'SECURITY').length,
+        DEBUG: recentLogs.filter(l => l.level === 'DEBUG').length
       },
       blockedIPs: Array.from(this.blockedIPs),
       topIPs: [...this.rateLimits.entries()]
@@ -199,11 +332,21 @@ class SecurityLogger {
 
 const securityLogger = new SecurityLogger();
 
-// Security Middleware
+// Security Middleware - VERSION DEBUG
 app.use((req, res, next) => {
   const startTime = Date.now();
   const ip = req.ip || req.connection.remoteAddress;
   const userId = req.headers['x-user-id'] || 'anonymous';
+  
+  securityLogger.debug('MIDDLEWARE_START', {
+    ip,
+    userId,
+    method: req.method,
+    path: req.path,
+    query: req.query,
+    headers: req.headers,
+    body: req.body
+  });
   
   const validation = securityLogger.validateRequest(req);
   
@@ -213,12 +356,20 @@ app.use((req, res, next) => {
       userId,
       method: req.method,
       endpoint: req.path,
-      reason: validation.reason
+      reason: validation.reason,
+      step: validation.step,
+      field: validation.field,
+      body: req.body
     });
     
     return res.status(403).json({
       success: false,
-      message: 'Request blocked for security reasons'
+      message: 'Request blocked for security reasons',
+      debug: {
+        reason: validation.reason,
+        step: validation.step,
+        field: validation.field
+      }
     });
   }
   
@@ -316,17 +467,21 @@ app.get('/api/stats', async (req, res) => {
 // Auth
 app.post('/api/auth/signup', async (req, res) => {
   try {
+    securityLogger.debug('SIGNUP_ATTEMPT', { body: req.body });
     const result = await backend.signup(req.body);
+    securityLogger.debug('SIGNUP_SUCCESS', { result });
     res.json(result);
   } catch (error) {
-    securityLogger.error('API_ERROR', { endpoint: '/api/auth/signup', error: error.message });
+    securityLogger.error('API_ERROR', { endpoint: '/api/auth/signup', error: error.message, stack: error.stack });
     res.status(400).json({ success: false, message: error.message });
   }
 });
 
 app.post('/api/auth/login', async (req, res) => {
   try {
+    securityLogger.debug('LOGIN_ATTEMPT', { email: req.body.email });
     const result = await backend.login(req.body);
+    securityLogger.debug('LOGIN_SUCCESS', { userId: result.user?.id });
     res.json(result);
   } catch (error) {
     securityLogger.error('API_ERROR', { endpoint: '/api/auth/login', error: error.message });
@@ -337,6 +492,7 @@ app.post('/api/auth/login', async (req, res) => {
 app.get('/api/auth/me', async (req, res) => {
   try {
     const userId = getUserId(req);
+    securityLogger.debug('GET_USER_INFO', { userId });
     if (!userId) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
@@ -351,7 +507,9 @@ app.get('/api/auth/me', async (req, res) => {
 // Webapps
 app.get('/api/webapps', async (req, res) => {
   try {
+    securityLogger.debug('GET_WEBAPPS', { query: req.query });
     const result = await backend.getWebapps(req.query);
+    securityLogger.debug('GET_WEBAPPS_SUCCESS', { count: result.webapps?.length });
     res.json(result);
   } catch (error) {
     securityLogger.error('API_ERROR', { endpoint: '/api/webapps', error: error.message });
@@ -362,7 +520,9 @@ app.get('/api/webapps', async (req, res) => {
 app.get('/api/webapps/:id', async (req, res) => {
   try {
     const userId = getUserId(req);
+    securityLogger.debug('GET_WEBAPP', { id: req.params.id, userId });
     const result = await backend.getWebapp(req.params.id, userId);
+    securityLogger.debug('GET_WEBAPP_SUCCESS', { webapp: result.webapp?.name });
     res.json(result);
   } catch (error) {
     securityLogger.error('API_ERROR', { endpoint: `/api/webapps/${req.params.id}`, error: error.message });
@@ -370,26 +530,68 @@ app.get('/api/webapps/:id', async (req, res) => {
   }
 });
 
+// POST WEBAPP - ENDPOINT CRITIQUE AVEC DEBUG MAXIMUM
 app.post('/api/webapps', async (req, res) => {
   try {
+    securityLogger.debug('WEBAPP_SUBMIT_START', {
+      headers: req.headers,
+      body: req.body,
+      bodyKeys: Object.keys(req.body),
+      timestamp: new Date().toISOString()
+    });
+    
     const userId = getUserId(req);
+    securityLogger.debug('WEBAPP_SUBMIT_USER_CHECK', { userId });
+    
     if (!userId) {
+      securityLogger.warn('WEBAPP_SUBMIT_NO_USER', { headers: req.headers });
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     
     // Rate limit: 3 webapps per day
     const ip = req.ip || req.connection.remoteAddress;
-    if (!securityLogger.checkRateLimit(`webapp_submit_${userId}`, 3, 24 * 60 * 60 * 1000)) {
+    const rateLimitKey = `webapp_submit_${userId}`;
+    
+    securityLogger.debug('WEBAPP_SUBMIT_RATE_LIMIT_CHECK', {
+      rateLimitKey,
+      userId,
+      ip
+    });
+    
+    if (!securityLogger.checkRateLimit(rateLimitKey, 3, 24 * 60 * 60 * 1000)) {
+      securityLogger.warn('WEBAPP_SUBMIT_RATE_LIMIT_EXCEEDED', {
+        userId,
+        ip,
+        rateLimitKey
+      });
       return res.status(429).json({
         success: false,
         message: 'You can only submit 3 webapps per day'
       });
     }
     
+    securityLogger.debug('WEBAPP_SUBMIT_CALLING_BACKEND', {
+      userId,
+      webappData: req.body
+    });
+    
     const result = await backend.createWebapp(req.body, userId);
+    
+    securityLogger.debug('WEBAPP_SUBMIT_SUCCESS', {
+      userId,
+      webappId: result.webapp?.id,
+      result
+    });
+    
     res.json(result);
   } catch (error) {
-    securityLogger.error('API_ERROR', { endpoint: '/api/webapps', error: error.message });
+    securityLogger.error('WEBAPP_SUBMIT_ERROR', {
+      endpoint: '/api/webapps',
+      error: error.message,
+      stack: error.stack,
+      body: req.body,
+      userId: getUserId(req)
+    });
     res.status(400).json({ success: false, message: error.message });
   }
 });
@@ -608,19 +810,23 @@ async function startServer() {
   
   app.listen(PORT, '0.0.0.0', () => {
     securityLogger.info('SYSTEM', {
-      message: 'Server started',
+      message: 'Server started in DEBUG MODE',
       port: PORT,
-      environment: process.env.NODE_ENV || 'development'
+      environment: process.env.NODE_ENV || 'development',
+      debugMode: true
     });
     
     console.log(`
 ===============================================================
-   NEXUS WEB HUB - API Gateway
+   NEXUS WEB HUB - API Gateway - DEBUG ULTRA MODE
    Server:     http://0.0.0.0:${PORT}
    Security:   Active (Rate Limit, Validation)
-   Logging:    logs/* (security, api, errors)
+   Logging:    ULTRA DETAILED - Every action logged
+   Debug Logs: logs/debug-*.log
    Backend:    server.js
    Gateway:    api.js
+   
+   DEBUG MODE: All requests are logged with maximum detail
 ===============================================================
     `);
   });
