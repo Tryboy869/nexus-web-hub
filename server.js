@@ -360,15 +360,41 @@ export class BackendService {
     const now = Date.now();
 
     console.log('[Backend] About to insert user with email:', email);
+    console.log('[Backend] Insert params:', {
+      userId,
+      email,
+      name: sanitizeText(name),
+      passwordHashLength: passwordHash.length,
+      now
+    });
 
-    // Insert user with ALL required fields
-    await this.db.execute(
-      `INSERT INTO users (id, email, password_hash, name, role, badges, followers_count, following_count, is_banned, created_at) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [userId, email, passwordHash, sanitizeText(name), 'user', '[]', 0, 0, 0, now]
-    );
+    try {
+      // Insert user - SIMPLIFIED approach
+      await this.db.execute({
+        sql: `INSERT INTO users (
+          id, email, password_hash, name, role, badges, 
+          followers_count, following_count, is_banned, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: [
+          userId,                    // 1: id
+          email,                     // 2: email
+          passwordHash,              // 3: password_hash
+          sanitizeText(name),        // 4: name
+          'user',                    // 5: role
+          '[]',                      // 6: badges
+          0,                         // 7: followers_count
+          0,                         // 8: following_count
+          0,                         // 9: is_banned
+          now                        // 10: created_at
+        ]
+      });
 
-    console.log('[Backend] User created successfully:', userId);
+      console.log('[Backend] User created successfully:', userId);
+    } catch (insertError) {
+      console.error('[Backend] INSERT ERROR:', insertError);
+      console.error('[Backend] Full error details:', JSON.stringify(insertError, null, 2));
+      throw insertError;
+    }
 
     // Generate JWT token
     const token = jwt.sign({ userId, email }, process.env.JWT_SECRET, { expiresIn: '30d' });
