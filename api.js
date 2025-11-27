@@ -132,19 +132,29 @@ class SecurityLogger {
       return { valid: false, reason: 'Payload too large' };
     }
     
-    const checkObject = (obj) => {
+    const checkObject = (obj, path = '') => {
       for (const [key, value] of Object.entries(obj)) {
         if (typeof value === 'string') {
           if (this.detectSQLInjection(value)) {
-            this.security('SQL_INJECTION_ATTEMPT', { ip, field: key, value: value.substring(0, 100) });
+            this.security('SQL_INJECTION_ATTEMPT', { 
+              ip, 
+              field: `${path}${key}`, 
+              value: value.substring(0, 200),
+              endpoint: req.path
+            });
             return false;
           }
           if (this.detectXSS(value)) {
-            this.security('XSS_ATTEMPT', { ip, field: key, value: value.substring(0, 100) });
+            this.security('XSS_ATTEMPT', { 
+              ip, 
+              field: `${path}${key}`, 
+              value: value.substring(0, 200),
+              endpoint: req.path
+            });
             return false;
           }
         } else if (typeof value === 'object' && value !== null) {
-          if (!checkObject(value)) return false;
+          if (!checkObject(value, `${path}${key}.`)) return false;
         }
       }
       return true;
