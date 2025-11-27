@@ -363,9 +363,27 @@
       e.preventDefault();
       hideError();
       
-      const name = document.getElementById('signup-name').value;
-      const email = document.getElementById('signup-email').value;
+      const name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
       const password = document.getElementById('signup-password').value;
+      
+      // Frontend validation
+      console.log('Signup form data:', { name, email, password: '***' });
+      
+      if (!name) {
+        showError('Name is required');
+        return;
+      }
+      
+      if (!email) {
+        showError('Email is required');
+        return;
+      }
+      
+      if (!password) {
+        showError('Password is required');
+        return;
+      }
       
       if (password.length < 6) {
         showError('Password must be at least 6 characters');
@@ -375,25 +393,33 @@
       showLoading(true);
       
       try {
+        const payload = { name, email, password };
+        console.log('Sending signup request:', payload);
+        
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password })
+          body: JSON.stringify(payload)
         });
         
+        console.log('Signup response status:', response.status);
+        
         const data = await response.json();
+        console.log('Signup response data:', data);
         
         if (data.success) {
           localStorage.setItem('token', data.token);
           localStorage.setItem('userId', data.user.id);
           localStorage.setItem('user', JSON.stringify(data.user));
           
+          console.log('Signup successful, redirecting to profile...');
           window.location.href = '/profile.html';
         } else {
           showError(data.message || 'Signup failed');
           showLoading(false);
         }
       } catch (error) {
+        console.error('Signup error:', error);
         showError('Network error. Please try again.');
         showLoading(false);
       }
