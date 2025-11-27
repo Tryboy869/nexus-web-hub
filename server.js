@@ -319,6 +319,11 @@ export class BackendService {
   async signup(data) {
     const { email, password, name } = data;
 
+    // Validation
+    if (!email || !password || !name) {
+      throw new Error('Email, password and name are required');
+    }
+
     if (!isValidEmail(email)) {
       throw new Error('Invalid email format');
     }
@@ -327,31 +332,43 @@ export class BackendService {
       throw new Error('Password must be at least 6 characters');
     }
 
+    // Check if email already exists
     const existingUser = await this.db.execute('SELECT id FROM users WHERE email = ?', [email]);
     if (existingUser.rows.length > 0) {
       throw new Error('Email already registered');
     }
 
+    // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
     const userId = generateId('user');
+    const now = Date.now();
 
+    // Insert user with ALL required fields
     await this.db.execute(
-      'INSERT INTO users (id, email, password_hash, name, created_at) VALUES (?, ?, ?, ?, ?)',
-      [userId, email, passwordHash, sanitizeText(name), Date.now()]
+      `INSERT INTO users (id, email, password_hash, name, role, badges, followers_count, following_count, is_banned, created_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [userId, email, passwordHash, sanitizeText(name), 'user', '[]', 0, 0, 0, now]
     );
 
+    // Generate JWT token
     const token = jwt.sign({ userId, email }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
     return {
       success: true,
       token,
-      user: { id: userId, email, name }
+      user: { id: userId, email, name: sanitizeText(name), role: 'user', badges: [] }
     };
   }
 
   async login(data) {
     const { email, password } = data;
 
+    // Validation
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
+
+    // Get user
     const result = await this.db.execute(
       'SELECT id, email, name, password_hash, role, badges FROM users WHERE email = ?',
       [email]
@@ -362,14 +379,18 @@ export class BackendService {
     }
 
     const user = result.rows[0];
+    
+    // Verify password
     const validPassword = await bcrypt.compare(password, user.password_hash);
 
     if (!validPassword) {
       throw new Error('Invalid credentials');
     }
 
+    // Update last login
     await this.db.execute('UPDATE users SET last_login_at = ? WHERE id = ?', [Date.now(), user.id]);
 
+    // Generate token
     const token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
     return {
