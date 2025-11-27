@@ -317,12 +317,28 @@ export class BackendService {
 
   // Auth Methods
   async signup(data) {
+    // DEBUG: Log received data
+    console.log('[Backend] Signup received data:', JSON.stringify(data));
+    
     const { email, password, name } = data;
 
-    // Validation
-    if (!email || !password || !name) {
-      throw new Error('Email, password and name are required');
+    // Validation avec logs
+    if (!email) {
+      console.log('[Backend] ERROR: Email is missing or empty');
+      throw new Error('Email is required');
     }
+    
+    if (!password) {
+      console.log('[Backend] ERROR: Password is missing or empty');
+      throw new Error('Password is required');
+    }
+    
+    if (!name) {
+      console.log('[Backend] ERROR: Name is missing or empty');
+      throw new Error('Name is required');
+    }
+
+    console.log('[Backend] Validation passed - email:', email, 'name:', name);
 
     if (!isValidEmail(email)) {
       throw new Error('Invalid email format');
@@ -343,12 +359,16 @@ export class BackendService {
     const userId = generateId('user');
     const now = Date.now();
 
+    console.log('[Backend] About to insert user with email:', email);
+
     // Insert user with ALL required fields
     await this.db.execute(
       `INSERT INTO users (id, email, password_hash, name, role, badges, followers_count, following_count, is_banned, created_at) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [userId, email, passwordHash, sanitizeText(name), 'user', '[]', 0, 0, 0, now]
     );
+
+    console.log('[Backend] User created successfully:', userId);
 
     // Generate JWT token
     const token = jwt.sign({ userId, email }, process.env.JWT_SECRET, { expiresIn: '30d' });
