@@ -30,52 +30,42 @@ export class BackendService {
 
       console.log('[Backend] Connected to database');
 
-      // Reset DB if flag set (DANGER!)
-      if (process.env.RESET_DB === 'true') {
-        console.log('[Backend] RESET_DB flag detected - Recreating tables...');
-        await this.resetDatabase();
-      }
-
-      // Create tables
+      // Always try to create tables (IF NOT EXISTS handles existing tables)
+      console.log('[Backend] Initializing database schema...');
       await this.createTables();
       
       this.initialized = true;
       console.log('[Backend] Service initialized successfully');
+      
+      // Display database info
+      const stats = await this.getTableStats();
+      console.log('[Backend] Database stats:', stats);
     } catch (error) {
       console.error('[Backend] Initialization failed:', error);
+      console.error('[Backend] Make sure DATABASE_URL and DATABASE_AUTH_TOKEN are correct in .env');
       throw error;
     }
   }
 
-  async resetDatabase() {
-    const tables = [
-      'webapp_shares',
-      'webapp_versions',
-      'follows',
-      'notifications',
-      'webapp_clicks',
-      'review_votes',
-      'review_replies',
-      'webapp_views',
-      'reports',
-      'reviews',
-      'collection_items',
-      'collections',
-      'webapps',
-      'users'
-    ];
-
-    for (const table of tables) {
-      try {
-        await this.db.execute(`DROP TABLE IF EXISTS ${table}`);
-        console.log(`[Backend] Dropped table: ${table}`);
-      } catch (error) {
-        console.log(`[Backend] Could not drop ${table}:`, error.message);
-      }
+  async getTableStats() {
+    try {
+      const users = await this.db.execute('SELECT COUNT(*) as count FROM users');
+      const webapps = await this.db.execute('SELECT COUNT(*) as count FROM webapps');
+      const reviews = await this.db.execute('SELECT COUNT(*) as count FROM reviews');
+      
+      return {
+        users: users.rows[0].count,
+        webapps: webapps.rows[0].count,
+        reviews: reviews.rows[0].count
+      };
+    } catch (error) {
+      return { users: 0, webapps: 0, reviews: 0 };
     }
   }
 
   async createTables() {
+    console.log('[Backend] Creating tables (if not exists)...');
+    
     // Users
     await this.db.execute(`
       CREATE TABLE IF NOT EXISTS users (
@@ -94,6 +84,7 @@ export class BackendService {
         created_at INTEGER NOT NULL
       )
     `);
+    console.log('[Backend] ✓ Users table ready');
 
     await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
 
@@ -128,6 +119,7 @@ export class BackendService {
         FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+    console.log('[Backend] ✓ Webapps table ready');
 
     await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_webapps_category ON webapps(category)`);
     await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_webapps_rating ON webapps(avg_rating DESC)`);
@@ -147,6 +139,7 @@ export class BackendService {
         UNIQUE(webapp_id, user_id)
       )
     `);
+    console.log('[Backend] ✓ Webapp views table ready');
 
     await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_webapp_views_webapp ON webapp_views(webapp_id)`);
 
@@ -161,6 +154,7 @@ export class BackendService {
         FOREIGN KEY (webapp_id) REFERENCES webapps(id) ON DELETE CASCADE
       )
     `);
+    console.log('[Backend] ✓ Webapp clicks table ready');
 
     await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_webapp_clicks_webapp ON webapp_clicks(webapp_id, clicked_at DESC)`);
 
@@ -180,6 +174,7 @@ export class BackendService {
         UNIQUE(webapp_id, user_id)
       )
     `);
+    console.log('[Backend] ✓ Reviews table ready');
 
     await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_reviews_webapp ON reviews(webapp_id, created_at DESC)`);
 
@@ -195,6 +190,7 @@ export class BackendService {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+    console.log('[Backend] ✓ Review replies table ready');
 
     // Review Votes
     await this.db.execute(`
@@ -209,6 +205,7 @@ export class BackendService {
         UNIQUE(review_id, user_id)
       )
     `);
+    console.log('[Backend] ✓ Review votes table ready');
 
     // Reports
     await this.db.execute(`
@@ -225,6 +222,7 @@ export class BackendService {
         FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+    console.log('[Backend] ✓ Reports table ready');
 
     await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status, created_at DESC)`);
 
@@ -241,6 +239,7 @@ export class BackendService {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+    console.log('[Backend] ✓ Collections table ready');
 
     await this.db.execute(`
       CREATE TABLE IF NOT EXISTS collection_items (
@@ -253,6 +252,7 @@ export class BackendService {
         UNIQUE(collection_id, webapp_id)
       )
     `);
+    console.log('[Backend] ✓ Collection items table ready');
 
     // Notifications
     await this.db.execute(`
@@ -268,6 +268,7 @@ export class BackendService {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+    console.log('[Backend] ✓ Notifications table ready');
 
     await this.db.execute(`CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, read, created_at DESC)`);
 
@@ -283,6 +284,7 @@ export class BackendService {
         UNIQUE(follower_id, following_id)
       )
     `);
+    console.log('[Backend] ✓ Follows table ready');
 
     // Webapp Versions
     await this.db.execute(`
@@ -295,6 +297,7 @@ export class BackendService {
         FOREIGN KEY (webapp_id) REFERENCES webapps(id) ON DELETE CASCADE
       )
     `);
+    console.log('[Backend] ✓ Webapp versions table ready');
 
     // Webapp Shares
     await this.db.execute(`
@@ -307,8 +310,9 @@ export class BackendService {
         FOREIGN KEY (webapp_id) REFERENCES webapps(id) ON DELETE CASCADE
       )
     `);
+    console.log('[Backend] ✓ Webapp shares table ready');
 
-    console.log('[Backend] All tables created successfully');
+    console.log('[Backend] All tables and indexes created successfully');
   }
 
   // Auth Methods
