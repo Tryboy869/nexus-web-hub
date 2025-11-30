@@ -2,30 +2,28 @@
 logs/
 *.log
 
-# Environment Variables - CRITICAL
+# Environment variables - CRITICAL
 .env
 
 # Dependencies
 node_modules/
 
-# System Files
+# macOS
 .DS_Store
+
+# Windows
 Thumbs.db
 
-# IDE
+# Editor
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Build outputs
+# Testing
+coverage/
+.nyc_output/
+
+# Build
 dist/
 build/
-
-# Temporary files
-tmp/
-temp/
-
-# Database backups (if local)
-*.db
-*.sqlite
