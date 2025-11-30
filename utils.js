@@ -1,27 +1,26 @@
 // utils.js - Backend Utilities for Nexus Web Hub
+
 import crypto from 'crypto';
 
-// Generate unique ID
+/**
+ * Generate unique ID
+ */
 export function generateId(prefix = '') {
   const timestamp = Date.now().toString(36);
   const randomStr = crypto.randomBytes(8).toString('hex');
   return prefix ? `${prefix}_${timestamp}_${randomStr}` : `${timestamp}_${randomStr}`;
 }
 
-// Validate email format
-export function isValidEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-// Validate URL (HTTPS only, no localhost)
+/**
+ * Validate URL (HTTPS only, no localhost)
+ */
 export function validateWebappURL(url) {
   try {
     const parsed = new URL(url);
     
-    // HTTPS only
+    // ONLY HTTPS
     if (parsed.protocol !== 'https:') {
-      return { valid: false, error: 'URL must use HTTPS protocol' };
+      return { valid: false, error: 'URL must use HTTPS' };
     }
     
     // Block localhost/internal IPs
@@ -33,7 +32,7 @@ export function validateWebappURL(url) {
       hostname.startsWith('10.') ||
       hostname.match(/^172\.(1[6-9]|2\d|3[01])\./)
     ) {
-      return { valid: false, error: 'Local/internal URLs not allowed' };
+      return { valid: false, error: 'Local URLs not allowed' };
     }
     
     // Block dangerous protocols
@@ -47,20 +46,28 @@ export function validateWebappURL(url) {
   }
 }
 
-// Sanitize text input (prevent XSS)
-export function sanitizeText(text) {
-  if (typeof text !== 'string') return '';
-  
-  return text
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;')
-    .trim();
+/**
+ * Validate email
+ */
+export function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
 
-// Validate webapp data
+/**
+ * Sanitize string (remove dangerous characters)
+ */
+export function sanitizeString(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .trim()
+    .replace(/[<>]/g, '') // Remove < and >
+    .substring(0, 1000); // Max 1000 chars
+}
+
+/**
+ * Validate webapp submission data
+ */
 export function validateWebappData(data) {
   const errors = [];
   
@@ -77,7 +84,7 @@ export function validateWebappData(data) {
   
   // Category
   const validCategories = ['productivity', 'design', 'games', 'api', 'nocode', 'other'];
-  if (!validCategories.includes(data.category)) {
+  if (!data.category || !validCategories.includes(data.category)) {
     errors.push('Invalid category');
   }
   
@@ -86,9 +93,27 @@ export function validateWebappData(data) {
     errors.push('Short description must be between 20 and 200 characters');
   }
   
-  // Tags (optional but validate if provided)
-  if (data.tags && !Array.isArray(data.tags)) {
-    errors.push('Tags must be an array');
+  // Optional fields validation
+  if (data.github_url && data.github_url.length > 0) {
+    try {
+      const githubUrl = new URL(data.github_url);
+      if (!githubUrl.hostname.includes('github.com')) {
+        errors.push('GitHub URL must be from github.com');
+      }
+    } catch {
+      errors.push('Invalid GitHub URL');
+    }
+  }
+  
+  if (data.video_url && data.video_url.length > 0) {
+    try {
+      const videoUrl = new URL(data.video_url);
+      if (!videoUrl.hostname.includes('youtube.com') && !videoUrl.hostname.includes('youtu.be')) {
+        errors.push('Video URL must be from YouTube');
+      }
+    } catch {
+      errors.push('Invalid video URL');
+    }
   }
   
   return {
@@ -97,7 +122,9 @@ export function validateWebappData(data) {
   };
 }
 
-// Calculate trust score for webapp
+/**
+ * Calculate webapp trust score (0-100)
+ */
 export function calculateTrustScore(webapp, creator) {
   let score = 50; // Base score
   
@@ -106,18 +133,18 @@ export function calculateTrustScore(webapp, creator) {
     score += 20;
   }
   
-  // Account age > 30 days (+10)
+  // Account age (+10)
   const accountAge = Date.now() - creator.created_at;
-  if (accountAge > 30 * 24 * 60 * 60 * 1000) {
+  if (accountAge > 30 * 24 * 60 * 60 * 1000) { // 30 days
     score += 10;
   }
   
-  // HTTPS URL (+10)
+  // URL provided (+10)
   if (webapp.url && webapp.url.startsWith('https://')) {
     score += 10;
   }
   
-  // Long description (+10)
+  // Description detailed (+10)
   if (webapp.description_long && webapp.description_long.length > 100) {
     score += 10;
   }
@@ -132,21 +159,23 @@ export function calculateTrustScore(webapp, creator) {
     score += 5;
   }
   
-  // Image provided (+5)
+  // Screenshot provided (+5)
   if (webapp.image_url) {
     score += 5;
   }
   
-  // Penalties
-  if (webapp.description_short && webapp.description_short.length < 20) {
+  // PENALTIES
+  // Description too short (-20)
+  if (webapp.description_short.length < 20) {
     score -= 20;
   }
   
+  // No tags (-10)
   if (!webapp.tags || webapp.tags.length === 0) {
     score -= 10;
   }
   
-  // Suspicious domains
+  // Suspicious domains (-30)
   const suspiciousDomains = ['bit.ly', 'tinyurl.com', 'goo.gl', 't.co'];
   if (suspiciousDomains.some(domain => webapp.url.includes(domain))) {
     score -= 30;
@@ -155,56 +184,73 @@ export function calculateTrustScore(webapp, creator) {
   return Math.max(0, Math.min(100, score)); // Clamp between 0-100
 }
 
-// Check badge eligibility
-export function checkBadgeEligibility(user, stats) {
-  const newBadges = [];
+/**
+ * Parse tags from comma-separated string
+ */
+export function parseTags(tagsString) {
+  if (!tagsString) return [];
   
-  // Verified Creator: 3+ webapps + 30+ days
-  const accountAge = Date.now() - user.created_at;
-  if (
-    stats.webapps_count >= 3 &&
-    accountAge > 30 * 24 * 60 * 60 * 1000 &&
-    !user.badges.includes('verified-creator')
-  ) {
-    newBadges.push('verified-creator');
+  return tagsString
+    .split(',')
+    .map(tag => tag.trim().toLowerCase())
+    .filter(tag => tag.length > 0 && tag.length <= 30)
+    .slice(0, 10); // Max 10 tags
+}
+
+/**
+ * Check if user should earn badge
+ */
+export function checkBadgeEligibility(user, userStats) {
+  const newBadges = [];
+  const currentBadges = user.badges || [];
+  
+  // Verified Creator: 3+ webapps + account 30+ days old
+  if (!currentBadges.includes('verified-creator')) {
+    const accountAge = Date.now() - user.created_at;
+    if (userStats.webapps_count >= 3 && accountAge >= 30 * 24 * 60 * 60 * 1000) {
+      newBadges.push('verified-creator');
+    }
   }
   
   // Beginner Tester: 10+ reviews
-  if (stats.reviews_count >= 10 && !user.badges.includes('beginner-tester')) {
-    newBadges.push('beginner-tester');
+  if (!currentBadges.includes('beginner-tester')) {
+    if (userStats.reviews_count >= 10) {
+      newBadges.push('beginner-tester');
+    }
   }
   
   // Pro Tester: 50+ reviews + 70% helpful
-  if (
-    stats.reviews_count >= 50 &&
-    stats.helpful_ratio >= 0.7 &&
-    !user.badges.includes('pro-tester')
-  ) {
-    newBadges.push('pro-tester');
+  if (!currentBadges.includes('pro-tester')) {
+    if (userStats.reviews_count >= 50 && userStats.helpful_ratio >= 0.7) {
+      newBadges.push('pro-tester');
+    }
   }
   
   // Legendary Tester: 200+ reviews + 80% helpful
-  if (
-    stats.reviews_count >= 200 &&
-    stats.helpful_ratio >= 0.8 &&
-    !user.badges.includes('legendary-tester')
-  ) {
-    newBadges.push('legendary-tester');
+  if (!currentBadges.includes('legendary-tester')) {
+    if (userStats.reviews_count >= 200 && userStats.helpful_ratio >= 0.8) {
+      newBadges.push('legendary-tester');
+    }
   }
   
   return newBadges;
 }
 
-// Format date for display
+/**
+ * Format date for display
+ */
 export function formatDate(timestamp) {
-  return new Date(timestamp).toLocaleDateString('en-US', {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString('en-US', {
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric'
   });
 }
 
-// Generate webapp slug for SEO-friendly URLs
+/**
+ * Generate SEO-friendly slug
+ */
 export function generateSlug(name, id) {
   const slug = name
     .toLowerCase()
