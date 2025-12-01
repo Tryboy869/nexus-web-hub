@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Submit Webapp | Nexus Web Hub</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    
     :root {
       --bg-deep-space: #0a0e27;
       --bg-card: #1a1f3a;
@@ -17,669 +17,562 @@
       --accent-cyan: #00d9ff;
       --accent-purple: #8b5cf6;
       --accent-green: #10b981;
+      --accent-gold: #fbbf24;
       --accent-red: #ef4444;
     }
-
+    
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg-deep-space);
       color: var(--text-primary);
       line-height: 1.6;
     }
-
+    
+    /* Navbar */
     nav {
-      background: var(--bg-card);
+      background: rgba(26, 31, 58, 0.9);
+      backdrop-filter: blur(10px);
       padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid var(--accent-cyan);
       position: sticky;
       top: 0;
       z-index: 1000;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.1);
     }
-
-    .logo {
-      height: 40px;
-      cursor: pointer;
+    
+    nav .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-flex;
+    
+    nav .logo {
+      display: flex;
       align-items: center;
       gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-cyan);
+      text-decoration: none;
     }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      color: white;
+    
+    nav .logo img {
+      width: 32px;
+      height: 32px;
     }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0, 217, 255, 0.3);
+    
+    nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
     }
-
-    .btn-secondary {
-      background: transparent;
-      border: 2px solid var(--accent-cyan);
+    
+    nav a:hover {
       color: var(--accent-cyan);
     }
-
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
+    
+    /* Container */
     .container {
       max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem;
+      margin: 2rem auto;
+      padding: 0 2rem;
     }
-
+    
+    /* Header */
     .page-header {
       text-align: center;
       margin-bottom: 3rem;
     }
-
-    .page-title {
+    
+    .page-header h1 {
       font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-
-    .page-subtitle {
+    
+    .page-header p {
       color: var(--text-secondary);
-      font-size: 1.1rem;
     }
-
-    .form-container {
+    
+    /* Form */
+    .form-card {
       background: var(--bg-card);
-      border-radius: 16px;
       padding: 2rem;
-      border: 2px solid var(--accent-purple);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 217, 255, 0.1);
     }
-
+    
     .form-group {
       margin-bottom: 1.5rem;
     }
-
+    
     .form-group label {
       display: block;
       margin-bottom: 0.5rem;
       font-weight: 600;
       color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
     }
-
-    .required {
+    
+    .form-group .required {
       color: var(--accent-red);
     }
-
-    input, textarea, select {
-      width: 100%;
-      padding: 1rem;
-      background: var(--bg-deep-space);
-      border: 2px solid var(--accent-purple);
-      border-radius: 12px;
-      color: var(--text-primary);
-      font-size: 1rem;
-      font-family: inherit;
-      transition: border-color 0.3s ease;
+    
+    .form-group .hint {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
     }
-
-    input:focus, textarea:focus, select:focus {
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.8rem;
+      background: var(--bg-deep-space);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
       outline: none;
       border-color: var(--accent-cyan);
     }
-
-    textarea {
+    
+    .form-group textarea {
       resize: vertical;
       min-height: 100px;
     }
-
-    .helper-text {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      margin-top: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .char-counter {
-      float: right;
-      color: var(--text-secondary);
-    }
-
-    .category-selector {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
-
-    .category-option {
-      padding: 1rem;
-      background: var(--bg-deep-space);
-      border: 2px solid var(--accent-purple);
-      border-radius: 12px;
+    
+    .form-group select {
       cursor: pointer;
-      text-align: center;
-      transition: all 0.3s ease;
+    }
+    
+    .char-count {
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+    
+    /* Popular Tags */
+    .popular-tags {
       display: flex;
-      flex-direction: column;
-      align-items: center;
       gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
     }
-
-    .category-option:hover, .category-option.selected {
-      border-color: var(--accent-cyan);
+    
+    .tag-suggestion {
+      padding: 0.3rem 0.8rem;
       background: rgba(0, 217, 255, 0.1);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+      cursor: pointer;
+      transition: all 0.3s;
     }
-
-    .category-option img {
-      width: 32px;
-      height: 32px;
+    
+    .tag-suggestion:hover {
+      background: rgba(0, 217, 255, 0.2);
+      border-color: var(--accent-cyan);
     }
-
+    
+    /* Buttons */
     .form-actions {
       display: flex;
       gap: 1rem;
-      justify-content: flex-end;
       margin-top: 2rem;
-      padding-top: 2rem;
-      border-top: 2px solid var(--bg-deep-space);
     }
-
-    .error-message {
-      background: rgba(239, 68, 68, 0.1);
-      border: 2px solid var(--accent-red);
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      color: var(--accent-red);
-      display: none;
-    }
-
-    .error-message.show {
-      display: block;
-    }
-
-    .success-message {
-      background: rgba(16, 185, 129, 0.1);
-      border: 2px solid var(--accent-green);
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      color: var(--accent-green);
-      display: none;
-    }
-
-    .success-message.show {
-      display: block;
-    }
-
-    .info-box {
-      background: rgba(139, 92, 246, 0.1);
-      border: 2px solid var(--accent-purple);
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .info-box h3 {
-      color: var(--accent-purple);
-      margin-bottom: 0.5rem;
-      display: flex;
+    
+    .btn {
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+      display: inline-flex;
       align-items: center;
       gap: 0.5rem;
     }
-
-    .changelog-section {
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: white;
+      flex: 1;
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Alert */
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
       display: none;
-      animation: fadeIn 0.3s ease;
     }
-
-    .changelog-section.show {
-      display: block;
+    
+    .alert-error {
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 4px solid var(--accent-red);
+      color: var(--accent-red);
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    
+    .alert-success {
+      background: rgba(16, 185, 129, 0.1);
+      border-left: 4px solid var(--accent-green);
+      color: var(--accent-green);
     }
-
+    
+    /* Responsive */
     @media (max-width: 768px) {
-      .category-selector {
-        grid-template-columns: repeat(2, 1fr);
+      .page-header h1 {
+        font-size: 2rem;
       }
+      
       .form-actions {
         flex-direction: column;
-      }
-      .btn {
-        width: 100%;
-        justify-content: center;
       }
     }
   </style>
 </head>
 <body>
+  <!-- Navbar -->
   <nav>
-    <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub" class="logo" onclick="window.location.href='/'">
-    <div style="display: flex; gap: 1rem;">
-      <button class="btn btn-secondary" onclick="window.location.href='/profile.html'">
-        <i class="fa-solid fa-user"></i>
-        Profile
-      </button>
+    <div class="container">
+      <a href="/" class="logo">
+        <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub">
+        <span>Nexus Web Hub</span>
+      </a>
+      
+      <a href="/profile.html">My Profile</a>
     </div>
   </nav>
-
+  
+  <!-- Container -->
   <div class="container">
+    <!-- Header -->
     <div class="page-header">
-      <h1 class="page-title" id="page-title">Publish a Webapp</h1>
-      <p class="page-subtitle">Share your creation with the community</p>
+      <h1 id="page-title">Publish a Webapp</h1>
+      <p>Share your creation with the community</p>
     </div>
-
-    <div class="info-box">
-      <h3><i class="fa-solid fa-circle-info"></i> Important Information</h3>
-      <p>Make sure your webapp is accessible via HTTPS. Include the full URL in the description if the main link has issues.</p>
-    </div>
-
-    <div class="error-message" id="error-message"></div>
-    <div class="success-message" id="success-message"></div>
-
-    <div class="form-container">
+    
+    <!-- Form -->
+    <div class="form-card">
+      <div class="alert alert-error" id="error-alert"></div>
+      <div class="alert alert-success" id="success-alert"></div>
+      
       <form id="webapp-form" onsubmit="handleSubmit(event)">
         <!-- Name -->
         <div class="form-group">
-          <label>
-            <i class="fa-solid fa-signature"></i>
-            Webapp Name <span class="required">*</span>
-            <span class="char-counter" id="name-counter">0/100</span>
-          </label>
-          <input type="text" id="name" required minlength="3" maxlength="100" placeholder="e.g: My Awesome Tool">
-          <div class="helper-text">
-            <i class="fa-solid fa-lightbulb"></i>
-            Choose a clear and descriptive name
-          </div>
+          <label>Webapp Name <span class="required">*</span></label>
+          <input type="text" id="name" required minlength="3" maxlength="100" placeholder="e.g. My Awesome Tool">
+          <div class="hint">Between 3 and 100 characters</div>
         </div>
-
-        <!-- Developer Name -->
-        <div class="form-group">
-          <label>
-            <i class="fa-solid fa-user"></i>
-            Developer/Creator Name
-          </label>
-          <input type="text" id="developer" placeholder="Your name or team name">
-          <div class="helper-text">
-            <i class="fa-solid fa-lightbulb"></i>
-            Leave empty to use your profile name
-          </div>
-        </div>
-
+        
         <!-- URL -->
         <div class="form-group">
-          <label>
-            <i class="fa-solid fa-link"></i>
-            Webapp URL <span class="required">*</span>
-          </label>
+          <label>URL (HTTPS only) <span class="required">*</span></label>
           <input type="url" id="url" required placeholder="https://example.com">
-          <div class="helper-text">
-            <i class="fa-solid fa-lock"></i>
-            Must use HTTPS protocol
-          </div>
+          <div class="hint">Must start with https://</div>
         </div>
-
+        
         <!-- Category -->
         <div class="form-group">
-          <label>
-            <i class="fa-solid fa-layer-group"></i>
-            Category <span class="required">*</span>
-          </label>
-          <div class="category-selector">
-            <div class="category-option" onclick="selectCategory('productivity', this)" data-category="productivity">
-              <img src="/assets/icons/icon-tools.svg" alt="Productivity">
-              <span>Productivity</span>
-            </div>
-            <div class="category-option" onclick="selectCategory('design', this)" data-category="design">
-              <img src="/assets/icons/icon-ui-kits.svg" alt="Design">
-              <span>Design</span>
-            </div>
-            <div class="category-option" onclick="selectCategory('games', this)" data-category="games">
-              <img src="/assets/icons/icon-games.svg" alt="Games">
-              <span>Games</span>
-            </div>
-            <div class="category-option" onclick="selectCategory('api', this)" data-category="api">
-              <img src="/assets/icons/icon-apis.svg" alt="API">
-              <span>API</span>
-            </div>
-            <div class="category-option" onclick="selectCategory('nocode', this)" data-category="nocode">
-              <img src="/assets/icons/icon-websites.svg" alt="No-Code">
-              <span>No-Code</span>
-            </div>
-            <div class="category-option" onclick="selectCategory('other', this)" data-category="other">
-              <img src="/assets/icons/icon-other.svg" alt="Other">
-              <span>Other</span>
-            </div>
-          </div>
-          <input type="hidden" id="category" required>
+          <label>Category <span class="required">*</span></label>
+          <select id="category" required>
+            <option value="">Select a category</option>
+            <option value="productivity">Productivity</option>
+            <option value="design">Design</option>
+            <option value="games">Games</option>
+            <option value="api">API</option>
+            <option value="nocode">No-Code</option>
+            <option value="other">Other</option>
+          </select>
         </div>
-
-        <!-- Short Description -->
+        
+        <!-- Description Short -->
         <div class="form-group">
-          <label>
-            <i class="fa-solid fa-align-left"></i>
-            Short Description <span class="required">*</span>
-            <span class="char-counter" id="short-counter">0/200</span>
-          </label>
-          <textarea id="description_short" required minlength="20" maxlength="200" rows="3" placeholder="Describe your webapp briefly (20-200 characters)"></textarea>
-          <div class="helper-text">
-            <i class="fa-solid fa-circle-info"></i>
-            Include the URL here if the main link might have issues
-          </div>
+          <label>Short Description <span class="required">*</span></label>
+          <textarea id="description_short" required minlength="20" maxlength="200" placeholder="Describe your webapp in a few words (20-200 characters)" oninput="updateCharCount('description_short', 200)"></textarea>
+          <div class="char-count" id="char-count-short">0 / 200</div>
+          <div class="hint">This appears in the catalog. Include the URL here as fallback if your main link doesn't work.</div>
         </div>
-
-        <!-- Long Description -->
+        
+        <!-- Description Long -->
         <div class="form-group">
-          <label>
-            <i class="fa-solid fa-file-lines"></i>
-            Detailed Description (Optional)
-          </label>
-          <textarea id="description_long" rows="6" placeholder="Provide a detailed description of your webapp, its features, how to use it..."></textarea>
+          <label>Detailed Description (Optional)</label>
+          <textarea id="description_long" placeholder="Provide more details about your webapp..." oninput="updateCharCount('description_long', 1000)"></textarea>
+          <div class="char-count" id="char-count-long">0 / 1000</div>
         </div>
-
+        
         <!-- Tags -->
         <div class="form-group">
-          <label>
-            <i class="fa-solid fa-tags"></i>
-            Tags (Optional)
-          </label>
-          <input type="text" id="tags" placeholder="javascript, productivity, free, open-source">
-          <div class="helper-text">
-            <i class="fa-solid fa-lightbulb"></i>
-            Separate tags with commas. Max 10 tags.
-          </div>
+          <label>Tags (Optional)</label>
+          <input type="text" id="tags" placeholder="react, productivity, free (comma separated)">
+          <div class="hint">Separate tags with commas. Max 10 tags.</div>
+          <div class="popular-tags" id="popular-tags"></div>
         </div>
-
+        
         <!-- GitHub URL -->
         <div class="form-group">
-          <label>
-            <i class="fa-brands fa-github"></i>
-            GitHub URL (Optional)
-          </label>
+          <label>GitHub URL (Optional)</label>
           <input type="url" id="github_url" placeholder="https://github.com/username/repo">
-          <div class="helper-text">
-            <i class="fa-solid fa-code"></i>
-            Share your source code with the community
-          </div>
+          <div class="hint">Link to your source code</div>
         </div>
-
+        
         <!-- Video URL -->
         <div class="form-group">
-          <label>
-            <i class="fa-brands fa-youtube"></i>
-            YouTube Video URL (Optional)
-          </label>
+          <label>YouTube Video URL (Optional)</label>
           <input type="url" id="video_url" placeholder="https://youtube.com/watch?v=...">
-          <div class="helper-text">
-            <i class="fa-solid fa-video"></i>
-            Demo or tutorial video
-          </div>
+          <div class="hint">Demo video of your webapp</div>
         </div>
-
+        
         <!-- Image URL -->
         <div class="form-group">
-          <label>
-            <i class="fa-solid fa-image"></i>
-            Screenshot URL (Optional)
-          </label>
+          <label>Screenshot URL (Optional)</label>
           <input type="url" id="image_url" placeholder="https://example.com/screenshot.png">
-          <div class="helper-text">
-            <i class="fa-solid fa-camera"></i>
-            Direct link to a screenshot or logo
-          </div>
+          <div class="hint">Screenshot or logo of your webapp</div>
         </div>
-
-        <!-- Changelog (Edit mode only) -->
-        <div class="changelog-section" id="changelog-section">
-          <div class="form-group">
-            <label>
-              <i class="fa-solid fa-code-branch"></i>
-              Version (Optional)
-            </label>
-            <input type="text" id="version" placeholder="e.g: 2.0.0">
-          </div>
-
-          <div class="form-group">
-            <label>
-              <i class="fa-solid fa-list"></i>
-              Changelog (Optional)
-            </label>
-            <textarea id="changelog" rows="5" placeholder="What's new in this version?&#10;- New feature X&#10;- Bug fix Y&#10;- Performance improvements"></textarea>
-            <div class="helper-text">
-              <i class="fa-solid fa-lightbulb"></i>
-              Let users know what changed
-            </div>
-          </div>
-        </div>
-
+        
         <!-- Actions -->
         <div class="form-actions">
-          <button type="button" class="btn btn-secondary" onclick="window.location.href='/profile.html'">
-            <i class="fa-solid fa-xmark"></i>
-            Cancel
-          </button>
           <button type="submit" class="btn btn-primary" id="submit-btn">
-            <i class="fa-solid fa-rocket"></i>
-            <span id="submit-text">Publish</span>
+            <i class="fa-solid fa-rocket"></i> Publish
           </button>
+          <a href="/profile.html" class="btn btn-secondary">
+            <i class="fa-solid fa-times"></i> Cancel
+          </a>
         </div>
       </form>
     </div>
   </div>
-
+  
   <script>
-    let isEditMode = false;
-    let editWebappId = null;
-
-    // Character counters
-    document.getElementById('name').addEventListener('input', (e) => {
-      document.getElementById('name-counter').textContent = `${e.target.value.length}/100`;
-    });
-
-    document.getElementById('description_short').addEventListener('input', (e) => {
-      document.getElementById('short-counter').textContent = `${e.target.value.length}/200`;
-    });
-
-    // Category selection - CORRIGÉ
-    function selectCategory(category, element) {
-      console.log('Selecting category:', category);
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('edit');
+    const isEditMode = !!editId;
+    
+    let user = null;
+    
+    // Check auth
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
       
-      document.querySelectorAll('.category-option').forEach(opt => {
-        opt.classList.remove('selected');
-      });
-      
-      element.classList.add('selected');
-      document.getElementById('category').value = category;
-      
-      console.log('Category set to:', document.getElementById('category').value);
-    }
-
-    // Load webapp data if edit mode
-    async function loadWebappData() {
-      const urlParams = new URLSearchParams(window.location.search);
-      editWebappId = urlParams.get('edit');
-
-      if (editWebappId) {
-        isEditMode = true;
-        document.getElementById('page-title').textContent = 'Edit Webapp';
-        document.getElementById('submit-text').textContent = 'Save Changes';
-        document.getElementById('changelog-section').classList.add('show');
-
-        try {
-          const response = await fetch(`/api/webapps/${editWebappId}`);
-          const data = await response.json();
-
-          if (data.success) {
-            const webapp = data.webapp;
-
-            // Fill form
-            document.getElementById('name').value = webapp.name;
-            document.getElementById('developer').value = webapp.developer;
-            document.getElementById('url').value = webapp.url;
-            document.getElementById('description_short').value = webapp.description_short;
-            document.getElementById('description_long').value = webapp.description_long || '';
-            document.getElementById('tags').value = JSON.parse(webapp.tags || '[]').join(', ');
-            document.getElementById('github_url').value = webapp.github_url || '';
-            document.getElementById('video_url').value = webapp.video_url || '';
-            document.getElementById('image_url').value = webapp.image_url || '';
-
-            // Select category
-            const categoryElement = document.querySelector(`[data-category="${webapp.category}"]`);
-            if (categoryElement) {
-              selectCategory(webapp.category, categoryElement);
-            }
-
-            // Update counters
-            document.getElementById('name-counter').textContent = `${webapp.name.length}/100`;
-            document.getElementById('short-counter').textContent = `${webapp.description_short.length}/200`;
-          }
-        } catch (error) {
-          console.error('Load error:', error);
-          showError('Error loading webapp data');
-        }
-      }
-    }
-
-    async function handleSubmit(e) {
-      e.preventDefault();
-
-      console.log('Form submitted');
-
-      const userId = localStorage.getItem('userId');
-      console.log('User ID:', userId);
-      
-      if (!userId) {
-        window.location.href = '/auth.html';
+      if (!token || !userStr) {
+        window.location.href = '/auth.html?return=/submit.html';
         return;
       }
-
-      // Get form data
-      const formData = {
-        name: document.getElementById('name').value.trim(),
-        developer: document.getElementById('developer').value.trim() || undefined,
-        url: document.getElementById('url').value.trim(),
-        category: document.getElementById('category').value,
-        description_short: document.getElementById('description_short').value.trim(),
-        description_long: document.getElementById('description_long').value.trim() || undefined,
-        tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(Boolean),
-        github_url: document.getElementById('github_url').value.trim() || undefined,
-        video_url: document.getElementById('video_url').value.trim() || undefined,
-        image_url: document.getElementById('image_url').value.trim() || undefined
-      };
-
-      console.log('Form data:', formData);
-
-      // Changelog (edit mode only)
+      
+      user = JSON.parse(userStr);
+      
       if (isEditMode) {
-        const version = document.getElementById('version').value.trim();
-        const changelog = document.getElementById('changelog').value.trim();
-        if (version && changelog) {
-          formData.version = version;
-          formData.changelog = changelog;
-        }
+        loadWebapp();
+      } else {
+        loadPopularTags();
       }
-
-      // Validate
-      if (!formData.category) {
-        showError('Please select a category');
+    }
+    
+    // Load webapp (edit mode)
+    async function loadWebapp() {
+      try {
+        const response = await fetch(`/api/webapps/${editId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+          alert('Webapp not found');
+          window.location.href = '/profile.html';
+          return;
+        }
+        
+        const webapp = data.webapp;
+        
+        // Check ownership
+        if (webapp.creator_id !== user.id) {
+          alert('Unauthorized');
+          window.location.href = '/profile.html';
+          return;
+        }
+        
+        // Update title
+        document.getElementById('page-title').textContent = 'Edit Webapp';
+        document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-save"></i> Save Changes';
+        
+        // Fill form
+        document.getElementById('name').value = webapp.name;
+        document.getElementById('url').value = webapp.url;
+        document.getElementById('category').value = webapp.category;
+        document.getElementById('description_short').value = webapp.description_short;
+        document.getElementById('description_long').value = webapp.description_long || '';
+        document.getElementById('tags').value = webapp.tags.join(', ');
+        document.getElementById('github_url').value = webapp.github_url || '';
+        document.getElementById('video_url').value = webapp.video_url || '';
+        document.getElementById('image_url').value = webapp.image_url || '';
+        
+        updateCharCount('description_short', 200);
+        updateCharCount('description_long', 1000);
+      } catch (error) {
+        console.error('Error loading webapp:', error);
+        alert('Error loading webapp');
+        window.location.href = '/profile.html';
+      }
+    }
+    
+    // Load popular tags
+    async function loadPopularTags() {
+      try {
+        const response = await fetch('/api/tags/popular');
+        const data = await response.json();
+        
+        if (data.success && data.tags.length > 0) {
+          const popularTagsHTML = data.tags.slice(0, 10).map(tag => 
+            `<span class="tag-suggestion" onclick="addTag('${tag.name}')">${tag.name} (${tag.count})</span>`
+          ).join('');
+          
+          document.getElementById('popular-tags').innerHTML = `
+            <div class="hint" style="width: 100%; margin-bottom: 0.5rem;">Popular tags:</div>
+            ${popularTagsHTML}
+          `;
+        }
+      } catch (error) {
+        console.error('Error loading popular tags:', error);
+      }
+    }
+    
+    // Add tag
+    function addTag(tagName) {
+      const tagsInput = document.getElementById('tags');
+      const currentTags = tagsInput.value.split(',').map(t => t.trim()).filter(Boolean);
+      
+      if (!currentTags.includes(tagName)) {
+        currentTags.push(tagName);
+        tagsInput.value = currentTags.join(', ');
+      }
+    }
+    
+    // Update char count
+    function updateCharCount(fieldId, max) {
+      const field = document.getElementById(fieldId);
+      const count = field.value.length;
+      const countEl = document.getElementById(`char-count-${fieldId === 'description_short' ? 'short' : 'long'}`);
+      countEl.textContent = `${count} / ${max}`;
+      
+      if (count > max) {
+        countEl.style.color = 'var(--accent-red)';
+      } else {
+        countEl.style.color = 'var(--text-secondary)';
+      }
+    }
+    
+    // Show error
+    function showError(message) {
+      const errorEl = document.getElementById('error-alert');
+      errorEl.textContent = message;
+      errorEl.style.display = 'block';
+      document.getElementById('success-alert').style.display = 'none';
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // Show success
+    function showSuccess(message) {
+      const successEl = document.getElementById('success-alert');
+      successEl.textContent = message;
+      successEl.style.display = 'block';
+      document.getElementById('error-alert').style.display = 'none';
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // Handle submit
+    async function handleSubmit(event) {
+      event.preventDefault();
+      
+      const formData = {
+        name: document.getElementById('name').value,
+        url: document.getElementById('url').value,
+        category: document.getElementById('category').value,
+        description_short: document.getElementById('description_short').value,
+        description_long: document.getElementById('description_long').value || null,
+        tags: document.getElementById('tags').value,
+        github_url: document.getElementById('github_url').value || null,
+        video_url: document.getElementById('video_url').value || null,
+        image_url: document.getElementById('image_url').value || null
+      };
+      
+      // Validate URL
+      if (!formData.url.startsWith('https://')) {
+        showError('URL must start with https://');
         return;
       }
-
-      // Submit
-      document.getElementById('submit-btn').disabled = true;
-
+      
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publishing...';
+      
       try {
-        const endpoint = isEditMode ? `/api/webapps/${editWebappId}` : '/api/webapps';
+        const endpoint = isEditMode ? `/api/webapps/${editId}` : '/api/webapps';
         const method = isEditMode ? 'PUT' : 'POST';
-
-        console.log('Sending request to:', endpoint);
-        console.log('Method:', method);
-        console.log('Headers:', {
-          'Content-Type': 'application/json',
-          'X-User-Id': userId
-        });
-
+        
         const response = await fetch(endpoint, {
           method,
           headers: {
             'Content-Type': 'application/json',
-            'X-User-Id': userId
+            'X-User-Id': user.id
           },
           body: JSON.stringify(formData)
         });
-
-        console.log('Response status:', response.status);
-
+        
         const data = await response.json();
-        console.log('Response data:', data);
-
+        
         if (data.success) {
           showSuccess(isEditMode ? 'Webapp updated successfully!' : 'Webapp published successfully!');
-
+          
           setTimeout(() => {
             window.location.href = '/profile.html';
-          }, 2000);
+          }, 1500);
         } else {
-          showError(data.message || 'Submission failed');
-          document.getElementById('submit-btn').disabled = false;
+          showError(data.message || 'Failed to publish webapp');
+          btn.disabled = false;
+          btn.innerHTML = isEditMode ? '<i class="fa-solid fa-save"></i> Save Changes' : '<i class="fa-solid fa-rocket"></i> Publish';
         }
       } catch (error) {
-        console.error('Submit error:', error);
+        console.error('Error submitting webapp:', error);
         showError('Network error. Please try again.');
-        document.getElementById('submit-btn').disabled = false;
+        btn.disabled = false;
+        btn.innerHTML = isEditMode ? '<i class="fa-solid fa-save"></i> Save Changes' : '<i class="fa-solid fa-rocket"></i> Publish';
       }
     }
-
-    function showError(message) {
-      const errorEl = document.getElementById('error-message');
-      errorEl.textContent = message;
-      errorEl.classList.add('show');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      setTimeout(() => {
-        errorEl.classList.remove('show');
-      }, 5000);
-    }
-
-    function showSuccess(message) {
-      const successEl = document.getElementById('success-message');
-      successEl.textContent = message;
-      successEl.classList.add('show');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
+    
     // Init
-    document.addEventListener('DOMContentLoaded', () => {
-      if (!localStorage.getItem('token')) {
-        window.location.href = '/auth.html';
-        return;
-      }
-      loadWebappData();
-    });
+    document.addEventListener('DOMContentLoaded', checkAuth);
   </script>
 </body>
 </html>
