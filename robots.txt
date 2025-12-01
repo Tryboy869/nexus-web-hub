@@ -1,23 +1,13 @@
-# robots.txt - Nexus Web Hub
+# robots.txt for Nexus Web Hub
 
-# Allow all search engines
 User-agent: *
 Allow: /
-
-# Disallow admin and private pages
 Disallow: /admin.html
 Disallow: /api/
-Disallow: /submit.html
-Disallow: /profile.html
-Disallow: /auth.html
+Disallow: /logs/
 
-# Allow public pages
-Allow: /index.html
-Allow: /webapp.html
-Allow: /assets/
-
-# Sitemap
+# Sitemaps
 Sitemap: https://nexuswebhub.com/sitemap.xml
 
-# Crawl delay (optional, for politeness)
+# Crawl-delay (optional, for polite crawlers)
 Crawl-delay: 1
