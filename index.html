@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,8 +19,6 @@
   <meta name="twitter:description" content="Discover thousands of free webapps">
   
   <link rel="canonical" href="https://nexuswebhub.com">
-  
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
@@ -47,104 +45,81 @@
     
     /* Navbar */
     nav {
-      background: var(--bg-card);
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid var(--accent-cyan);
+      background: rgba(26, 31, 58, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
       position: sticky;
       top: 0;
       z-index: 1000;
-      gap: 0.5rem;
-      flex-wrap: wrap;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.1);
     }
     
-    .nav-left {
+    nav .container {
+      max-width: 1400px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
-      gap: 1rem;
-      flex: 1;
-      min-width: 0;
+      justify-content: space-between;
     }
     
-    .logo {
-      height: 35px;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    
-    .stats {
+    nav .logo {
       display: flex;
-      gap: 1rem;
-      color: var(--text-secondary);
-      font-size: 0.75rem;
-      flex-wrap: wrap;
-    }
-    
-    .stat-item {
-      white-space: nowrap;
-    }
-    
-    .stat-item strong {
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
       color: var(--accent-cyan);
     }
     
-    .nav-right {
+    nav .logo img {
+      width: 32px;
+      height: 32px;
+    }
+    
+    nav .nav-links {
       display: flex;
-      gap: 0.5rem;
+      gap: 2rem;
       align-items: center;
-      flex-shrink: 0;
     }
     
-    .lang-selector {
-      background: transparent;
-      border: 1px solid var(--accent-purple);
-      color: var(--text-primary);
-      padding: 0.5rem 0.75rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    
-    .btn {
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
+    nav .nav-links a {
+      color: var(--text-secondary);
       text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.85rem;
-      white-space: nowrap;
+      transition: color 0.3s;
     }
     
-    .btn-primary {
+    nav .nav-links a:hover {
+      color: var(--accent-cyan);
+    }
+    
+    nav .lang-selector {
+      background: var(--bg-card);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      color: var(--text-primary);
+      padding: 0.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    
+    nav .btn-primary {
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.2s;
     }
     
-    .btn-primary:hover {
+    nav .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0, 217, 255, 0.3);
-    }
-    
-    .btn-secondary {
-      background: transparent;
-      border: 2px solid var(--accent-cyan);
-      color: var(--accent-cyan);
     }
     
     /* Hero */
     .hero {
       text-align: center;
       padding: 4rem 2rem;
-      background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(139, 92, 246, 0.1));
-      border-radius: 20px;
-      margin: 2rem;
+      background: linear-gradient(180deg, var(--bg-deep-space) 0%, var(--bg-card) 100%);
     }
     
     .hero h1 {
@@ -153,6 +128,7 @@
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
     .hero p {
@@ -161,18 +137,69 @@
       margin-bottom: 2rem;
     }
     
-    .hero-buttons {
+    .hero .cta-buttons {
       display: flex;
       gap: 1rem;
       justify-content: center;
       flex-wrap: wrap;
     }
     
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 217, 255, 0.3);
+    }
+    
+    /* Stats */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      padding: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--accent-cyan);
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+    
     /* Search & Filters */
     .search-section {
-      padding: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
     }
     
     .search-bar {
@@ -181,75 +208,79 @@
       margin-bottom: 2rem;
     }
     
-    .search-input {
+    .search-bar input {
       flex: 1;
       padding: 1rem;
       background: var(--bg-card);
-      border: 2px solid var(--accent-purple);
-      border-radius: 12px;
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 10px;
       color: var(--text-primary);
       font-size: 1rem;
     }
     
-    .search-input:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
+    .search-bar input::placeholder {
+      color: var(--text-secondary);
+    }
+    
+    .search-bar button {
+      padding: 1rem 1.5rem;
+      background: var(--accent-purple);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
     }
     
     .filters {
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
-      align-items: center;
       margin-bottom: 2rem;
     }
     
     .filter-btn {
-      padding: 0.75rem 1.5rem;
+      padding: 0.6rem 1.2rem;
       background: var(--bg-card);
-      border: 2px solid transparent;
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 8px;
       color: var(--text-secondary);
-      border-radius: 12px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      transition: all 0.3s;
     }
     
-    .filter-btn:hover, .filter-btn.active {
+    .filter-btn.active {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: white;
+      border-color: transparent;
+    }
+    
+    .filter-btn:hover {
       border-color: var(--accent-cyan);
       color: var(--accent-cyan);
     }
     
+    /* Tabs */
     .tabs {
       display: flex;
-      gap: 0.5rem;
-      border-bottom: 2px solid var(--bg-card);
+      gap: 1rem;
       margin-bottom: 2rem;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none; /* Firefox */
-    }
-    
-    .tabs::-webkit-scrollbar {
-      display: none; /* Chrome, Safari */
+      border-bottom: 2px solid rgba(0, 217, 255, 0.1);
     }
     
     .tab {
-      padding: 0.75rem 1.25rem;
+      padding: 0.8rem 1.5rem;
       background: transparent;
       border: none;
       color: var(--text-secondary);
       cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-      flex-shrink: 0;
-      font-size: 0.9rem;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.3s;
+      font-weight: 600;
     }
     
-    .tab:hover, .tab.active {
+    .tab.active {
       color: var(--accent-cyan);
       border-bottom-color: var(--accent-cyan);
     }
@@ -258,66 +289,78 @@
     .catalog {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 2rem;
-      padding: 2rem;
-      max-width: 1400px;
-      margin: 0 auto;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
     }
     
     .webapp-card {
       background: var(--bg-card);
-      border-radius: 16px;
+      border-radius: 12px;
       padding: 1.5rem;
       cursor: pointer;
-      transition: all 0.3s ease;
-      border: 2px solid transparent;
+      transition: all 0.3s;
+      border: 1px solid rgba(0, 217, 255, 0.1);
     }
     
     .webapp-card:hover {
       transform: translateY(-5px);
       border-color: var(--accent-cyan);
-      box-shadow: 0 15px 40px rgba(0, 217, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
     }
     
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      margin-bottom: 1rem;
-    }
-    
-    .card-badges {
+    .webapp-card .badges {
       display: flex;
       gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
     }
     
     .badge {
-      width: 24px;
-      height: 24px;
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
     }
     
-    .card-title {
-      font-size: 1.3rem;
-      font-weight: 700;
+    .badge-trending {
+      background: var(--accent-red);
+      color: white;
+    }
+    
+    .badge-new {
+      background: var(--accent-green);
+      color: white;
+    }
+    
+    .badge-featured {
+      background: var(--accent-gold);
+      color: var(--bg-deep-space);
+    }
+    
+    .webapp-card h3 {
+      font-size: 1.2rem;
       margin-bottom: 0.5rem;
       color: var(--text-primary);
     }
     
-    .card-creator {
+    .webapp-card .developer {
       color: var(--text-secondary);
       font-size: 0.9rem;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
     }
     
-    .card-stats {
+    .webapp-card .rating {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 0.75rem;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
     }
     
-    .card-description {
+    .webapp-card .rating .stars {
+      color: var(--accent-gold);
+    }
+    
+    .webapp-card .description {
       color: var(--text-secondary);
       font-size: 0.9rem;
       margin-bottom: 1rem;
@@ -327,34 +370,34 @@
       overflow: hidden;
     }
     
-    .card-tags {
+    .webapp-card .tags {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
     }
     
     .tag {
-      background: rgba(139, 92, 246, 0.2);
-      color: var(--accent-purple);
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      font-size: 0.8rem;
+      padding: 0.2rem 0.6rem;
+      background: rgba(0, 217, 255, 0.1);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
     }
     
     /* Loading */
     .loading {
       text-align: center;
-      padding: 4rem;
+      padding: 3rem;
     }
     
     .spinner {
+      display: inline-block;
       width: 50px;
       height: 50px;
-      border: 4px solid var(--bg-card);
+      border: 5px solid rgba(0, 217, 255, 0.1);
       border-top-color: var(--accent-cyan);
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
     }
     
     @keyframes spin {
@@ -364,14 +407,8 @@
     /* Empty State */
     .empty-state {
       text-align: center;
-      padding: 4rem 2rem;
+      padding: 3rem;
       color: var(--text-secondary);
-    }
-    
-    .empty-state i {
-      font-size: 4rem;
-      margin-bottom: 1rem;
-      opacity: 0.5;
     }
     
     /* Modal */
@@ -382,161 +419,88 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(10, 14, 39, 0.95);
+      background: rgba(0, 0, 0, 0.8);
       z-index: 2000;
-      align-items: center;
       justify-content: center;
-      padding: 2rem;
+      align-items: center;
     }
     
     .modal-content {
       background: var(--bg-card);
-      border-radius: 20px;
       padding: 2rem;
+      border-radius: 16px;
       max-width: 500px;
-      width: 100%;
-      border: 2px solid var(--accent-cyan);
+      margin: 1rem;
+      border: 1px solid var(--accent-cyan);
     }
     
-    .modal-header {
-      font-size: 1.5rem;
-      font-weight: 700;
+    .modal-content h2 {
       margin-bottom: 1rem;
       color: var(--accent-cyan);
     }
     
-    .modal-body {
-      margin-bottom: 1.5rem;
+    .modal-content p {
+      margin-bottom: 1rem;
       color: var(--text-secondary);
-      line-height: 1.8;
     }
     
-    .disclaimer-box {
+    .modal-content .warning {
       background: rgba(239, 68, 68, 0.1);
-      border: 2px solid var(--accent-red);
-      border-radius: 12px;
+      border-left: 4px solid var(--accent-red);
       padding: 1rem;
-      margin: 1rem 0;
-      color: var(--accent-red);
+      border-radius: 8px;
+      margin-bottom: 1rem;
     }
     
-    .modal-footer {
-      display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
-    }
-    
-    .checkbox-container {
+    .modal-content .checkbox-group {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .modal-content .buttons {
+      display: flex;
+      gap: 1rem;
     }
     
     /* Footer */
     footer {
       background: var(--bg-card);
-      padding: 2rem;
-      margin-top: 4rem;
+      padding: 3rem 2rem;
       text-align: center;
-      border-top: 2px solid var(--accent-cyan);
+      margin-top: 4rem;
+      border-top: 1px solid rgba(0, 217, 255, 0.1);
     }
     
-    .footer-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-      flex-wrap: wrap;
-      gap: 2rem;
-    }
-    
-    .footer-links {
-      display: flex;
-      gap: 2rem;
-    }
-    
-    .footer-links a {
+    footer p {
       color: var(--text-secondary);
-      text-decoration: none;
-      transition: color 0.3s ease;
+      margin-bottom: 1rem;
     }
     
-    .footer-links a:hover {
+    footer .links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+    }
+    
+    footer .links a {
       color: var(--accent-cyan);
+      text-decoration: none;
     }
     
     /* Responsive */
     @media (max-width: 768px) {
-      nav {
-        padding: 0.75rem;
-      }
-      
-      .stats {
-        display: none; /* Masquer stats sur mobile pour gagner de la place */
-      }
-      
-      .nav-right {
-        gap: 0.25rem;
-      }
-      
-      .lang-selector {
-        padding: 0.5rem;
-        font-size: 0.75rem;
-      }
-      
-      .btn {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.75rem;
-      }
-      
-      .btn span {
-        display: none; /* Masquer texte, garder icônes */
-      }
-      
-      .hero h1 { 
-        font-size: 1.8rem; 
-      }
-      
-      .hero p {
-        font-size: 1rem;
-      }
-      
-      .catalog { 
-        grid-template-columns: 1fr; 
-        padding: 1rem;
-      }
-      
-      .filters { 
-        flex-direction: column; 
-      }
-      
-      .search-section {
-        padding: 1rem;
-      }
-      
-      .tabs {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-      
-      .tab {
-        flex-shrink: 0;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .logo {
-        height: 30px;
-      }
-      
-      .hero {
-        padding: 2rem 1rem;
-      }
-      
       .hero h1 {
-        font-size: 1.5rem;
+        font-size: 2rem;
+      }
+      
+      nav .nav-links {
+        gap: 1rem;
+      }
+      
+      .catalog {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -544,380 +508,271 @@
 <body>
   <!-- Navbar -->
   <nav>
-    <div class="nav-left">
-      <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub" class="logo" onclick="window.location.href='/'">
-      <div class="stats">
-        <div class="stat-item"><strong id="stats-webapps">...</strong> <span data-i18n="webapp.views">webapps</span></div>
-        <div class="stat-item"><strong id="stats-creators">...</strong> <span>creators</span></div>
-        <div class="stat-item"><strong id="stats-reviews">...</strong> <span data-i18n="webapp.reviews">reviews</span></div>
+    <div class="container">
+      <a href="/" class="logo">
+        <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub">
+        <span>Nexus Web Hub</span>
+      </a>
+      
+      <div class="nav-links">
+        <select class="lang-selector" id="lang-selector">
+          <option value="fr">🇫🇷 FR</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="es">🇪🇸 ES</option>
+        </select>
+        
+        <a href="/submit.html" class="btn-primary" id="nav-submit">Submit</a>
+        <a href="/auth.html" id="nav-auth">Login</a>
+        <a href="/profile.html" id="nav-profile" style="display: none;">Profile</a>
       </div>
     </div>
-    <div class="nav-right">
-      <select class="lang-selector" id="language-selector" onchange="changeLanguage(this.value)">
-        <option value="en">EN</option>
-        <option value="fr">FR</option>
-        <option value="es">ES</option>
-      </select>
-      <a href="/submit.html" class="btn btn-primary" data-i18n="nav.submit">
-        <i class="fa-solid fa-plus"></i>
-        <span>Submit</span>
-      </a>
-      <button class="btn btn-secondary" id="auth-btn" onclick="handleAuth()">
-        <i class="fa-solid fa-user"></i>
-        <span id="auth-text" data-i18n="nav.login">Login</span>
-      </button>
-    </div>
   </nav>
-
+  
   <!-- Hero -->
   <section class="hero">
-    <h1 data-i18n="hero.title">Discover the Best of the Web</h1>
-    <p data-i18n="hero.subtitle">Thousands of webapps created by the community</p>
-    <div class="hero-buttons">
-      <button class="btn btn-primary" onclick="scrollToCatalog()">
-        <i class="fa-solid fa-compass"></i>
-        <span data-i18n="hero.cta_explore">Explore Catalog</span>
-      </button>
-      <a href="/submit.html" class="btn btn-secondary">
-        <i class="fa-solid fa-plus"></i>
-        <span data-i18n="hero.cta_submit">Publish your webapp</span>
-      </a>
+    <h1 id="hero-title">Discover the Best of the Web</h1>
+    <p id="hero-subtitle">Thousands of webapps created by the community</p>
+    <div class="cta-buttons">
+      <a href="#catalog" class="btn btn-primary" id="hero-explore">Explore Catalog</a>
+      <a href="/submit.html" class="btn btn-secondary" id="hero-submit">Publish your webapp</a>
     </div>
   </section>
-
+  
+  <!-- Stats -->
+  <div class="stats" id="stats">
+    <div class="stat-item">
+      <div class="stat-value" id="stat-webapps">...</div>
+      <div class="stat-label">Webapps</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="stat-creators">...</div>
+      <div class="stat-label">Creators</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="stat-reviews">...</div>
+      <div class="stat-label">Reviews</div>
+    </div>
+  </div>
+  
   <!-- Search & Filters -->
-  <section class="search-section">
+  <div class="search-section">
     <div class="search-bar">
-      <input type="text" class="search-input" id="search-input" placeholder="Search for a webapp..." data-i18n-placeholder="search.placeholder">
-      <button class="btn btn-primary" onclick="surpriseMe()">
-        <i class="fa-solid fa-shuffle"></i>
-        <span data-i18n="search.surprise">Surprise me</span>
+      <input type="text" id="search-input" placeholder="Search for a webapp...">
+      <button onclick="surpriseMe()"><i class="fa-solid fa-shuffle"></i> Surprise me</button>
+    </div>
+    
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-category="all">All</button>
+      <button class="filter-btn" data-category="productivity">
+        <i class="fa-solid fa-briefcase"></i> Productivity
+      </button>
+      <button class="filter-btn" data-category="design">
+        <i class="fa-solid fa-palette"></i> Design
+      </button>
+      <button class="filter-btn" data-category="games">
+        <i class="fa-solid fa-gamepad"></i> Games
+      </button>
+      <button class="filter-btn" data-category="api">
+        <i class="fa-solid fa-plug"></i> API
+      </button>
+      <button class="filter-btn" data-category="nocode">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> No-Code
       </button>
     </div>
-
-    <div class="filters" id="category-filters">
-      <button class="filter-btn active" onclick="filterCategory('all')" data-category="all">
-        <span data-i18n="categories.all">All</span>
-      </button>
-      <button class="filter-btn" onclick="filterCategory('productivity')" data-category="productivity">
-        <img src="/assets/icons/icon-tools.svg" width="20" height="20">
-        <span data-i18n="categories.productivity">Productivity</span>
-      </button>
-      <button class="filter-btn" onclick="filterCategory('design')" data-category="design">
-        <img src="/assets/icons/icon-ui-kits.svg" width="20" height="20">
-        <span data-i18n="categories.design">Design</span>
-      </button>
-      <button class="filter-btn" onclick="filterCategory('games')" data-category="games">
-        <img src="/assets/icons/icon-games.svg" width="20" height="20">
-        <span data-i18n="categories.games">Games</span>
-      </button>
-      <button class="filter-btn" onclick="filterCategory('api')" data-category="api">
-        <img src="/assets/icons/icon-apis.svg" width="20" height="20">
-        <span data-i18n="categories.api">API</span>
-      </button>
-      <button class="filter-btn" onclick="filterCategory('nocode')" data-category="nocode">
-        <img src="/assets/icons/icon-websites.svg" width="20" height="20">
-        <span data-i18n="categories.nocode">No-Code</span>
-      </button>
-    </div>
-
+    
     <div class="tabs">
-      <button class="tab active" onclick="sortBy('all')" data-i18n="sort.all">All</button>
-      <button class="tab" onclick="sortBy('trending')"><i class="fa-solid fa-fire"></i> <span data-i18n="sort.trending">Trending</span></button>
-      <button class="tab" onclick="sortBy('new')"><i class="fa-solid fa-sparkles"></i> <span data-i18n="sort.new">New</span></button>
-      <button class="tab" onclick="sortBy('top')"><i class="fa-solid fa-star"></i> <span data-i18n="sort.top">Top Rated</span></button>
+      <button class="tab active" data-sort="all">All</button>
+      <button class="tab" data-sort="trending"><i class="fa-solid fa-fire"></i> Trending</button>
+      <button class="tab" data-sort="new"><i class="fa-solid fa-sparkles"></i> New</button>
+      <button class="tab" data-sort="rating"><i class="fa-solid fa-star"></i> Top Rated</button>
     </div>
-  </section>
-
-  <!-- Catalog -->
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-    <p>Loading webapps...</p>
+    
+    <!-- Catalog -->
+    <div class="catalog" id="catalog"></div>
+    
+    <!-- Loading -->
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+    </div>
+    
+    <!-- Empty State -->
+    <div class="empty-state" id="empty-state" style="display: none;">
+      <i class="fa-solid fa-magnifying-glass" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+      <p>No webapps found</p>
+    </div>
   </div>
-
-  <div class="catalog" id="catalog" style="display: none;"></div>
-
-  <div class="empty-state" id="empty-state" style="display: none;">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <h2 data-i18n="search.no_results">No webapps found</h2>
-    <p>Try adjusting your filters or search query</p>
-  </div>
-
+  
   <!-- Welcome Modal -->
   <div class="modal" id="welcome-modal">
     <div class="modal-content">
-      <div class="modal-header" data-i18n="modal.welcome_title">Welcome to Nexus Web Hub!</div>
-      <div class="modal-body">
-        <p data-i18n="modal.welcome_message">Discover thousands of webapps created by the community. Nexus Web Hub is a community directory.</p>
-        <div class="disclaimer-box">
-          <strong><i class="fa-solid fa-triangle-exclamation"></i> Important</strong>
-          <p data-i18n="modal.disclaimer">Webapps are hosted by their creators. We do not guarantee their permanent availability.</p>
-        </div>
-        <div class="checkbox-container">
-          <input type="checkbox" id="dont-show-again">
-          <label for="dont-show-again" data-i18n="modal.dont_show_again">Don't show this message again</label>
-        </div>
+      <h2>Welcome to Nexus Web Hub</h2>
+      <p>Discover and share the best webapps created by the community.</p>
+      <div class="warning">
+        <strong>Important:</strong> NWH is a directory. Webapps are hosted by their creators. We do not guarantee their permanent availability.
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" onclick="closeWelcomeModal()">
-          <i class="fa-solid fa-check"></i>
-          <span data-i18n="modal.understand">I understand</span>
-        </button>
+      <div class="checkbox-group">
+        <input type="checkbox" id="dont-show-again">
+        <label for="dont-show-again">Don't show again</label>
+      </div>
+      <div class="buttons">
+        <button class="btn btn-primary" onclick="closeWelcomeModal()">Got it!</button>
       </div>
     </div>
   </div>
-
+  
   <!-- Footer -->
   <footer>
-    <div class="footer-content">
-      <div>
-        <img src="/assets/contributors/contributor-anzize.svg" height="30" alt="Anzize">
-        <p style="margin-top: 0.5rem;" data-i18n="footer.created_by">Created by Daouda Abdoul Anzize - Nexus Studio</p>
-      </div>
-      <div class="footer-links">
-        <a href="mailto:contact@nexusstudio.com" data-i18n="footer.contact">Contact</a>
-        <a href="https://github.com/anzize" target="_blank" data-i18n="footer.github">GitHub</a>
-      </div>
+    <p>Created by Daouda Abdoul Anzize - Nexus Studio</p>
+    <div class="links">
+      <a href="mailto:contact@nexusstudio.com">Contact</a>
+      <a href="https://github.com/yourusername/nexus-web-hub" target="_blank">GitHub</a>
     </div>
   </footer>
-
+  
   <script>
-    // I18n System
-    let currentLang = localStorage.getItem('user_locale') || navigator.language.split('-')[0] || 'en';
-    let translations = {};
-
-    async function loadTranslations() {
-      try {
-        const response = await fetch(`/i18n/${currentLang}.json`);
-        translations = await response.json();
-        applyTranslations();
-        document.getElementById('language-selector').value = currentLang;
-      } catch (error) {
-        console.error('Translation load error:', error);
-      }
-    }
-
-    function applyTranslations() {
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        const text = getTranslation(key);
-        if (text) el.textContent = text;
-      });
-
-      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-i18n-placeholder');
-        const text = getTranslation(key);
-        if (text) el.placeholder = text;
-      });
-    }
-
-    function getTranslation(key) {
-      const keys = key.split('.');
-      let value = translations;
-      for (const k of keys) {
-        value = value[k];
-        if (!value) return key;
-      }
-      return value;
-    }
-
-    function changeLanguage(lang) {
-      currentLang = lang;
-      localStorage.setItem('user_locale', lang);
-      loadTranslations();
-    }
-
-    // State
-    let allWebapps = [];
+    // Global state
     let currentCategory = 'all';
     let currentSort = 'all';
     let currentSearch = '';
-
-    // Auth
-    function handleAuth() {
-      const user = localStorage.getItem('user');
-      if (user) {
-        window.location.href = '/profile.html';
-      } else {
-        window.location.href = '/auth.html';
-      }
-    }
-
-    function updateAuthButton() {
-      const user = localStorage.getItem('user');
-      if (user) {
-        const userData = JSON.parse(user);
-        document.getElementById('auth-text').textContent = userData.name.split(' ')[0];
-      }
-    }
-
-    // Welcome Modal
-    function showWelcomeModal() {
-      const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
-      if (!hasSeenWelcome) {
-        document.getElementById('welcome-modal').style.display = 'flex';
-      }
-    }
-
-    function closeWelcomeModal() {
-      const dontShow = document.getElementById('dont-show-again').checked;
-      if (dontShow) {
-        localStorage.setItem('hasSeenWelcome', 'true');
-      }
-      document.getElementById('welcome-modal').style.display = 'none';
-    }
-
-    // Load Stats
-    async function loadStats() {
-      try {
-        const response = await fetch('/api/stats');
-        const data = await response.json();
-        if (data.success) {
-          document.getElementById('stats-webapps').textContent = data.stats.webapps;
-          document.getElementById('stats-creators').textContent = data.stats.creators;
-          document.getElementById('stats-reviews').textContent = data.stats.reviews;
-        }
-      } catch (error) {
-        console.error('Stats load error:', error);
-      }
-    }
-
-    // Load Webapps
+    let allWebapps = [];
+    
+    // Load webapps
     async function loadWebapps() {
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('catalog').innerHTML = '';
+      document.getElementById('empty-state').style.display = 'none';
+      
       try {
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('catalog').style.display = 'none';
-        document.getElementById('empty-state').style.display = 'none';
-
-        const response = await fetch('/api/webapps');
+        const params = new URLSearchParams();
+        if (currentCategory !== 'all') params.append('category', currentCategory);
+        if (currentSort === 'trending') params.append('trending', 'true');
+        if (currentSort === 'new') params.append('new', 'true');
+        if (currentSort === 'rating') params.append('sort', 'rating');
+        if (currentSearch) params.append('search', currentSearch);
+        
+        const response = await fetch(`/api/webapps?${params}`);
         const data = await response.json();
-
-        if (data.success) {
-          allWebapps = data.webapps;
-          filterAndRender();
+        
+        allWebapps = data.webapps;
+        
+        document.getElementById('loading').style.display = 'none';
+        
+        if (allWebapps.length === 0) {
+          document.getElementById('empty-state').style.display = 'block';
+        } else {
+          renderWebapps(allWebapps);
         }
-
-        document.getElementById('loading').style.display = 'none';
       } catch (error) {
-        console.error('Webapps load error:', error);
+        console.error('Error loading webapps:', error);
         document.getElementById('loading').style.display = 'none';
       }
     }
-
-    function filterAndRender() {
-      let filtered = allWebapps;
-
-      // Category filter
-      if (currentCategory !== 'all') {
-        filtered = filtered.filter(w => w.category === currentCategory);
-      }
-
-      // Search filter
-      if (currentSearch) {
-        const search = currentSearch.toLowerCase();
-        filtered = filtered.filter(w => 
-          w.name.toLowerCase().includes(search) ||
-          w.description_short.toLowerCase().includes(search) ||
-          w.tags.some(tag => tag.toLowerCase().includes(search))
-        );
-      }
-
-      // Sort
-      if (currentSort === 'trending') {
-        filtered = filtered.filter(w => w.is_trending === 1);
-        filtered.sort((a, b) => b.views_count - a.views_count);
-      } else if (currentSort === 'new') {
-        filtered.sort((a, b) => b.created_at - a.created_at);
-      } else if (currentSort === 'top') {
-        filtered.sort((a, b) => b.avg_rating - a.avg_rating || b.reviews_count - a.reviews_count);
-      }
-
-      renderWebapps(filtered);
-    }
-
+    
+    // Render webapps
     function renderWebapps(webapps) {
       const catalog = document.getElementById('catalog');
-      const emptyState = document.getElementById('empty-state');
-
-      if (webapps.length === 0) {
-        catalog.style.display = 'none';
-        emptyState.style.display = 'block';
-        return;
-      }
-
-      catalog.style.display = 'grid';
-      emptyState.style.display = 'none';
-
       catalog.innerHTML = webapps.map(webapp => `
-        <div class="webapp-card" onclick="openWebapp('${webapp.id}')">
-          <div class="card-header">
-            <div>
-              <h3 class="card-title">${webapp.name}</h3>
-              <p class="card-creator">${getTranslation('webapp.created_by')} ${webapp.developer}</p>
-            </div>
-            <div class="card-badges">
-              ${webapp.is_trending ? '<img src="/assets/badges/system/badge-trending.svg" class="badge" title="Trending">' : ''}
-              ${webapp.is_featured ? '<img src="/assets/badges/system/badge-featured.svg" class="badge" title="Featured">' : ''}
-              ${webapp.is_new ? '<img src="/assets/badges/system/badge-new.svg" class="badge" title="New">' : ''}
-            </div>
+        <div class="webapp-card" onclick="window.location.href='/webapp.html?id=${webapp.id}'">
+          <div class="badges">
+            ${webapp.is_trending ? '<span class="badge badge-trending"><i class="fa-solid fa-fire"></i> Trending</span>' : ''}
+            ${webapp.is_featured ? '<span class="badge badge-featured"><i class="fa-solid fa-star"></i> Featured</span>' : ''}
+            ${webapp.is_new ? '<span class="badge badge-new"><i class="fa-solid fa-sparkles"></i> New</span>' : ''}
           </div>
-          <div class="card-stats">
-            <span><i class="fa-solid fa-star" style="color: var(--accent-gold)"></i> ${webapp.avg_rating.toFixed(1)}</span>
-            <span><i class="fa-solid fa-eye"></i> ${webapp.views_count}</span>
-            <span><i class="fa-solid fa-comment"></i> ${webapp.reviews_count}</span>
+          <h3>${webapp.name}</h3>
+          <p class="developer">by ${webapp.developer}</p>
+          <div class="rating">
+            <span class="stars">${'⭐'.repeat(Math.round(webapp.avg_rating))}</span>
+            <span>${webapp.avg_rating.toFixed(1)} (${webapp.reviews_count})</span>
           </div>
-          <p class="card-description">${webapp.description_short}</p>
-          <div class="card-tags">
+          <p class="description">${webapp.description_short}</p>
+          <div class="tags">
             ${webapp.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')}
           </div>
         </div>
       `).join('');
     }
-
-    function openWebapp(id) {
-      window.location.href = `/webapp.html?id=${id}`;
+    
+    // Load stats
+    async function loadStats() {
+      try {
+        const response = await fetch('/api/stats');
+        const data = await response.json();
+        
+        document.getElementById('stat-webapps').textContent = data.stats.webapps_count;
+        document.getElementById('stat-creators').textContent = data.stats.users_count;
+        document.getElementById('stat-reviews').textContent = data.stats.reviews_count;
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      }
     }
-
-    // Filters
-    function filterCategory(category) {
-      currentCategory = category;
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.category === category || (category === 'all' && btn.textContent.includes('All')));
-      });
-      filterAndRender();
-    }
-
-    function sortBy(sort) {
-      currentSort = sort;
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-      event.target.closest('.tab').classList.add('active');
-      filterAndRender();
-    }
-
-    // Search
-    document.getElementById('search-input').addEventListener('input', (e) => {
-      currentSearch = e.target.value;
-      filterAndRender();
-    });
-
+    
+    // Surprise me
     function surpriseMe() {
       if (allWebapps.length > 0) {
         const random = allWebapps[Math.floor(Math.random() * allWebapps.length)];
-        openWebapp(random.id);
+        window.location.href = `/webapp.html?id=${random.id}`;
       }
     }
-
-    function scrollToCatalog() {
-      document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', async () => {
-      await loadTranslations();
-      updateAuthButton();
-      showWelcomeModal();
-      loadStats();
+    
+    // Search
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      currentSearch = e.target.value;
       loadWebapps();
+    });
+    
+    // Filters
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentCategory = btn.dataset.category;
+        loadWebapps();
+      });
+    });
+    
+    // Tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentSort = tab.dataset.sort;
+        loadWebapps();
+      });
+    });
+    
+    // Welcome modal
+    function showWelcomeModal() {
+      const dontShow = localStorage.getItem('welcome_modal_dismissed');
+      if (!dontShow) {
+        document.getElementById('welcome-modal').style.display = 'flex';
+      }
+    }
+    
+    function closeWelcomeModal() {
+      const dontShow = document.getElementById('dont-show-again').checked;
+      if (dontShow) {
+        localStorage.setItem('welcome_modal_dismissed', 'true');
+      }
+      document.getElementById('welcome-modal').style.display = 'none';
+    }
+    
+    // Check auth
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      
+      if (token && user) {
+        document.getElementById('nav-auth').style.display = 'none';
+        document.getElementById('nav-profile').style.display = 'block';
+      }
+    }
+    
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      loadWebapps();
+      loadStats();
+      showWelcomeModal();
+      checkAuth();
     });
   </script>
 </body>
