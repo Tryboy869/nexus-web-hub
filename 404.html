@@ -4,80 +4,48 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>404 - Page Not Found | Nexus Web Hub</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
-    :root {
-      --bg-deep-space: #0a0e27;
-      --bg-card: #1a1f3a;
-      --text-primary: #E0E6ED;
-      --text-secondary: #a0aec0;
-      --accent-cyan: #00d9ff;
-      --accent-purple: #8b5cf6;
-    }
-    
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, var(--bg-deep-space), #1a1f3a);
-      color: var(--text-primary);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      padding: 2rem;
-      overflow: hidden;
+      padding: 1rem;
+      color: white;
     }
     
     .container {
       text-align: center;
       max-width: 600px;
-      position: relative;
-      z-index: 10;
     }
     
-    .logo {
-      width: 100px;
-      margin-bottom: 2rem;
-      animation: float 3s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
-    }
-    
-    .error-code {
-      font-size: 10rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      line-height: 1;
-      margin-bottom: 1rem;
-      animation: glitch 2s ease-in-out infinite;
-    }
-    
-    @keyframes glitch {
-      0%, 100% { transform: translate(0); }
-      20% { transform: translate(-2px, 2px); }
-      40% { transform: translate(2px, -2px); }
-      60% { transform: translate(-2px, -2px); }
-      80% { transform: translate(2px, 2px); }
+    .error-animation {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 2rem;
     }
     
     h1 {
-      font-size: 2.5rem;
+      font-size: 6rem;
       margin-bottom: 1rem;
-      color: var(--text-primary);
+      font-weight: bold;
+      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
     
     p {
       font-size: 1.2rem;
-      color: var(--text-secondary);
-      margin-bottom: 3rem;
-      line-height: 1.8;
+      margin-bottom: 2rem;
+      opacity: 0.9;
     }
     
     .buttons {
@@ -89,138 +57,93 @@
     
     .btn {
       padding: 1rem 2rem;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
+      border-radius: 50px;
       font-weight: 600;
-      font-size: 1rem;
-      transition: all 0.3s ease;
       text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
     }
     
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 15px 40px rgba(0, 217, 255, 0.4);
+      background: white;
+      color: #667eea;
     }
     
     .btn-secondary {
       background: transparent;
-      border: 2px solid var(--accent-cyan);
-      color: var(--accent-cyan);
+      border: 2px solid white;
+      color: white;
     }
     
-    .btn-secondary:hover {
-      background: var(--accent-cyan);
-      color: var(--bg-deep-space);
-    }
-    
-    /* Animated background */
-    .stars {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-    }
-    
-    .star {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: var(--accent-cyan);
-      border-radius: 50%;
-      animation: twinkle 3s ease-in-out infinite;
-    }
-    
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 1; }
-    }
-    
-    /* Floating illustration */
-    .illustration {
-      margin: 2rem 0;
-      font-size: 6rem;
-      animation: spin 20s linear infinite;
-    }
-    
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    
-    @media (max-width: 768px) {
-      .error-code {
-        font-size: 6rem;
-      }
-      h1 {
-        font-size: 1.8rem;
-      }
-      p {
-        font-size: 1rem;
-      }
-      .buttons {
-        flex-direction: column;
-      }
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     }
   </style>
 </head>
 <body>
-  <!-- Animated stars -->
-  <div class="stars" id="stars"></div>
-  
   <div class="container">
-    <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub" class="logo">
+    <!-- 404 Animation SVG (inline) -->
+    <svg class="error-animation" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- Magnifying glass -->
+      <g id="magnifying-glass">
+        <circle cx="70" cy="70" r="40" fill="none" stroke="white" stroke-width="6">
+          <animate attributeName="r" values="40;45;40" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <line x1="100" y1="100" x2="140" y2="140" stroke="white" stroke-width="6" stroke-linecap="round">
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            values="0 70 70; 10 70 70; 0 70 70"
+            dur="2s"
+            repeatCount="indefinite"/>
+        </line>
+        
+        <!-- Question mark inside -->
+        <text x="70" y="85" font-size="40" font-weight="bold" fill="white" text-anchor="middle">
+          ?
+          <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite"/>
+        </text>
+      </g>
+      
+      <!-- Floating particles -->
+      <circle cx="30" cy="30" r="3" fill="white" opacity="0.6">
+        <animate attributeName="cy" values="30;20;30" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.6;0.2;0.6" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="170" cy="50" r="2" fill="white" opacity="0.5">
+        <animate attributeName="cy" values="50;40;50" dur="2.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="150" cy="160" r="2.5" fill="white" opacity="0.7">
+        <animate attributeName="cy" values="160;150;160" dur="2.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.7;0.3;0.7" dur="2.8s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
     
-    <div class="error-code">404</div>
-    
-    <h1>Page Not Found</h1>
-    
-    <p>
-      Looks like you've ventured into the unknown! The page you're looking for doesn't exist or has been moved.
-    </p>
-    
-    <div class="illustration">
-      <i class="fa-solid fa-satellite-dish"></i>
-    </div>
+    <h1>404</h1>
+    <h2>Page Not Found</h2>
+    <p>The page you're looking for doesn't exist or has been moved.</p>
     
     <div class="buttons">
       <a href="/" class="btn btn-primary">
-        <i class="fa-solid fa-home"></i>
-        Back to Home
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        </svg>
+        Go Home
       </a>
-      <a href="javascript:history.back()" class="btn btn-secondary">
-        <i class="fa-solid fa-arrow-left"></i>
+      <button class="btn btn-secondary" onclick="window.history.back()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
         Go Back
-      </a>
+      </button>
     </div>
   </div>
-
-  <script>
-    // Generate random stars
-    const starsContainer = document.getElementById('stars');
-    for (let i = 0; i < 100; i++) {
-      const star = document.createElement('div');
-      star.className = 'star';
-      star.style.left = `${Math.random() * 100}%`;
-      star.style.top = `${Math.random() * 100}%`;
-      star.style.animationDelay = `${Math.random() * 3}s`;
-      starsContainer.appendChild(star);
-    }
-  </script>
 </body>
 </html>
