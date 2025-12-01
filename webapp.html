@@ -600,8 +600,28 @@
       
       // Media
       if (webapp.video_url) {
-        const videoId = webapp.video_url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1];
-        document.getElementById('media').innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        // Extract video ID from various YouTube URL formats
+        let videoId = null;
+        
+        // Format: https://www.youtube.com/watch?v=VIDEO_ID
+        if (webapp.video_url.includes('youtube.com/watch')) {
+          videoId = new URL(webapp.video_url).searchParams.get('v');
+        }
+        // Format: https://youtu.be/VIDEO_ID
+        else if (webapp.video_url.includes('youtu.be/')) {
+          videoId = webapp.video_url.split('youtu.be/')[1]?.split('?')[0];
+        }
+        // Format: https://www.youtube.com/embed/VIDEO_ID
+        else if (webapp.video_url.includes('youtube.com/embed/')) {
+          videoId = webapp.video_url.split('youtube.com/embed/')[1]?.split('?')[0];
+        }
+        
+        if (videoId) {
+          document.getElementById('media').innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        } else {
+          // Fallback si l'extraction échoue
+          document.getElementById('media').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: rgba(0, 217, 255, 0.1);"><p style="color: var(--text-secondary);">Vidéo YouTube non disponible</p></div>';
+        }
       } else if (webapp.image_url) {
         document.getElementById('media').innerHTML = `<img src="${webapp.image_url}" alt="${webapp.name}">`;
       } else {
