@@ -521,20 +521,20 @@
           <option value="es">🇪🇸 ES</option>
         </select>
         
-        <a href="/submit.html" class="btn-primary" id="nav-submit">Submit</a>
-        <a href="/auth.html" id="nav-auth">Login</a>
-        <a href="/profile.html" id="nav-profile" style="display: none;">Profile</a>
+        <a href="/submit.html" class="btn-primary" data-i18n="nav.submit">Submit</a>
+        <a href="/auth.html" id="nav-auth" data-i18n="nav.login">Login</a>
+        <a href="/profile.html" id="nav-profile" style="display: none;" data-i18n="nav.profile">Profile</a>
       </div>
     </div>
   </nav>
   
   <!-- Hero -->
   <section class="hero">
-    <h1 id="hero-title">Discover the Best of the Web</h1>
-    <p id="hero-subtitle">Thousands of webapps created by the community</p>
+    <h1 id="hero-title" data-i18n="hero.title">Discover the Best of the Web</h1>
+    <p id="hero-subtitle" data-i18n="hero.subtitle">Thousands of webapps created by the community</p>
     <div class="cta-buttons">
-      <a href="#catalog" class="btn btn-primary" id="hero-explore">Explore Catalog</a>
-      <a href="/submit.html" class="btn btn-secondary" id="hero-submit">Publish your webapp</a>
+      <a href="#catalog" class="btn btn-primary" data-i18n="hero.cta_explore">Explore Catalog</a>
+      <a href="/submit.html" class="btn btn-secondary" data-i18n="hero.cta_submit">Publish your webapp</a>
     </div>
   </section>
   
@@ -557,34 +557,34 @@
   <!-- Search & Filters -->
   <div class="search-section">
     <div class="search-bar">
-      <input type="text" id="search-input" placeholder="Search for a webapp...">
-      <button onclick="surpriseMe()"><i class="fa-solid fa-shuffle"></i> Surprise me</button>
+      <input type="text" id="search-input" data-i18n-placeholder="search.placeholder" placeholder="Search for a webapp...">
+      <button onclick="surpriseMe()"><i class="fa-solid fa-shuffle"></i> <span data-i18n="search.surprise_me">Surprise me</span></button>
     </div>
     
     <div class="filters" id="filters">
-      <button class="filter-btn active" data-category="all">All</button>
+      <button class="filter-btn active" data-category="all" data-i18n="categories.all">All</button>
       <button class="filter-btn" data-category="productivity">
-        <i class="fa-solid fa-briefcase"></i> Productivity
+        <i class="fa-solid fa-briefcase"></i> <span data-i18n="categories.productivity">Productivity</span>
       </button>
       <button class="filter-btn" data-category="design">
-        <i class="fa-solid fa-palette"></i> Design
+        <i class="fa-solid fa-palette"></i> <span data-i18n="categories.design">Design</span>
       </button>
       <button class="filter-btn" data-category="games">
-        <i class="fa-solid fa-gamepad"></i> Games
+        <i class="fa-solid fa-gamepad"></i> <span data-i18n="categories.games">Games</span>
       </button>
       <button class="filter-btn" data-category="api">
-        <i class="fa-solid fa-plug"></i> API
+        <i class="fa-solid fa-plug"></i> <span data-i18n="categories.api">API</span>
       </button>
       <button class="filter-btn" data-category="nocode">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> No-Code
+        <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="categories.nocode">No-Code</span>
       </button>
     </div>
     
     <div class="tabs">
-      <button class="tab active" data-sort="all">All</button>
-      <button class="tab" data-sort="trending"><i class="fa-solid fa-fire"></i> Trending</button>
-      <button class="tab" data-sort="new"><i class="fa-solid fa-sparkles"></i> New</button>
-      <button class="tab" data-sort="rating"><i class="fa-solid fa-star"></i> Top Rated</button>
+      <button class="tab active" data-sort="all" data-i18n="sort.all">All</button>
+      <button class="tab" data-sort="trending"><i class="fa-solid fa-fire"></i> <span data-i18n="sort.trending">Trending</span></button>
+      <button class="tab" data-sort="new"><i class="fa-solid fa-sparkles"></i> <span data-i18n="sort.new">New</span></button>
+      <button class="tab" data-sort="rating"><i class="fa-solid fa-star"></i> <span data-i18n="sort.top_rated">Top Rated</span></button>
     </div>
     
     <!-- Catalog -->
@@ -630,6 +630,82 @@
   </footer>
   
   <script>
+    // ==================== I18N SYSTEM ====================
+    let currentLang = 'en';
+    let translations = {};
+    
+    // Detect language
+    function detectLanguage() {
+      // 1. URL parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlLang = urlParams.get('lang');
+      if (urlLang && ['fr', 'en', 'es'].includes(urlLang)) {
+        localStorage.setItem('user_locale', urlLang);
+        return urlLang;
+      }
+      
+      // 2. LocalStorage
+      const savedLang = localStorage.getItem('user_locale');
+      if (savedLang) return savedLang;
+      
+      // 3. Browser language
+      const browserLang = navigator.language.split('-')[0];
+      return ['fr', 'en', 'es'].includes(browserLang) ? browserLang : 'en';
+    }
+    
+    // Load translations
+    async function loadTranslations(lang) {
+      try {
+        const response = await fetch(`/i18n/${lang}.json`);
+        translations = await response.json();
+        currentLang = lang;
+        applyTranslations();
+      } catch (error) {
+        console.error('Error loading translations:', error);
+      }
+    }
+    
+    // Apply translations to page
+    function applyTranslations() {
+      // Translate all elements with data-i18n attribute
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const translation = getTranslation(key);
+        if (translation) {
+          el.textContent = translation;
+        }
+      });
+      
+      // Translate placeholders
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        const translation = getTranslation(key);
+        if (translation) {
+          el.placeholder = translation;
+        }
+      });
+    }
+    
+    // Get translation by key
+    function getTranslation(key) {
+      const keys = key.split('.');
+      let value = translations;
+      for (const k of keys) {
+        value = value?.[k];
+        if (!value) return key;
+      }
+      return value;
+    }
+    
+    // Change language
+    function changeLanguage(lang) {
+      localStorage.setItem('user_locale', lang);
+      currentLang = lang;
+      loadTranslations(lang);
+    }
+    
+    // ==================== END I18N SYSTEM ====================
+    
     // Global state
     let currentCategory = 'all';
     let currentSort = 'all';
@@ -740,6 +816,11 @@
       });
     });
     
+    // Language selector
+    document.getElementById('lang-selector').addEventListener('change', (e) => {
+      changeLanguage(e.target.value);
+    });
+    
     // Welcome modal
     function showWelcomeModal() {
       const dontShow = localStorage.getItem('welcome_modal_dismissed');
@@ -768,7 +849,11 @@
     }
     
     // Init
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      currentLang = detectLanguage();
+      document.getElementById('lang-selector').value = currentLang;
+      await loadTranslations(currentLang);
+      
       loadWebapps();
       loadStats();
       showWelcomeModal();
