@@ -27,699 +27,665 @@
       color: var(--text-primary);
       line-height: 1.6;
     }
-
+    
     /* Login Screen */
-    .login-container {
+    .login-screen {
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      padding: 2rem;
+      padding: 1rem;
     }
-
-    .login-box {
+    
+    .login-card {
       background: var(--bg-card);
-      border-radius: 20px;
       padding: 3rem;
+      border-radius: 16px;
       max-width: 400px;
       width: 100%;
-      border: 2px solid var(--accent-red);
-      box-shadow: 0 20px 60px rgba(239, 68, 68, 0.3);
+      border: 1px solid var(--accent-cyan);
     }
-
-    .login-box h1 {
+    
+    .login-card h1 {
       text-align: center;
       margin-bottom: 2rem;
-      color: var(--accent-red);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
+      color: var(--accent-cyan);
     }
-
+    
     .form-group {
       margin-bottom: 1.5rem;
     }
-
-    label {
+    
+    .form-group label {
       display: block;
       margin-bottom: 0.5rem;
       font-weight: 600;
     }
-
-    input {
+    
+    .form-group input {
       width: 100%;
-      padding: 1rem;
+      padding: 0.8rem;
       background: var(--bg-deep-space);
-      border: 2px solid var(--accent-purple);
-      border-radius: 12px;
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 8px;
       color: var(--text-primary);
       font-size: 1rem;
     }
-
-    input:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-    }
-
+    
     .btn {
       width: 100%;
       padding: 1rem;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
+      border-radius: 10px;
       font-weight: 600;
+      border: none;
       font-size: 1rem;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-
-    .btn-danger {
-      background: var(--accent-red);
+      cursor: pointer;
+      transition: all 0.3s;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       color: white;
     }
-
-    .btn-danger:hover {
+    
+    .btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
     }
-
-    .btn-secondary {
-      background: transparent;
-      border: 2px solid var(--accent-cyan);
-      color: var(--accent-cyan);
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
-
-    /* Admin Panel */
-    #admin-panel {
+    
+    /* Dashboard */
+    .dashboard {
       display: none;
     }
-
+    
+    .dashboard.active {
+      display: block;
+    }
+    
     nav {
       background: var(--bg-card);
       padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid var(--accent-red);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.1);
     }
-
-    .logo {
-      height: 40px;
-    }
-
-    .container {
+    
+    nav .container {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .dashboard-header {
-      background: var(--bg-card);
-      border-radius: 16px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      border: 2px solid var(--accent-red);
-    }
-
-    .dashboard-title {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      color: var(--accent-red);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: space-between;
     }
-
+    
+    nav h1 {
+      color: var(--accent-cyan);
+      font-size: 1.5rem;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-top: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
     }
-
+    
     .stat-card {
-      background: var(--bg-deep-space);
+      background: var(--bg-card);
       padding: 1.5rem;
       border-radius: 12px;
-      text-align: center;
+      border: 1px solid rgba(0, 217, 255, 0.1);
     }
-
+    
     .stat-value {
-      font-size: 2.5rem;
-      font-weight: 700;
+      font-size: 2rem;
+      font-weight: bold;
       color: var(--accent-cyan);
     }
-
+    
     .stat-label {
       color: var(--text-secondary);
       margin-top: 0.5rem;
     }
-
+    
     .tabs {
       display: flex;
       gap: 1rem;
-      border-bottom: 2px solid var(--bg-card);
       margin-bottom: 2rem;
+      border-bottom: 2px solid rgba(0, 217, 255, 0.1);
     }
-
+    
     .tab {
-      padding: 1rem 2rem;
+      padding: 0.8rem 1.5rem;
       background: transparent;
       border: none;
       color: var(--text-secondary);
       cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.3s;
+      font-weight: 600;
     }
-
-    .tab:hover, .tab.active {
-      color: var(--accent-red);
-      border-bottom-color: var(--accent-red);
+    
+    .tab.active {
+      color: var(--accent-cyan);
+      border-bottom-color: var(--accent-cyan);
     }
-
+    
     .tab-content {
       display: none;
     }
-
+    
     .tab-content.active {
       display: block;
     }
-
+    
     table {
       width: 100%;
       background: var(--bg-card);
       border-radius: 12px;
       overflow: hidden;
+      border-collapse: collapse;
     }
-
-    thead {
-      background: var(--bg-deep-space);
-    }
-
-    th, td {
+    
+    table th {
+      background: rgba(0, 217, 255, 0.1);
       padding: 1rem;
       text-align: left;
-    }
-
-    th {
-      font-weight: 600;
       color: var(--accent-cyan);
+      font-weight: 600;
     }
-
-    tbody tr {
-      border-bottom: 1px solid var(--bg-deep-space);
+    
+    table td {
+      padding: 1rem;
+      border-top: 1px solid rgba(0, 217, 255, 0.1);
     }
-
-    tbody tr:hover {
+    
+    table tr:hover {
       background: rgba(0, 217, 255, 0.05);
     }
-
-    .status-badge {
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
+    
+    .action-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
       font-size: 0.85rem;
       font-weight: 600;
+      transition: all 0.3s;
     }
-
+    
+    .btn-view {
+      background: var(--accent-cyan);
+      color: var(--bg-deep-space);
+    }
+    
+    .btn-resolve {
+      background: var(--accent-green);
+      color: white;
+    }
+    
+    .btn-delete {
+      background: var(--accent-red);
+      color: white;
+    }
+    
+    .action-btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .status-badge {
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
     .status-pending {
-      background: rgba(251, 191, 36, 0.2);
-      color: var(--accent-gold);
+      background: var(--accent-gold);
+      color: var(--bg-deep-space);
     }
-
+    
     .status-resolved {
-      background: rgba(16, 185, 129, 0.2);
-      color: var(--accent-green);
+      background: var(--accent-green);
+      color: white;
     }
-
-    .action-btns {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .btn-small {
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-    }
-
+    
     .empty-state {
       text-align: center;
-      padding: 4rem 2rem;
+      padding: 3rem;
       color: var(--text-secondary);
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(10, 14, 39, 0.95);
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .modal-content {
-      background: var(--bg-card);
-      border-radius: 20px;
-      padding: 2rem;
-      max-width: 600px;
-      width: 100%;
-      border: 2px solid var(--accent-cyan);
-    }
-
-    .modal-header {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      color: var(--accent-cyan);
-    }
-
-    .modal-body {
-      margin-bottom: 1.5rem;
-    }
-
-    .modal-footer {
-      display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
-    }
-
-    textarea {
-      width: 100%;
-      padding: 1rem;
-      background: var(--bg-deep-space);
-      border: 2px solid var(--accent-purple);
-      border-radius: 12px;
-      color: var(--text-primary);
-      font-family: inherit;
-      resize: vertical;
-      min-height: 100px;
-    }
-
-    @media (max-width: 768px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      table {
-        font-size: 0.85rem;
-      }
-      .action-btns {
-        flex-direction: column;
-      }
     }
   </style>
 </head>
 <body>
   <!-- Login Screen -->
-  <div class="login-container" id="login-screen">
-    <div class="login-box">
+  <div class="login-screen" id="login-screen">
+    <div class="login-card">
       <h1><i class="fa-solid fa-shield-halved"></i> Admin Login</h1>
       <form onsubmit="handleLogin(event)">
         <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="admin-email" required placeholder="admin@nexusstudio.com">
+          <label>Admin Email</label>
+          <input type="email" id="admin-email" required>
         </div>
         <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="admin-password" required placeholder="••••••••">
+          <label>Admin Password</label>
+          <input type="password" id="admin-password" required>
         </div>
-        <button type="submit" class="btn btn-danger">
-          <i class="fa-solid fa-right-to-bracket"></i>
-          Login as Admin
+        <button type="submit" class="btn" id="login-btn">
+          <i class="fa-solid fa-right-to-bracket"></i> Login
         </button>
       </form>
-      <div style="text-align: center; margin-top: 2rem;">
-        <a href="/" style="color: var(--accent-cyan); text-decoration: none;">
-          <i class="fa-solid fa-arrow-left"></i> Back to Home
-        </a>
-      </div>
     </div>
   </div>
-
-  <!-- Admin Panel -->
-  <div id="admin-panel">
+  
+  <!-- Dashboard -->
+  <div class="dashboard" id="dashboard">
     <nav>
-      <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub" class="logo">
-      <button class="btn btn-danger" onclick="logout()">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        Logout
-      </button>
+      <div class="container">
+        <h1><i class="fa-solid fa-shield-halved"></i> Admin Dashboard</h1>
+        <a href="/" style="color: var(--text-secondary); text-decoration: none;">Back to site</a>
+      </div>
     </nav>
-
+    
     <div class="container">
-      <div class="dashboard-header">
-        <h1 class="dashboard-title">
-          <i class="fa-solid fa-gauge-high"></i>
-          Admin Dashboard
-        </h1>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-value" id="total-webapps">0</div>
-            <div class="stat-label">Total Webapps</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="pending-reports">0</div>
-            <div class="stat-label">Pending Reports</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="total-users">0</div>
-            <div class="stat-label">Total Users</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="total-reviews">0</div>
-            <div class="stat-label">Total Reviews</div>
-          </div>
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-webapps">0</div>
+          <div class="stat-label">Total Webapps</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-reports">0</div>
+          <div class="stat-label">Pending Reports</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-users">0</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-security">0</div>
+          <div class="stat-label">Security Events (24h)</div>
         </div>
       </div>
-
+      
+      <!-- Tabs -->
       <div class="tabs">
         <button class="tab active" onclick="switchTab('reports')">
-          <i class="fa-solid fa-flag"></i>
-          Reports
+          <i class="fa-solid fa-flag"></i> Reports
         </button>
         <button class="tab" onclick="switchTab('webapps')">
-          <i class="fa-solid fa-grid-2"></i>
-          All Webapps
+          <i class="fa-solid fa-th-large"></i> All Webapps
+        </button>
+        <button class="tab" onclick="switchTab('logs')">
+          <i class="fa-solid fa-shield-halved"></i> Security Logs
         </button>
       </div>
-
+      
       <!-- Reports Tab -->
-      <div class="tab-content active" id="tab-reports">
-        <table id="reports-table">
-          <thead>
-            <tr>
-              <th>Webapp</th>
-              <th>Reported By</th>
-              <th>Reason</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="reports-tbody"></tbody>
-        </table>
-        <div class="empty-state" id="reports-empty" style="display: none;">
-          <i class="fa-solid fa-check-circle" style="font-size: 4rem; color: var(--accent-green);"></i>
-          <h2>No pending reports</h2>
-          <p>All caught up!</p>
-        </div>
+      <div class="tab-content active" id="reports-tab">
+        <div id="reports-table"></div>
       </div>
-
+      
       <!-- Webapps Tab -->
-      <div class="tab-content" id="tab-webapps">
-        <table id="webapps-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Creator</th>
-              <th>Category</th>
-              <th>Rating</th>
-              <th>Views</th>
-              <th>Reviews</th>
-              <th>Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="webapps-tbody"></tbody>
-        </table>
+      <div class="tab-content" id="webapps-tab">
+        <div id="webapps-table"></div>
+      </div>
+      
+      <!-- Logs Tab -->
+      <div class="tab-content" id="logs-tab">
+        <div id="logs-table"></div>
       </div>
     </div>
   </div>
-
-  <!-- Resolve Report Modal -->
-  <div class="modal" id="resolve-modal">
-    <div class="modal-content">
-      <div class="modal-header">Resolve Report</div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Admin Notes</label>
-          <textarea id="admin-notes" placeholder="Add any notes about this resolution..."></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeResolveModal()">Cancel</button>
-        <button class="btn btn-danger" onclick="confirmResolve()">
-          <i class="fa-solid fa-check"></i>
-          Mark as Resolved
-        </button>
-      </div>
-    </div>
-  </div>
-
+  
   <script>
     let adminKey = null;
-    let currentReportId = null;
-
-    function switchTab(tab) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      
-      event.target.closest('.tab').classList.add('active');
-      document.getElementById(`tab-${tab}`).classList.add('active');
-    }
-
-    async function handleLogin(e) {
-      e.preventDefault();
+    
+    // Handle login
+    async function handleLogin(event) {
+      event.preventDefault();
       
       const email = document.getElementById('admin-email').value;
       const password = document.getElementById('admin-password').value;
-
+      const btn = document.getElementById('login-btn');
+      
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
+      
       try {
         const response = await fetch('/api/admin/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
         });
-
+        
         const data = await response.json();
-
+        
         if (data.success) {
-          adminKey = btoa(`${email}:${password}`); // Simple encoding
+          // Store admin key in session
+          adminKey = btoa(`${email}:${password}`);
           sessionStorage.setItem('adminKey', adminKey);
           
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('admin-panel').style.display = 'block';
-          
-          loadDashboard();
+          showDashboard();
         } else {
           alert('Invalid credentials');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login';
         }
       } catch (error) {
         console.error('Login error:', error);
         alert('Login failed');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login';
       }
     }
-
-    async function loadDashboard() {
-      await loadStats();
-      await loadReports();
-      await loadWebapps();
+    
+    // Show dashboard
+    function showDashboard() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard').classList.add('active');
+      
+      loadStats();
+      loadReports();
     }
-
+    
+    // Load stats
     async function loadStats() {
       try {
-        const response = await fetch('/api/stats');
-        const data = await response.json();
-
-        if (data.success) {
-          document.getElementById('total-webapps').textContent = data.stats.webapps;
-          document.getElementById('total-users').textContent = data.stats.creators;
-          document.getElementById('total-reviews').textContent = data.stats.reviews;
-        }
-
-        // Load reports count
-        const reportsResponse = await fetch('/api/admin/reports', {
+        // Global stats
+        const statsResponse = await fetch('/api/stats');
+        const statsData = await statsResponse.json();
+        
+        document.getElementById('stat-webapps').textContent = statsData.stats.webapps_count;
+        document.getElementById('stat-users').textContent = statsData.stats.users_count;
+        
+        // Reports
+        const reportsResponse = await fetch('/api/admin/reports?status=pending', {
           headers: { 'X-Admin-Key': adminKey }
         });
         const reportsData = await reportsResponse.json();
+        document.getElementById('stat-reports').textContent = reportsData.reports.length;
         
-        if (reportsData.success) {
-          const pending = reportsData.reports.filter(r => r.status === 'pending').length;
-          document.getElementById('pending-reports').textContent = pending;
-        }
+        // Security logs
+        const securityResponse = await fetch('/api/admin/stats', {
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        const securityData = await securityResponse.json();
+        document.getElementById('stat-security').textContent = securityData.stats.byLevel.SECURITY || 0;
       } catch (error) {
-        console.error('Stats load error:', error);
+        console.error('Error loading stats:', error);
       }
     }
-
+    
+    // Load reports
     async function loadReports() {
       try {
         const response = await fetch('/api/admin/reports', {
           headers: { 'X-Admin-Key': adminKey }
         });
         const data = await response.json();
-
-        if (data.success) {
-          const tbody = document.getElementById('reports-tbody');
-          const empty = document.getElementById('reports-empty');
-
-          if (data.reports.length === 0) {
-            document.getElementById('reports-table').style.display = 'none';
-            empty.style.display = 'block';
-            return;
-          }
-
-          document.getElementById('reports-table').style.display = 'table';
-          empty.style.display = 'none';
-
-          tbody.innerHTML = data.reports.map(report => `
-            <tr>
-              <td><a href="/webapp.html?id=${report.target_id}" style="color: var(--accent-cyan);">${report.webapp_name || report.target_id}</a></td>
-              <td>${report.reporter_name}</td>
-              <td>${report.reason.substring(0, 100)}${report.reason.length > 100 ? '...' : ''}</td>
-              <td>${new Date(report.created_at).toLocaleDateString()}</td>
-              <td><span class="status-badge status-${report.status}">${report.status}</span></td>
-              <td>
-                <div class="action-btns">
-                  ${report.status === 'pending' ? `
-                    <button class="btn btn-secondary btn-small" onclick="resolveReport('${report.id}')">
-                      <i class="fa-solid fa-check"></i> Resolve
-                    </button>
-                    <button class="btn btn-danger btn-small" onclick="deleteWebappFromReport('${report.target_id}', '${report.webapp_name}')">
-                      <i class="fa-solid fa-trash"></i> Delete
-                    </button>
-                  ` : `
-                    <span style="color: var(--accent-green);">Resolved</span>
-                  `}
-                </div>
-              </td>
-            </tr>
-          `).join('');
+        
+        if (data.reports.length === 0) {
+          document.getElementById('reports-table').innerHTML = '<div class="empty-state">No reports</div>';
+          return;
         }
+        
+        const tableHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Webapp/Target</th>
+                <th>Reporter</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.reports.map(report => `
+                <tr>
+                  <td>${report.target_id}</td>
+                  <td>${report.reporter_name}</td>
+                  <td>${report.reason}</td>
+                  <td>
+                    <span class="status-badge status-${report.status}">
+                      ${report.status}
+                    </span>
+                  </td>
+                  <td>${new Date(report.created_at).toLocaleDateString()}</td>
+                  <td>
+                    <button class="action-btn btn-view" onclick="window.open('/webapp.html?id=${report.target_id}', '_blank')">
+                      View
+                    </button>
+                    ${report.status === 'pending' ? `
+                      <button class="action-btn btn-resolve" onclick="resolveReport('${report.id}')">
+                        Resolve
+                      </button>
+                      <button class="action-btn btn-delete" onclick="deleteWebappFromReport('${report.target_id}')">
+                        Delete Webapp
+                      </button>
+                    ` : ''}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        
+        document.getElementById('reports-table').innerHTML = tableHTML;
       } catch (error) {
-        console.error('Reports load error:', error);
+        console.error('Error loading reports:', error);
       }
     }
-
-    async function loadWebapps() {
+    
+    // Load all webapps
+    async function loadAllWebapps() {
       try {
         const response = await fetch('/api/admin/webapps', {
           headers: { 'X-Admin-Key': adminKey }
         });
         const data = await response.json();
-
-        if (data.success) {
-          const tbody = document.getElementById('webapps-tbody');
-
-          tbody.innerHTML = data.webapps.map(webapp => `
-            <tr>
-              <td><a href="/webapp.html?id=${webapp.id}" style="color: var(--accent-cyan);">${webapp.name}</a></td>
-              <td>${webapp.creator_name}</td>
-              <td>${webapp.category}</td>
-              <td>${webapp.avg_rating.toFixed(1)} ⭐</td>
-              <td>${webapp.views_count}</td>
-              <td>${webapp.reviews_count}</td>
-              <td>${new Date(webapp.created_at).toLocaleDateString()}</td>
-              <td>
-                <button class="btn btn-danger btn-small" onclick="deleteWebapp('${webapp.id}', '${webapp.name}')">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-              </td>
-            </tr>
-          `).join('');
+        
+        if (data.webapps.length === 0) {
+          document.getElementById('webapps-table').innerHTML = '<div class="empty-state">No webapps</div>';
+          return;
         }
+        
+        const tableHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Creator</th>
+                <th>URL</th>
+                <th>Rating</th>
+                <th>Views</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.webapps.map(webapp => `
+                <tr>
+                  <td>${webapp.name}</td>
+                  <td>${webapp.developer}</td>
+                  <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    ${webapp.url}
+                  </td>
+                  <td>${webapp.avg_rating.toFixed(1)} ⭐</td>
+                  <td>${webapp.views_count}</td>
+                  <td>${new Date(webapp.created_at).toLocaleDateString()}</td>
+                  <td>
+                    <button class="action-btn btn-view" onclick="window.open('/webapp.html?id=${webapp.id}', '_blank')">
+                      View
+                    </button>
+                    <button class="action-btn btn-delete" onclick="deleteWebapp('${webapp.id}')">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        
+        document.getElementById('webapps-table').innerHTML = tableHTML;
       } catch (error) {
-        console.error('Webapps load error:', error);
+        console.error('Error loading webapps:', error);
       }
     }
-
-    function resolveReport(reportId) {
-      currentReportId = reportId;
-      document.getElementById('resolve-modal').style.display = 'flex';
-    }
-
-    function closeResolveModal() {
-      document.getElementById('resolve-modal').style.display = 'none';
-      currentReportId = null;
-      document.getElementById('admin-notes').value = '';
-    }
-
-    async function confirmResolve() {
-      const notes = document.getElementById('admin-notes').value;
-
+    
+    // Load security logs
+    async function loadLogs() {
       try {
-        const response = await fetch(`/api/admin/reports/${currentReportId}`, {
+        const response = await fetch('/api/admin/logs', {
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        const data = await response.json();
+        
+        if (data.logs.length === 0) {
+          document.getElementById('logs-table').innerHTML = '<div class="empty-state">No logs</div>';
+          return;
+        }
+        
+        const tableHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Type</th>
+                <th>Timestamp</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.logs.slice(0, 100).map(log => `
+                <tr>
+                  <td>
+                    <span class="status-badge status-${log.level.toLowerCase()}">
+                      ${log.level}
+                    </span>
+                  </td>
+                  <td>${log.type}</td>
+                  <td>${new Date(log.timestamp).toLocaleString()}</td>
+                  <td style="font-family: monospace; font-size: 0.85rem; max-width: 400px; overflow: hidden; text-overflow: ellipsis;">
+                    ${JSON.stringify(log).substring(0, 100)}...
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        
+        document.getElementById('logs-table').innerHTML = tableHTML;
+      } catch (error) {
+        console.error('Error loading logs:', error);
+      }
+    }
+    
+    // Switch tabs
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+      
+      if (tabName === 'webapps') {
+        loadAllWebapps();
+      } else if (tabName === 'logs') {
+        loadLogs();
+      }
+    }
+    
+    // Resolve report
+    async function resolveReport(reportId) {
+      if (!confirm('Mark this report as resolved?')) return;
+      
+      try {
+        const response = await fetch(`/api/admin/reports/${reportId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'X-Admin-Key': adminKey
           },
-          body: JSON.stringify({ admin_notes: notes })
+          body: JSON.stringify({ admin_notes: 'Resolved by admin' })
         });
-
+        
         const data = await response.json();
-
+        
         if (data.success) {
-          alert('Report marked as resolved');
-          closeResolveModal();
-          loadDashboard();
+          alert('Report resolved');
+          loadReports();
+          loadStats();
         }
       } catch (error) {
-        console.error('Resolve error:', error);
+        console.error('Error resolving report:', error);
         alert('Error resolving report');
       }
     }
-
-    async function deleteWebapp(id, name) {
-      if (!confirm(`Delete webapp "${name}"? This action is irreversible.`)) {
-        return;
-      }
-
+    
+    // Delete webapp from report
+    async function deleteWebappFromReport(webappId) {
+      if (!confirm('Delete this webapp? This action is irreversible.')) return;
+      
       try {
-        const response = await fetch(`/api/admin/webapps/${id}`, {
+        const response = await fetch(`/api/admin/webapps/${webappId}`, {
           method: 'DELETE',
           headers: { 'X-Admin-Key': adminKey }
         });
-
+        
         const data = await response.json();
-
+        
         if (data.success) {
           alert('Webapp deleted');
-          loadDashboard();
+          loadReports();
+          loadStats();
         }
       } catch (error) {
-        console.error('Delete error:', error);
+        console.error('Error deleting webapp:', error);
         alert('Error deleting webapp');
       }
     }
-
-    async function deleteWebappFromReport(id, name) {
-      if (!confirm(`Delete webapp "${name}" due to report? This action is irreversible.`)) {
-        return;
+    
+    // Delete webapp
+    async function deleteWebapp(webappId) {
+      if (!confirm('Delete this webapp? This action is irreversible.')) return;
+      
+      try {
+        const response = await fetch(`/api/admin/webapps/${webappId}`, {
+          method: 'DELETE',
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Webapp deleted');
+          loadAllWebapps();
+          loadStats();
+        }
+      } catch (error) {
+        console.error('Error deleting webapp:', error);
+        alert('Error deleting webapp');
       }
-
-      await deleteWebapp(id, name);
     }
-
-    function logout() {
-      if (confirm('Logout from admin panel?')) {
-        sessionStorage.removeItem('adminKey');
-        window.location.reload();
-      }
-    }
-
+    
     // Check if already logged in
-    const savedKey = sessionStorage.getItem('adminKey');
-    if (savedKey) {
-      adminKey = savedKey;
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('admin-panel').style.display = 'block';
-      loadDashboard();
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedKey = sessionStorage.getItem('adminKey');
+      if (savedKey) {
+        adminKey = savedKey;
+        showDashboard();
+      }
+    });
   </script>
 </body>
 </html>
