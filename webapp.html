@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="page-title">Webapp | Nexus Web Hub</title>
   <meta name="description" id="page-description">
+  
+  <!-- Open Graph -->
   <meta property="og:title" id="og-title">
   <meta property="og:description" id="og-description">
   <meta property="og:image" id="og-image">
@@ -33,322 +35,364 @@
       color: var(--text-primary);
       line-height: 1.6;
     }
-
+    
+    /* Navbar */
     nav {
-      background: var(--bg-card);
+      background: rgba(26, 31, 58, 0.9);
+      backdrop-filter: blur(10px);
       padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid var(--accent-cyan);
       position: sticky;
       top: 0;
       z-index: 1000;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.1);
     }
-
-    .logo {
-      height: 40px;
-      cursor: pointer;
-    }
-
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      color: white;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0, 217, 255, 0.3);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      border: 2px solid var(--accent-cyan);
-      color: var(--accent-cyan);
-    }
-
-    .btn-danger {
-      background: var(--accent-red);
-      color: white;
-    }
-
-    .container {
-      max-width: 1200px;
+    
+    nav .container {
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .webapp-header {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      margin-bottom: 3rem;
-    }
-
-    .media-section {
-      background: var(--bg-card);
-      border-radius: 16px;
-      padding: 2rem;
       display: flex;
       align-items: center;
-      justify-content: center;
-      min-height: 400px;
+      justify-content: space-between;
     }
-
-    .media-section iframe {
-      width: 100%;
-      height: 350px;
-      border-radius: 12px;
-    }
-
-    .media-section img {
-      max-width: 100%;
-      border-radius: 12px;
-    }
-
-    .info-section {
+    
+    nav .logo {
       display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .badges-container {
-      display: flex;
+      align-items: center;
       gap: 0.5rem;
-      flex-wrap: wrap;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-cyan);
+      text-decoration: none;
     }
-
-    .badge {
+    
+    nav .logo img {
       width: 32px;
       height: 32px;
     }
-
-    .webapp-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .webapp-creator {
+    
+    nav .back-btn {
       color: var(--text-secondary);
-      font-size: 1.1rem;
-    }
-
-    .webapp-category {
-      display: inline-flex;
+      text-decoration: none;
+      display: flex;
       align-items: center;
       gap: 0.5rem;
-      background: rgba(139, 92, 246, 0.2);
-      color: var(--accent-purple);
-      padding: 0.5rem 1rem;
+    }
+    
+    nav .back-btn:hover {
+      color: var(--accent-cyan);
+    }
+    
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    /* Header */
+    .webapp-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    
+    .media-section {
+      background: var(--bg-card);
       border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+    }
+    
+    .media-section iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .media-section img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .info-section .badges {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .badge {
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
       font-weight: 600;
     }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      background: var(--bg-card);
-      padding: 1.5rem;
-      border-radius: 12px;
+    
+    .badge-trending {
+      background: var(--accent-red);
+      color: white;
     }
-
-    .stat-item {
-      text-align: center;
+    
+    .badge-new {
+      background: var(--accent-green);
+      color: white;
     }
-
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--accent-cyan);
+    
+    .badge-featured {
+      background: var(--accent-gold);
+      color: var(--bg-deep-space);
     }
-
-    .stat-label {
+    
+    .info-section h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .info-section .developer {
       color: var(--text-secondary);
-      font-size: 0.9rem;
-      margin-top: 0.25rem;
+      margin-bottom: 1rem;
     }
-
+    
+    .info-section .category {
+      display: inline-block;
+      background: rgba(0, 217, 255, 0.1);
+      color: var(--accent-cyan);
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    
     .description {
-      background: var(--bg-card);
-      padding: 1.5rem;
-      border-radius: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
       line-height: 1.8;
     }
-
+    
     .description.collapsed {
-      max-height: 100px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
       overflow: hidden;
-      position: relative;
     }
-
-    .description.collapsed::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 50px;
-      background: linear-gradient(transparent, var(--bg-card));
-    }
-
-    .see-more {
+    
+    .see-more-btn {
+      background: none;
+      border: none;
       color: var(--accent-cyan);
       cursor: pointer;
-      margin-top: 0.5rem;
-      display: inline-block;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
     }
-
-    .tags-container {
+    
+    .tags {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
-
+    
     .tag {
-      background: rgba(139, 92, 246, 0.2);
-      color: var(--accent-purple);
-      padding: 0.5rem 1rem;
-      border-radius: 12px;
+      padding: 0.3rem 0.8rem;
+      background: rgba(0, 217, 255, 0.1);
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
     }
-
+    
     .actions {
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
     }
-
-    .reviews-section {
-      margin-top: 3rem;
-    }
-
-    .section-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      display: flex;
+    
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+      display: inline-flex;
       align-items: center;
       gap: 0.5rem;
     }
-
-    .review-form {
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+    
+    .btn-danger {
+      background: transparent;
+      border: 2px solid var(--accent-red);
+      color: var(--accent-red);
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+    
+    .stat-card {
+      background: var(--bg-card);
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid rgba(0, 217, 255, 0.1);
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--accent-cyan);
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    /* Reviews Section */
+    .reviews-section {
       background: var(--bg-card);
       padding: 2rem;
       border-radius: 12px;
+      margin-bottom: 3rem;
+    }
+    
+    .reviews-section h2 {
       margin-bottom: 2rem;
     }
-
-    .form-group {
-      margin-bottom: 1.5rem;
+    
+    .review-form {
+      background: rgba(0, 217, 255, 0.05);
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
     }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-    }
-
-    .stars-input {
+    
+    .review-form .rating-input {
       display: flex;
       gap: 0.5rem;
-      font-size: 2rem;
+      margin-bottom: 1rem;
     }
-
-    .star {
+    
+    .review-form .rating-input .star {
+      font-size: 2rem;
       cursor: pointer;
       color: var(--text-secondary);
-      transition: color 0.2s ease;
     }
-
-    .star.active, .star:hover {
+    
+    .review-form .rating-input .star.active {
       color: var(--accent-gold);
     }
-
-    textarea {
+    
+    .review-form textarea {
       width: 100%;
       padding: 1rem;
       background: var(--bg-deep-space);
-      border: 2px solid var(--accent-purple);
-      border-radius: 12px;
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 8px;
       color: var(--text-primary);
       font-family: inherit;
       resize: vertical;
       min-height: 100px;
+      margin-bottom: 1rem;
     }
-
-    textarea:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-    }
-
-    .reviews-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .review-card {
-      background: var(--bg-card);
+    
+    .review-item {
       padding: 1.5rem;
+      background: rgba(0, 217, 255, 0.05);
       border-radius: 12px;
+      margin-bottom: 1rem;
     }
-
+    
     .review-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
     }
-
+    
     .review-author {
-      font-weight: 700;
+      font-weight: 600;
     }
-
+    
     .review-rating {
       color: var(--accent-gold);
     }
-
+    
     .review-comment {
       color: var(--text-secondary);
-      line-height: 1.8;
+      margin-bottom: 1rem;
     }
-
+    
+    .review-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .vote-btn {
+      background: transparent;
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      color: var(--text-secondary);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .vote-btn:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+    
+    /* Loading */
     .loading {
       text-align: center;
-      padding: 4rem;
+      padding: 3rem;
     }
-
+    
     .spinner {
+      display: inline-block;
       width: 50px;
       height: 50px;
-      border: 4px solid var(--bg-card);
+      border: 5px solid rgba(0, 217, 255, 0.1);
       border-top-color: var(--accent-cyan);
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
     }
-
+    
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-
+    
+    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -356,352 +400,340 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(10, 14, 39, 0.95);
+      background: rgba(0, 0, 0, 0.8);
       z-index: 2000;
-      align-items: center;
       justify-content: center;
-      padding: 2rem;
+      align-items: center;
     }
-
+    
     .modal-content {
       background: var(--bg-card);
-      border-radius: 20px;
       padding: 2rem;
+      border-radius: 16px;
       max-width: 500px;
-      width: 100%;
-      border: 2px solid var(--accent-cyan);
+      margin: 1rem;
+      border: 1px solid var(--accent-cyan);
     }
-
-    .modal-header {
-      font-size: 1.5rem;
-      font-weight: 700;
+    
+    .modal-content h3 {
       margin-bottom: 1rem;
       color: var(--accent-cyan);
     }
-
-    .modal-body {
-      margin-bottom: 1.5rem;
-    }
-
-    .modal-footer {
-      display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
-    }
-
-    input[type="password"] {
+    
+    .modal-content input,
+    .modal-content textarea {
       width: 100%;
-      padding: 0.75rem;
+      padding: 1rem;
       background: var(--bg-deep-space);
-      border: 2px solid var(--accent-purple);
+      border: 1px solid rgba(0, 217, 255, 0.2);
       border-radius: 8px;
       color: var(--text-primary);
-      font-size: 1rem;
+      font-family: inherit;
+      margin-bottom: 1rem;
     }
-
-    input[type="password"]:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
+    
+    .modal-content .buttons {
+      display: flex;
+      gap: 1rem;
     }
-
+    
+    /* Responsive */
     @media (max-width: 768px) {
       .webapp-header {
         grid-template-columns: 1fr;
       }
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+      
+      .info-section h1 {
+        font-size: 1.8rem;
       }
     }
   </style>
 </head>
 <body>
+  <!-- Navbar -->
   <nav>
-    <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub" class="logo" onclick="window.location.href='/'">
-    <button class="btn btn-secondary" onclick="window.location.href='/'">
-      <i class="fa-solid fa-arrow-left"></i>
-      Back to Catalog
-    </button>
+    <div class="container">
+      <a href="/" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i> Back to catalog
+      </a>
+      
+      <a href="/" class="logo">
+        <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub">
+        <span>NWH</span>
+      </a>
+    </div>
   </nav>
-
+  
+  <!-- Loading -->
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    <p>Loading webapp...</p>
   </div>
-
+  
+  <!-- Content -->
   <div class="container" id="content" style="display: none;">
+    <!-- Header -->
     <div class="webapp-header">
-      <div class="media-section" id="media-section">
-        <!-- Media loaded dynamically -->
-      </div>
-
+      <div class="media-section" id="media"></div>
+      
       <div class="info-section">
-        <div class="badges-container" id="badges"></div>
-        <h1 class="webapp-title" id="webapp-name"></h1>
-        <p class="webapp-creator"><span id="webapp-creator"></span></p>
-        <div class="webapp-category" id="category-container"></div>
-
-        <div class="stats-grid">
-          <div class="stat-item">
-            <div class="stat-value" id="views-count">0</div>
-            <div class="stat-label"><i class="fa-solid fa-eye"></i> Views</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="clicks-count">0</div>
-            <div class="stat-label"><i class="fa-solid fa-mouse-pointer"></i> Clicks</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="rating-value">0.0</div>
-            <div class="stat-label"><i class="fa-solid fa-star"></i> Rating</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="reviews-count">0</div>
-            <div class="stat-label"><i class="fa-solid fa-comment"></i> Reviews</div>
-          </div>
-        </div>
-
-        <div>
-          <h3>Description</h3>
-          <div class="description collapsed" id="description">
-            <p id="description-text"></p>
-          </div>
-          <span class="see-more" onclick="toggleDescription()">See more</span>
-        </div>
-
-        <div>
-          <h3>Tags</h3>
-          <div class="tags-container" id="tags"></div>
-        </div>
-
+        <div class="badges" id="badges"></div>
+        <h1 id="webapp-name"></h1>
+        <p class="developer" id="developer"></p>
+        <span class="category" id="category"></span>
+        
+        <div class="description collapsed" id="description"></div>
+        <button class="see-more-btn" id="see-more-btn" onclick="toggleDescription()">See more</button>
+        
+        <div class="tags" id="tags"></div>
+        
         <div class="actions">
           <button class="btn btn-primary" onclick="openWebapp()">
-            <i class="fa-solid fa-rocket"></i>
-            Open Webapp
+            <i class="fa-solid fa-rocket"></i> Open Webapp
           </button>
-          <button class="btn btn-secondary" id="github-btn" style="display: none;" onclick="openGithub()">
-            <i class="fa-brands fa-github"></i>
-            Source Code
-          </button>
-          <button class="btn btn-danger" onclick="reportWebapp()">
-            <i class="fa-solid fa-flag"></i>
-            Report
+          <a class="btn btn-secondary" id="github-link" style="display: none;" target="_blank">
+            <i class="fa-brands fa-github"></i> Source Code
+          </a>
+          <button class="btn btn-danger" onclick="showReportModal()">
+            <i class="fa-solid fa-flag"></i> Report
           </button>
         </div>
       </div>
     </div>
-
+    
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="views">0</div>
+        <div class="stat-label">
+          <i class="fa-solid fa-eye"></i> Unique views
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="clicks">0</div>
+        <div class="stat-label">
+          <i class="fa-solid fa-mouse-pointer"></i> Clicks
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="rating">0.0</div>
+        <div class="stat-label">
+          <i class="fa-solid fa-star"></i> Average rating
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="reviews-count">0</div>
+        <div class="stat-label">
+          <i class="fa-solid fa-comment"></i> Reviews
+        </div>
+      </div>
+    </div>
+    
+    <!-- Reviews -->
     <div class="reviews-section">
-      <h2 class="section-title">
-        <i class="fa-solid fa-comments"></i>
-        Reviews
-      </h2>
-
-      <div id="review-form-container"></div>
-
-      <div class="reviews-list" id="reviews-list"></div>
+      <h2>Reviews</h2>
+      
+      <!-- Review Form -->
+      <div class="review-form" id="review-form">
+        <h3>Your review</h3>
+        <div class="rating-input" id="rating-input"></div>
+        <textarea id="comment" placeholder="Share your experience..."></textarea>
+        <button class="btn btn-primary" onclick="submitReview()">Post review</button>
+      </div>
+      
+      <!-- Login Required -->
+      <div id="login-required" style="display: none; text-align: center; padding: 2rem;">
+        <p style="margin-bottom: 1rem;">Login to leave a review</p>
+        <a href="/auth.html" class="btn btn-primary">Login</a>
+      </div>
+      
+      <!-- Reviews List -->
+      <div id="reviews-list"></div>
     </div>
   </div>
-
+  
   <!-- Report Modal -->
   <div class="modal" id="report-modal">
     <div class="modal-content">
-      <div class="modal-header">Report an Issue</div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Reason</label>
-          <textarea id="report-reason" placeholder="Describe the issue..."></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
+      <h3>Report an issue</h3>
+      <textarea id="report-reason" placeholder="Describe the problem..." rows="5"></textarea>
+      <div class="buttons">
         <button class="btn btn-secondary" onclick="closeReportModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="submitReport()">Submit Report</button>
+        <button class="btn btn-primary" onclick="submitReport()">Send report</button>
       </div>
     </div>
   </div>
-
+  
   <script>
-    let webappData = null;
-    let userRating = 0;
-
+    let webapp = null;
+    let reviews = [];
+    let selectedRating = 0;
+    const webappId = new URLSearchParams(window.location.search).get('id');
+    const userId = localStorage.getItem('userId');
+    
+    // Load webapp
     async function loadWebapp() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const webappId = urlParams.get('id');
-
-      if (!webappId) {
-        window.location.href = '/';
-        return;
-      }
-
       try {
-        const userId = localStorage.getItem('userId');
-        const headers = userId ? { 'X-User-Id': userId } : {};
-
+        const headers = {};
+        if (userId) headers['X-User-Id'] = userId;
+        
         const response = await fetch(`/api/webapps/${webappId}`, { headers });
         const data = await response.json();
-
-        if (data.success) {
-          webappData = data.webapp;
-          renderWebapp(webappData, data.reviews);
-          updateSEO(webappData);
-        } else {
-          alert('Webapp not found');
-          window.location.href = '/';
-        }
-
+        
+        webapp = data.webapp;
+        reviews = data.reviews;
+        
+        renderWebapp();
+        renderReviews();
+        
         document.getElementById('loading').style.display = 'none';
         document.getElementById('content').style.display = 'block';
       } catch (error) {
-        console.error('Load error:', error);
-        alert('Error loading webapp');
+        console.error('Error loading webapp:', error);
       }
     }
-
-    function renderWebapp(webapp, reviews) {
-      // Title
-      document.getElementById('webapp-name').textContent = webapp.name;
-      document.getElementById('webapp-creator').textContent = `Created by ${webapp.developer}`;
-
-      // Badges
-      const badges = [];
-      if (webapp.is_trending) badges.push('<img src="/assets/badges/system/badge-trending.svg" class="badge" title="Trending">');
-      if (webapp.is_featured) badges.push('<img src="/assets/badges/system/badge-featured.svg" class="badge" title="Featured">');
-      if (webapp.is_new) badges.push('<img src="/assets/badges/system/badge-new.svg" class="badge" title="New">');
-      document.getElementById('badges').innerHTML = badges.join('');
-
-      // Category
-      const categoryIcons = {
-        productivity: '/assets/icons/icon-tools.svg',
-        design: '/assets/icons/icon-ui-kits.svg',
-        games: '/assets/icons/icon-games.svg',
-        api: '/assets/icons/icon-apis.svg',
-        nocode: '/assets/icons/icon-websites.svg',
-        other: '/assets/icons/icon-other.svg'
-      };
-      document.getElementById('category-container').innerHTML = `
-        <img src="${categoryIcons[webapp.category]}" width="20" height="20">
-        <span>${webapp.category}</span>
-      `;
-
-      // Stats
-      document.getElementById('views-count').textContent = webapp.views_count;
-      document.getElementById('clicks-count').textContent = webapp.clicks_count;
-      document.getElementById('rating-value').textContent = webapp.avg_rating.toFixed(1);
-      document.getElementById('reviews-count').textContent = webapp.reviews_count;
-
+    
+    // Render webapp
+    function renderWebapp() {
+      // SEO
+      document.getElementById('page-title').textContent = `${webapp.name} | Nexus Web Hub`;
+      document.getElementById('page-description').content = webapp.description_short;
+      
       // Media
-      const mediaSection = document.getElementById('media-section');
       if (webapp.video_url) {
         const videoId = webapp.video_url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1];
-        if (videoId) {
-          mediaSection.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
-        }
+        document.getElementById('media').innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
       } else if (webapp.image_url) {
-        mediaSection.innerHTML = `<img src="${webapp.image_url}" alt="${webapp.name}">`;
+        document.getElementById('media').innerHTML = `<img src="${webapp.image_url}" alt="${webapp.name}">`;
       } else {
-        mediaSection.innerHTML = `<i class="fa-solid fa-image" style="font-size: 4rem; color: var(--text-secondary);"></i>`;
+        document.getElementById('media').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: rgba(0, 217, 255, 0.1);"><i class="fa-solid fa-image" style="font-size: 4rem; color: var(--text-secondary);"></i></div>';
       }
-
-      // Description
-      document.getElementById('description-text').textContent = webapp.description_long || webapp.description_short;
-
-      // Tags
-      const tags = JSON.parse(webapp.tags || '[]');
-      document.getElementById('tags').innerHTML = tags.map(tag => `<span class="tag">${tag}</span>`).join('');
-
-      // GitHub button
+      
+      // Badges
+      let badgesHTML = '';
+      if (webapp.is_trending) badgesHTML += '<span class="badge badge-trending"><i class="fa-solid fa-fire"></i> Trending</span>';
+      if (webapp.is_featured) badgesHTML += '<span class="badge badge-featured"><i class="fa-solid fa-star"></i> Featured</span>';
+      if (webapp.is_new) badgesHTML += '<span class="badge badge-new"><i class="fa-solid fa-sparkles"></i> New</span>';
+      document.getElementById('badges').innerHTML = badgesHTML;
+      
+      // Info
+      document.getElementById('webapp-name').textContent = webapp.name;
+      document.getElementById('developer').textContent = `by ${webapp.developer}`;
+      document.getElementById('category').textContent = webapp.category;
+      
+      const longDesc = webapp.description_long || webapp.description_short;
+      document.getElementById('description').textContent = longDesc;
+      
+      if (longDesc.length <= 200) {
+        document.getElementById('see-more-btn').style.display = 'none';
+        document.getElementById('description').classList.remove('collapsed');
+      }
+      
+      document.getElementById('tags').innerHTML = webapp.tags.map(tag => 
+        `<span class="tag">${tag}</span>`
+      ).join('');
+      
       if (webapp.github_url) {
-        document.getElementById('github-btn').style.display = 'inline-flex';
+        document.getElementById('github-link').href = webapp.github_url;
+        document.getElementById('github-link').style.display = 'inline-flex';
       }
-
-      // Review form
-      renderReviewForm(reviews);
+      
+      // Stats
+      document.getElementById('views').textContent = webapp.views_count;
+      document.getElementById('clicks').textContent = webapp.clicks_count;
+      document.getElementById('rating').textContent = webapp.avg_rating.toFixed(1);
+      document.getElementById('reviews-count').textContent = webapp.reviews_count;
     }
-
-    function renderReviewForm(reviews) {
-      const container = document.getElementById('review-form-container');
-      const userId = localStorage.getItem('userId');
-      const userReview = reviews.find(r => r.user_id === userId);
-
-      if (!userId) {
-        container.innerHTML = `
-          <div class="review-form">
-            <p style="text-align: center; color: var(--text-secondary);">
-              <i class="fa-solid fa-lock"></i> Login to leave a review
-            </p>
-            <button class="btn btn-primary" style="margin: 1rem auto; display: block;" onclick="window.location.href='/auth.html'">
-              Login
-            </button>
-          </div>
-        `;
-      } else if (userReview) {
-        container.innerHTML = `
-          <div class="review-form">
-            <p style="color: var(--accent-green);">
-              <i class="fa-solid fa-check-circle"></i> You already reviewed this webapp
-            </p>
-          </div>
-        `;
+    
+    // Toggle description
+    function toggleDescription() {
+      const desc = document.getElementById('description');
+      const btn = document.getElementById('see-more-btn');
+      
+      if (desc.classList.contains('collapsed')) {
+        desc.classList.remove('collapsed');
+        btn.textContent = 'See less';
       } else {
-        container.innerHTML = `
-          <div class="review-form">
-            <h3>Leave a Review</h3>
-            <div class="form-group">
-              <label>Rating</label>
-              <div class="stars-input" id="stars-input">
-                ${[1,2,3,4,5].map(i => `<span class="star" onclick="setRating(${i})">★</span>`).join('')}
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Comment (optional)</label>
-              <textarea id="review-comment" placeholder="Share your experience..."></textarea>
-            </div>
-            <button class="btn btn-primary" onclick="submitReview()">
-              <i class="fa-solid fa-paper-plane"></i>
-              Submit Review
-            </button>
-          </div>
-        `;
+        desc.classList.add('collapsed');
+        btn.textContent = 'See more';
       }
-
-      // Render reviews list
-      renderReviews(reviews);
     }
-
-    function renderReviews(reviews) {
-      const list = document.getElementById('reviews-list');
-      if (reviews.length === 0) {
-        list.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No reviews yet. Be the first!</p>';
-        return;
+    
+    // Open webapp
+    function openWebapp() {
+      window.open(`/redirect.html?id=${webappId}&url=${encodeURIComponent(webapp.url)}&source=detail`, '_blank');
+    }
+    
+    // Render reviews
+    function renderReviews() {
+      if (!userId) {
+        document.getElementById('review-form').style.display = 'none';
+        document.getElementById('login-required').style.display = 'block';
+      } else {
+        renderRatingInput();
       }
-
-      list.innerHTML = reviews.map(review => `
-        <div class="review-card">
+      
+      const reviewsHTML = reviews.map(review => `
+        <div class="review-item">
           <div class="review-header">
             <span class="review-author">${review.user_name}</span>
-            <span class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</span>
+            <span class="review-rating">${'⭐'.repeat(review.rating)}</span>
           </div>
-          <p class="review-comment">${review.comment || '<em>No comment</em>'}</p>
+          <p class="review-comment">${review.comment || ''}</p>
+          <div class="review-actions">
+            <button class="vote-btn" onclick="voteReview('${review.id}', 'helpful')">
+              <i class="fa-solid fa-thumbs-up"></i> Helpful (${review.helpful_count})
+            </button>
+            <button class="vote-btn" onclick="voteReview('${review.id}', 'not_helpful')">
+              <i class="fa-solid fa-thumbs-down"></i> Not helpful (${review.not_helpful_count})
+            </button>
+          </div>
         </div>
       `).join('');
+      
+      document.getElementById('reviews-list').innerHTML = reviewsHTML || '<p style="text-align: center; color: var(--text-secondary);">No reviews yet</p>';
     }
-
-    function setRating(rating) {
-      userRating = rating;
-      document.querySelectorAll('.star').forEach((star, index) => {
-        star.classList.toggle('active', index < rating);
+    
+    // Render rating input
+    function renderRatingInput() {
+      const ratingInput = document.getElementById('rating-input');
+      ratingInput.innerHTML = '';
+      
+      for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('span');
+        star.className = 'star';
+        star.innerHTML = '★';
+        star.onclick = () => selectRating(i);
+        ratingInput.appendChild(star);
+      }
+    }
+    
+    // Select rating
+    function selectRating(rating) {
+      selectedRating = rating;
+      const stars = document.querySelectorAll('.rating-input .star');
+      stars.forEach((star, index) => {
+        if (index < rating) {
+          star.classList.add('active');
+        } else {
+          star.classList.remove('active');
+        }
       });
     }
-
+    
+    // Submit review
     async function submitReview() {
-      if (userRating === 0) {
+      if (!userId) {
+        window.location.href = '/auth.html';
+        return;
+      }
+      
+      if (selectedRating === 0) {
         alert('Please select a rating');
         return;
       }
-
-      const comment = document.getElementById('review-comment').value;
-      const urlParams = new URLSearchParams(window.location.search);
-      const webappId = urlParams.get('id');
-      const userId = localStorage.getItem('userId');
-
+      
+      const comment = document.getElementById('comment').value;
+      
       try {
         const response = await fetch(`/api/webapps/${webappId}/reviews`, {
           method: 'POST',
@@ -709,78 +741,74 @@
             'Content-Type': 'application/json',
             'X-User-Id': userId
           },
-          body: JSON.stringify({ rating: userRating, comment })
+          body: JSON.stringify({
+            rating: selectedRating,
+            comment
+          })
         });
-
+        
         const data = await response.json();
-
+        
         if (data.success) {
-          alert('Review submitted!');
+          alert('Review posted!');
           location.reload();
         } else {
-          alert('Error: ' + data.message);
+          alert(data.message);
         }
       } catch (error) {
-        console.error('Submit error:', error);
+        console.error('Error submitting review:', error);
         alert('Error submitting review');
       }
     }
-
-    function toggleDescription() {
-      const desc = document.getElementById('description');
-      const btn = event.target;
-      desc.classList.toggle('collapsed');
-      btn.textContent = desc.classList.contains('collapsed') ? 'See more' : 'See less';
-    }
-
-    function openWebapp() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const webappId = urlParams.get('id');
-      const userId = localStorage.getItem('userId');
-
-      // Track click
-      fetch(`/api/webapps/${webappId}/click`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-Id': userId || ''
-        },
-        body: JSON.stringify({ source: 'detail' })
-      });
-
-      // Redirect
-      window.location.href = `/redirect.html?id=${webappId}&url=${encodeURIComponent(webappData.url)}&source=detail`;
-    }
-
-    function openGithub() {
-      window.open(webappData.github_url, '_blank');
-    }
-
-    function reportWebapp() {
-      const userId = localStorage.getItem('userId');
+    
+    // Vote review
+    async function voteReview(reviewId, voteType) {
       if (!userId) {
-        alert('Please login to report');
+        window.location.href = '/auth.html';
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/reviews/${reviewId}/vote`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId
+          },
+          body: JSON.stringify({ vote_type: voteType })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          location.reload();
+        }
+      } catch (error) {
+        console.error('Error voting review:', error);
+      }
+    }
+    
+    // Report modal
+    function showReportModal() {
+      if (!userId) {
         window.location.href = '/auth.html';
         return;
       }
       document.getElementById('report-modal').style.display = 'flex';
     }
-
+    
     function closeReportModal() {
       document.getElementById('report-modal').style.display = 'none';
     }
-
+    
     async function submitReport() {
       const reason = document.getElementById('report-reason').value;
-      if (!reason.trim()) {
-        alert('Please enter a reason');
+      
+      if (!reason) {
+        alert('Please describe the problem');
         return;
       }
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const webappId = urlParams.get('id');
-      const userId = localStorage.getItem('userId');
-
+      
       try {
         const response = await fetch('/api/reports', {
           method: 'POST',
@@ -794,31 +822,29 @@
             reason
           })
         });
-
+        
         const data = await response.json();
-
+        
         if (data.success) {
-          alert('Report submitted. Thank you!');
+          alert('Report sent. Thank you!');
           closeReportModal();
         } else {
-          alert('Error: ' + data.message);
+          alert(data.message);
         }
       } catch (error) {
-        console.error('Report error:', error);
+        console.error('Error submitting report:', error);
         alert('Error submitting report');
       }
     }
-
-    function updateSEO(webapp) {
-      document.getElementById('page-title').textContent = `${webapp.name} - ${webapp.category} | Nexus Web Hub`;
-      document.getElementById('page-description').content = `${webapp.description_short} | ${webapp.avg_rating}⭐ (${webapp.reviews_count} reviews) | Created by ${webapp.developer}`;
-      document.getElementById('og-title').content = webapp.name;
-      document.getElementById('og-description').content = webapp.description_short;
-      document.getElementById('og-image').content = webapp.image_url || '/assets/logos/logo-nwh.svg';
-      document.getElementById('canonical-url').href = `https://nexuswebhub.com/webapp.html?id=${webapp.id}`;
-    }
-
-    document.addEventListener('DOMContentLoaded', loadWebapp);
+    
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!webappId) {
+        window.location.href = '/';
+        return;
+      }
+      loadWebapp();
+    });
   </script>
 </body>
 </html>
