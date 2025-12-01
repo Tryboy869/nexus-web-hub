@@ -15,9 +15,8 @@
   },
   "search": {
     "placeholder": "Rechercher une webapp...",
-    "surprise": "Surprenez-moi",
     "no_results": "Aucune webapp trouvée",
-    "results_count": "{count} webapp(s) trouvée(s)"
+    "surprise_me": "Surprenez-moi"
   },
   "categories": {
     "all": "Toutes",
@@ -32,7 +31,7 @@
     "all": "Toutes",
     "trending": "Tendances",
     "new": "Nouveautés",
-    "top": "Mieux notées"
+    "top_rated": "Mieux notées"
   },
   "webapp": {
     "views": "Vues uniques",
@@ -40,7 +39,7 @@
     "rating": "Note moyenne",
     "reviews": "Avis",
     "open": "Ouvrir la Webapp",
-    "source_code": "Code Source",
+    "code_source": "Code Source",
     "report": "Signaler un problème",
     "created_by": "Créé par",
     "category": "Catégorie",
@@ -48,134 +47,91 @@
     "description": "Description",
     "see_more": "Voir plus",
     "see_less": "Voir moins",
-    "add_to_collection": "Ajouter à une collection",
-    "share": "Partager",
-    "leave_review": "Laisser un avis",
-    "login_to_review": "Connectez-vous pour laisser un avis"
+    "share": "Partager"
   },
   "review": {
     "your_review": "Votre avis",
     "rating_label": "Note",
     "comment_placeholder": "Partagez votre expérience...",
     "submit": "Publier l'avis",
+    "login_required": "Connectez-vous pour laisser un avis",
     "helpful": "Utile",
-    "not_helpful": "Pas utile",
-    "reply": "Répondre",
-    "creator_response": "Réponse du créateur"
+    "not_helpful": "Pas utile"
   },
-  "redirect": {
+  "disclaimer": {
     "title": "Vous quittez Nexus Web Hub",
-    "message": "Vous allez être redirigé vers",
     "warning": "Cette webapp est hébergée en dehors de NWH. Nous ne contrôlons pas son contenu, sa disponibilité ou sa sécurité.",
-    "countdown": "Redirection dans {seconds} secondes...",
     "continue": "Continuer vers la webapp",
-    "back": "Retour au catalogue"
+    "back": "Retour au catalogue",
+    "countdown": "Redirection dans {seconds} secondes..."
   },
   "auth": {
-    "login_title": "Connexion",
-    "signup_title": "Inscription",
+    "login": "Connexion",
+    "signup": "Inscription",
     "email": "Email",
     "password": "Mot de passe",
     "name": "Nom complet",
     "login_button": "Se connecter",
     "signup_button": "Créer mon compte",
-    "switch_to_signup": "Pas encore de compte ? Inscrivez-vous",
-    "switch_to_login": "Déjà inscrit ? Connectez-vous"
+    "already_account": "Déjà un compte ?",
+    "no_account": "Pas encore de compte ?"
   },
   "profile": {
     "my_webapps": "Mes Webapps",
     "my_reviews": "Mes Avis",
-    "my_collections": "Mes Collections",
     "settings": "Paramètres",
-    "badges": "Badges",
-    "stats": "Statistiques",
-    "logout": "Déconnexion",
     "new_webapp": "Nouvelle Webapp",
-    "edit": "Modifier",
-    "delete": "Supprimer",
-    "view": "Voir",
-    "confirm_delete": "Êtes-vous sûr de vouloir supprimer cette webapp ? Cette action est irréversible.",
-    "enter_password": "Entrez votre mot de passe pour confirmer"
+    "logout": "Déconnexion",
+    "stats": "{count} Webapps publiées",
+    "badges": "Badges"
   },
   "submit": {
-    "title_create": "Publier une Webapp",
-    "title_edit": "Modifier la Webapp",
+    "title": "Publier une Webapp",
     "name": "Nom de la webapp",
-    "name_placeholder": "ex: Mon Outil Génial",
-    "url": "URL de la webapp",
-    "url_placeholder": "https://exemple.com",
+    "name_placeholder": "ex: Mon Super Outil",
+    "url": "URL (HTTPS uniquement)",
+    "url_placeholder": "https://example.com",
     "category": "Catégorie",
     "description_short": "Description courte",
-    "description_short_placeholder": "Décrivez votre webapp en quelques mots (max 200 caractères)",
-    "description_long": "Description détaillée",
-    "description_long_placeholder": "Description complète...",
-    "tags": "Tags",
-    "tags_placeholder": "Séparez les tags par des virgules",
-    "github_url": "URL GitHub",
-    "github_placeholder": "https://github.com/user/repo (optionnel)",
-    "video_url": "URL Vidéo YouTube",
-    "video_placeholder": "https://youtube.com/watch?v=... (optionnel)",
-    "image_url": "URL Screenshot",
-    "image_placeholder": "https://exemple.com/screenshot.png (optionnel)",
-    "version": "Version",
-    "version_placeholder": "ex: 2.0.0",
-    "changelog": "Changelog",
-    "changelog_placeholder": "- Nouvelle fonctionnalité X\n- Correction bug Y",
-    "publish": "Publier",
-    "save": "Enregistrer les modifications",
+    "description_short_placeholder": "Décrivez votre webapp en quelques mots (20-200 caractères)",
+    "description_long": "Description détaillée (optionnel)",
+    "tags": "Tags (séparés par virgules)",
+    "tags_placeholder": "react, productivity, free",
+    "github_url": "URL GitHub (optionnel)",
+    "video_url": "URL Vidéo YouTube (optionnel)",
+    "image_url": "URL Image/Screenshot (optionnel)",
+    "submit_button": "Publier",
+    "update_button": "Mettre à jour",
     "cancel": "Annuler"
   },
   "admin": {
-    "title": "Panel Administration",
-    "login_title": "Connexion Admin",
-    "dashboard": "Tableau de bord",
+    "dashboard": "Tableau de bord Admin",
     "reports": "Signalements",
     "webapps": "Toutes les Webapps",
-    "users": "Utilisateurs",
-    "stats": "Statistiques",
-    "logs": "Logs",
     "pending_reports": "Signalements en attente",
-    "resolved": "Résolu",
-    "ignore": "Ignorer",
-    "delete_webapp": "Supprimer la webapp",
-    "admin_notes": "Notes admin",
-    "resolve": "Marquer résolu"
-  },
-  "notifications": {
-    "success": "Succès !",
-    "error": "Erreur",
-    "warning": "Attention",
-    "webapp_published": "Webapp publiée avec succès",
-    "review_submitted": "Avis soumis avec succès",
-    "report_submitted": "Signalement envoyé",
-    "login_success": "Connexion réussie",
-    "logout_success": "Déconnexion réussie"
+    "total_webapps": "Total Webapps",
+    "resolve": "Résoudre",
+    "delete": "Supprimer",
+    "view": "Voir"
   },
   "footer": {
     "created_by": "Créé par Daouda Abdoul Anzize - Nexus Studio",
     "contact": "Contact",
-    "github": "GitHub",
-    "privacy": "Confidentialité",
-    "terms": "Conditions"
+    "github": "GitHub"
   },
-  "badges_names": {
-    "verified-creator": "Créateur Vérifié",
-    "beginner-tester": "Testeur Débutant",
-    "pro-tester": "Testeur Pro",
-    "legendary-tester": "Testeur Légendaire",
-    "admin": "Administrateur",
-    "supporter": "Supporter",
-    "contributor": "Contributeur",
-    "trending": "Tendance",
-    "featured": "Mis en avant",
-    "new": "Nouveau"
+  "notifications": {
+    "success": "Opération réussie !",
+    "error": "Une erreur s'est produite",
+    "warning": "Attention",
+    "webapp_published": "Votre webapp a été publiée !",
+    "review_posted": "Votre avis a été publié !",
+    "report_sent": "Signalement envoyé"
   },
   "modal": {
-    "welcome_title": "Bienvenue sur Nexus Web Hub !",
-    "welcome_message": "Découvrez des milliers de webapps créées par la communauté. Nexus Web Hub est un annuaire communautaire.",
-    "disclaimer": "Les webapps sont hébergées par leurs créateurs. Nous ne garantissons pas leur disponibilité permanente.",
-    "dont_show_again": "Ne plus afficher ce message",
-    "close": "Fermer",
-    "understand": "J'ai compris"
+    "welcome_title": "Bienvenue sur Nexus Web Hub",
+    "welcome_message": "Découvrez et partagez les meilleures webapps créées par la communauté.",
+    "welcome_disclaimer": "NWH est un annuaire. Les webapps sont hébergées par leurs créateurs. Nous ne garantissons pas leur disponibilité permanente.",
+    "dont_show_again": "Ne plus afficher",
+    "got_it": "J'ai compris"
   }
 }
