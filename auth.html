@@ -9,330 +9,301 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
-    :root {
-      --bg-deep-space: #0a0e27;
-      --bg-card: #1a1f3a;
-      --text-primary: #E0E6ED;
-      --text-secondary: #a0aec0;
-      --accent-cyan: #00d9ff;
-      --accent-purple: #8b5cf6;
-      --accent-red: #ef4444;
-    }
-    
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, var(--bg-deep-space), #1a1f3a);
-      color: var(--text-primary);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      padding: 2rem;
+      padding: 1rem;
     }
     
     .container {
-      background: var(--bg-card);
+      background: white;
       border-radius: 20px;
       padding: 3rem;
       max-width: 450px;
       width: 100%;
-      border: 2px solid var(--accent-cyan);
-      box-shadow: 0 20px 60px rgba(0, 217, 255, 0.2);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
     
     .logo {
-      width: 80px;
-      display: block;
-      margin: 0 auto 2rem;
-    }
-    
-    h1 {
-      font-size: 2rem;
       text-align: center;
-      margin-bottom: 0.5rem;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    .subtitle {
-      text-align: center;
-      color: var(--text-secondary);
       margin-bottom: 2rem;
+    }
+    
+    .logo img {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 1rem;
+    }
+    
+    .logo h1 {
+      font-size: 1.8rem;
+      color: #2d3748;
     }
     
     .tabs {
       display: flex;
-      gap: 1rem;
+      border-bottom: 2px solid #e2e8f0;
       margin-bottom: 2rem;
-      border-bottom: 2px solid var(--bg-deep-space);
     }
     
     .tab {
       flex: 1;
+      text-align: center;
       padding: 1rem;
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
       cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: all 0.3s ease;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
       font-weight: 600;
-      font-size: 1rem;
+      color: #718096;
+      transition: all 0.3s;
     }
     
     .tab.active {
-      color: var(--accent-cyan);
-      border-bottom-color: var(--accent-cyan);
+      color: #667eea;
+      border-bottom-color: #667eea;
     }
     
-    .form-container {
+    .tab-content {
       display: none;
     }
     
-    .form-container.active {
+    .tab-content.active {
       display: block;
-      animation: fadeIn 0.3s ease;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
     }
     
     .form-group {
       margin-bottom: 1.5rem;
     }
     
-    label {
+    .form-group label {
       display: block;
       margin-bottom: 0.5rem;
+      color: #2d3748;
       font-weight: 600;
-      color: var(--text-primary);
     }
     
-    input {
+    .form-group input {
       width: 100%;
-      padding: 1rem;
-      background: var(--bg-deep-space);
-      border: 2px solid var(--accent-purple);
-      border-radius: 12px;
-      color: var(--text-primary);
+      padding: 0.8rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
       font-size: 1rem;
-      transition: border-color 0.3s ease;
+      transition: all 0.3s;
     }
     
-    input:focus {
+    .form-group input:focus {
       outline: none;
-      border-color: var(--accent-cyan);
+      border-color: #667eea;
     }
     
     .btn {
       width: 100%;
       padding: 1rem;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
+      border-radius: 10px;
       font-weight: 600;
+      border: none;
       font-size: 1rem;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      cursor: pointer;
+      transition: all 0.3s;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
     }
     
-    .btn-primary:hover {
+    .btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0, 217, 255, 0.4);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
     }
     
-    .btn-primary:disabled {
-      opacity: 0.5;
+    .btn:disabled {
+      opacity: 0.6;
       cursor: not-allowed;
+      transform: none;
+    }
+    
+    .switch-tab {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #718096;
+    }
+    
+    .switch-tab a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .switch-tab a:hover {
+      text-decoration: underline;
     }
     
     .error-message {
-      background: rgba(239, 68, 68, 0.1);
-      border: 2px solid var(--accent-red);
-      border-radius: 12px;
+      background: #fff5f5;
+      border-left: 4px solid #fc8181;
       padding: 1rem;
+      border-radius: 8px;
       margin-bottom: 1rem;
-      color: var(--accent-red);
+      color: #c53030;
       display: none;
     }
     
-    .error-message.show {
-      display: block;
-      animation: shake 0.5s ease;
-    }
-    
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      75% { transform: translateX(10px); }
+    .success-message {
+      background: #f0fff4;
+      border-left: 4px solid #48bb78;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      color: #22543d;
+      display: none;
     }
     
     .back-link {
       text-align: center;
-      margin-top: 2rem;
+      margin-top: 1.5rem;
     }
     
     .back-link a {
-      color: var(--accent-cyan);
+      color: #718096;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      transition: color 0.3s ease;
     }
     
     .back-link a:hover {
-      color: var(--accent-purple);
-    }
-    
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 1rem;
-    }
-    
-    .spinner {
-      width: 30px;
-      height: 30px;
-      border: 3px solid var(--bg-deep-space);
-      border-top-color: var(--accent-cyan);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+      color: #667eea;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub" class="logo">
-    <h1>Welcome Back</h1>
-    <p class="subtitle">Join the community of webapp creators</p>
+    <div class="logo">
+      <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub">
+      <h1>Nexus Web Hub</h1>
+    </div>
     
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('login')">Login</button>
-      <button class="tab" onclick="switchTab('signup')">Sign Up</button>
+      <div class="tab active" onclick="switchTab('login')">Login</div>
+      <div class="tab" onclick="switchTab('signup')">Sign up</div>
     </div>
     
     <div class="error-message" id="error-message"></div>
+    <div class="success-message" id="success-message"></div>
     
-    <!-- Login Form -->
-    <div class="form-container active" id="login-form">
+    <!-- Login Tab -->
+    <div class="tab-content active" id="login-tab">
       <form onsubmit="handleLogin(event)">
         <div class="form-group">
-          <label for="login-email">
-            <i class="fa-solid fa-envelope"></i> Email
-          </label>
-          <input type="email" id="login-email" required placeholder="your@email.com">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" required>
         </div>
         
         <div class="form-group">
-          <label for="login-password">
-            <i class="fa-solid fa-lock"></i> Password
-          </label>
-          <input type="password" id="login-password" required placeholder="••••••••" minlength="6">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required>
         </div>
         
-        <button type="submit" class="btn btn-primary" id="login-btn">
-          <i class="fa-solid fa-right-to-bracket"></i>
-          Login
+        <button type="submit" class="btn" id="login-btn">
+          <i class="fa-solid fa-right-to-bracket"></i> Log in
         </button>
       </form>
+      
+      <div class="switch-tab">
+        Don't have an account? <a onclick="switchTab('signup')">Sign up</a>
+      </div>
     </div>
     
-    <!-- Signup Form -->
-    <div class="form-container" id="signup-form">
+    <!-- Signup Tab -->
+    <div class="tab-content" id="signup-tab">
       <form onsubmit="handleSignup(event)">
         <div class="form-group">
-          <label for="signup-name">
-            <i class="fa-solid fa-user"></i> Full Name
-          </label>
-          <input type="text" id="signup-name" required placeholder="John Doe">
+          <label for="signup-name">Full name</label>
+          <input type="text" id="signup-name" required>
         </div>
         
         <div class="form-group">
-          <label for="signup-email">
-            <i class="fa-solid fa-envelope"></i> Email
-          </label>
-          <input type="email" id="signup-email" required placeholder="your@email.com">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" required>
         </div>
         
         <div class="form-group">
-          <label for="signup-password">
-            <i class="fa-solid fa-lock"></i> Password
-          </label>
-          <input type="password" id="signup-password" required placeholder="••••••••" minlength="6">
+          <label for="signup-password">Password (min. 6 characters)</label>
+          <input type="password" id="signup-password" minlength="6" required>
         </div>
         
-        <button type="submit" class="btn btn-primary" id="signup-btn">
-          <i class="fa-solid fa-user-plus"></i>
-          Create Account
+        <button type="submit" class="btn" id="signup-btn">
+          <i class="fa-solid fa-user-plus"></i> Create account
         </button>
       </form>
-    </div>
-    
-    <div class="loading" id="loading">
-      <div class="spinner"></div>
-      <p style="margin-top: 1rem; color: var(--text-secondary);">Processing...</p>
+      
+      <div class="switch-tab">
+        Already have an account? <a onclick="switchTab('login')">Log in</a>
+      </div>
     </div>
     
     <div class="back-link">
       <a href="/">
-        <i class="fa-solid fa-arrow-left"></i>
-        Back to Home
+        <i class="fa-solid fa-arrow-left"></i> Back to catalog
       </a>
     </div>
   </div>
-
+  
   <script>
-    function switchTab(tab) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
+    // Switch tabs
+    function switchTab(tabName) {
+      // Update tabs
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
       
-      event.target.classList.add('active');
-      document.getElementById(`${tab}-form`).classList.add('active');
+      if (tabName === 'login') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.getElementById('login-tab').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.getElementById('signup-tab').classList.add('active');
+      }
       
-      hideError();
+      // Clear messages
+      hideMessages();
     }
-
+    
+    // Show error
     function showError(message) {
       const errorEl = document.getElementById('error-message');
       errorEl.textContent = message;
-      errorEl.classList.add('show');
+      errorEl.style.display = 'block';
+      document.getElementById('success-message').style.display = 'none';
     }
-
-    function hideError() {
-      const errorEl = document.getElementById('error-message');
-      errorEl.classList.remove('show');
+    
+    // Show success
+    function showSuccess(message) {
+      const successEl = document.getElementById('success-message');
+      successEl.textContent = message;
+      successEl.style.display = 'block';
+      document.getElementById('error-message').style.display = 'none';
     }
-
-    function showLoading(show) {
-      document.getElementById('loading').style.display = show ? 'block' : 'none';
-      document.querySelectorAll('form').forEach(f => f.style.display = show ? 'none' : 'block');
+    
+    // Hide messages
+    function hideMessages() {
+      document.getElementById('error-message').style.display = 'none';
+      document.getElementById('success-message').style.display = 'none';
     }
-
-    async function handleLogin(e) {
-      e.preventDefault();
-      hideError();
+    
+    // Handle login
+    async function handleLogin(event) {
+      event.preventDefault();
+      hideMessages();
       
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
+      const btn = document.getElementById('login-btn');
       
-      showLoading(true);
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
       
       try {
         const response = await fetch('/api/auth/login', {
@@ -344,91 +315,88 @@
         const data = await response.json();
         
         if (data.success) {
+          // Store auth data
           localStorage.setItem('token', data.token);
           localStorage.setItem('userId', data.user.id);
           localStorage.setItem('user', JSON.stringify(data.user));
           
-          window.location.href = '/profile.html';
+          showSuccess('Login successful! Redirecting...');
+          
+          // Redirect to previous page or homepage
+          setTimeout(() => {
+            const returnUrl = new URLSearchParams(window.location.search).get('return') || '/';
+            window.location.href = returnUrl;
+          }, 1000);
         } else {
           showError(data.message || 'Login failed');
-          showLoading(false);
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Log in';
         }
       } catch (error) {
+        console.error('Login error:', error);
         showError('Network error. Please try again.');
-        showLoading(false);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Log in';
       }
     }
-
-    async function handleSignup(e) {
-      e.preventDefault();
-      hideError();
+    
+    // Handle signup
+    async function handleSignup(event) {
+      event.preventDefault();
+      hideMessages();
       
-      const name = document.getElementById('signup-name').value.trim();
-      const email = document.getElementById('signup-email').value.trim();
+      const name = document.getElementById('signup-name').value;
+      const email = document.getElementById('signup-email').value;
       const password = document.getElementById('signup-password').value;
+      const btn = document.getElementById('signup-btn');
       
-      // Frontend validation
-      console.log('Signup form data:', { name, email, password: '***' });
-      
-      if (!name) {
-        showError('Name is required');
-        return;
-      }
-      
-      if (!email) {
-        showError('Email is required');
-        return;
-      }
-      
-      if (!password) {
-        showError('Password is required');
-        return;
-      }
-      
-      if (password.length < 6) {
-        showError('Password must be at least 6 characters');
-        return;
-      }
-      
-      showLoading(true);
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
       
       try {
-        const payload = { name, email, password };
-        console.log('Sending signup request:', payload);
-        
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ name, email, password })
         });
         
-        console.log('Signup response status:', response.status);
-        
         const data = await response.json();
-        console.log('Signup response data:', data);
         
         if (data.success) {
+          // Store auth data
           localStorage.setItem('token', data.token);
           localStorage.setItem('userId', data.user.id);
           localStorage.setItem('user', JSON.stringify(data.user));
           
-          console.log('Signup successful, redirecting to profile...');
-          window.location.href = '/profile.html';
+          showSuccess('Account created! Redirecting...');
+          
+          // Redirect to previous page or homepage
+          setTimeout(() => {
+            const returnUrl = new URLSearchParams(window.location.search).get('return') || '/';
+            window.location.href = returnUrl;
+          }, 1000);
         } else {
           showError(data.message || 'Signup failed');
-          showLoading(false);
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create account';
         }
       } catch (error) {
         console.error('Signup error:', error);
         showError('Network error. Please try again.');
-        showLoading(false);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create account';
       }
     }
-
+    
     // Check if already logged in
-    if (localStorage.getItem('token')) {
-      window.location.href = '/profile.html';
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        // Already logged in, redirect
+        const returnUrl = new URLSearchParams(window.location.search).get('return') || '/profile.html';
+        window.location.href = returnUrl;
+      }
+    });
   </script>
 </body>
 </html>
