@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile | Nexus Web Hub</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+
     :root {
       --bg-deep-space: #0a0e27;
       --bg-card: #1a1f3a;
@@ -20,14 +20,14 @@
       --accent-gold: #fbbf24;
       --accent-red: #ef4444;
     }
-    
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg-deep-space);
       color: var(--text-primary);
       line-height: 1.6;
     }
-    
+
     /* Navbar */
     nav {
       background: rgba(26, 31, 58, 0.9);
@@ -38,7 +38,7 @@
       z-index: 1000;
       border-bottom: 1px solid rgba(0, 217, 255, 0.1);
     }
-    
+
     nav .container {
       max-width: 1400px;
       margin: 0 auto;
@@ -46,7 +46,7 @@
       align-items: center;
       justify-content: space-between;
     }
-    
+
     nav .logo {
       display: flex;
       align-items: center;
@@ -56,28 +56,127 @@
       color: var(--accent-cyan);
       text-decoration: none;
     }
-    
+
     nav .logo img {
       width: 32px;
       height: 32px;
     }
-    
+
+    nav .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
     nav a {
       color: var(--text-secondary);
       text-decoration: none;
     }
-    
+
     nav a:hover {
       color: var(--accent-cyan);
     }
-    
+
+    /* Notification Bell */
+    .notif-bell {
+      position: relative;
+      cursor: pointer;
+      font-size: 1.3rem;
+      color: var(--text-secondary);
+    }
+
+    .notif-bell:hover {
+      color: var(--accent-cyan);
+    }
+
+    .notif-bell .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--accent-red);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    /* Notifications Dropdown */
+    .notif-dropdown {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 2rem;
+      width: 400px;
+      max-height: 500px;
+      overflow-y: auto;
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+    }
+
+    .notif-dropdown.active {
+      display: block;
+    }
+
+    .notif-header {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .notif-item {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.05);
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .notif-item:hover {
+      background: rgba(0, 217, 255, 0.05);
+    }
+
+    .notif-item.unread {
+      background: rgba(0, 217, 255, 0.08);
+    }
+
+    .notif-item .notif-title {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .notif-item .notif-message {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .notif-item .notif-time {
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+    }
+
+    .notif-empty {
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
     /* Container */
     .container {
       max-width: 1200px;
       margin: 2rem auto;
       padding: 0 2rem;
     }
-    
+
     /* Profile Header */
     .profile-header {
       background: var(--bg-card);
@@ -88,7 +187,7 @@
       align-items: center;
       gap: 2rem;
     }
-    
+
     .avatar {
       width: 100px;
       height: 100px;
@@ -101,31 +200,39 @@
       font-weight: bold;
       color: white;
     }
-    
+
     .profile-info h1 {
       margin-bottom: 0.5rem;
     }
-    
+
     .profile-info .email {
       color: var(--text-secondary);
       margin-bottom: 1rem;
     }
-    
+
     .badges {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
     }
-    
-    .badge {
+
+    .badge-item {
       padding: 0.3rem 0.8rem;
       border-radius: 6px;
       font-size: 0.75rem;
       font-weight: 600;
       background: rgba(0, 217, 255, 0.1);
       color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
     }
-    
+
+    .badge-item img {
+      width: 16px;
+      height: 16px;
+    }
+
     /* Tabs */
     .tabs {
       display: flex;
@@ -133,7 +240,7 @@
       margin-bottom: 2rem;
       border-bottom: 2px solid rgba(0, 217, 255, 0.1);
     }
-    
+
     .tab {
       padding: 0.8rem 1.5rem;
       background: transparent;
@@ -145,27 +252,27 @@
       transition: all 0.3s;
       font-weight: 600;
     }
-    
+
     .tab.active {
       color: var(--accent-cyan);
       border-bottom-color: var(--accent-cyan);
     }
-    
+
     .tab-content {
       display: none;
     }
-    
+
     .tab-content.active {
       display: block;
     }
-    
+
     /* Search Bar */
     .search-bar {
       display: flex;
       gap: 1rem;
       margin-bottom: 2rem;
     }
-    
+
     .search-bar input {
       flex: 1;
       padding: 1rem;
@@ -175,7 +282,7 @@
       color: var(--text-primary);
       font-size: 1rem;
     }
-    
+
     .btn {
       padding: 0.8rem 1.5rem;
       border-radius: 10px;
@@ -189,46 +296,46 @@
       align-items: center;
       gap: 0.5rem;
     }
-    
+
     .btn-primary {
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       color: white;
     }
-    
+
     .btn-secondary {
       background: transparent;
       border: 2px solid var(--accent-cyan);
       color: var(--accent-cyan);
     }
-    
+
     .btn-danger {
       background: transparent;
       border: 2px solid var(--accent-red);
       color: var(--accent-red);
     }
-    
+
     .btn:hover {
       transform: translateY(-2px);
     }
-    
+
     /* Webapps Grid */
     .webapps-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 1.5rem;
     }
-    
+
     .webapp-card {
       background: var(--bg-card);
       border-radius: 12px;
       padding: 1.5rem;
       border: 1px solid rgba(0, 217, 255, 0.1);
     }
-    
+
     .webapp-card h3 {
       margin-bottom: 0.5rem;
     }
-    
+
     .webapp-card .stats {
       display: flex;
       gap: 1rem;
@@ -236,12 +343,12 @@
       color: var(--text-secondary);
       font-size: 0.9rem;
     }
-    
+
     .webapp-card .actions {
       display: flex;
       gap: 0.5rem;
     }
-    
+
     .icon-btn {
       background: transparent;
       border: 1px solid rgba(0, 217, 255, 0.2);
@@ -251,12 +358,50 @@
       cursor: pointer;
       transition: all 0.3s;
     }
-    
+
     .icon-btn:hover {
       border-color: var(--accent-cyan);
       color: var(--accent-cyan);
     }
-    
+
+    /* Collections Grid */
+    .collections-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .collection-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid rgba(0, 217, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .collection-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-5px);
+    }
+
+    .collection-card h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    .collection-card .description {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .collection-card .meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
     /* Logout Button */
     .logout-btn {
       position: fixed;
@@ -272,11 +417,11 @@
       box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
       transition: all 0.3s;
     }
-    
+
     .logout-btn:hover {
       transform: scale(1.05);
     }
-    
+
     /* Modal */
     .modal {
       display: none;
@@ -290,22 +435,23 @@
       justify-content: center;
       align-items: center;
     }
-    
+
     .modal-content {
       background: var(--bg-card);
       padding: 2rem;
       border-radius: 16px;
       max-width: 500px;
       margin: 1rem;
-      border: 1px solid var(--accent-red);
+      border: 1px solid var(--accent-cyan);
     }
-    
+
     .modal-content h3 {
       margin-bottom: 1rem;
-      color: var(--accent-red);
+      color: var(--accent-cyan);
     }
-    
-    .modal-content input {
+
+    .modal-content input,
+    .modal-content textarea {
       width: 100%;
       padding: 1rem;
       background: var(--bg-deep-space);
@@ -315,32 +461,45 @@
       font-family: inherit;
       margin-bottom: 1rem;
     }
-    
+
     .modal-content .buttons {
       display: flex;
       gap: 1rem;
     }
-    
+
+    .modal-content label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      color: var(--text-secondary);
+    }
+
     /* Empty State */
     .empty-state {
       text-align: center;
       padding: 3rem;
       color: var(--text-secondary);
     }
-    
+
     /* Responsive */
     @media (max-width: 768px) {
       .profile-header {
         flex-direction: column;
         text-align: center;
       }
-      
-      .webapps-grid {
+
+      .webapps-grid, .collections-grid {
         grid-template-columns: 1fr;
       }
-      
+
       .logout-btn {
         bottom: 1rem;
+        right: 1rem;
+      }
+
+      .notif-dropdown {
+        width: calc(100vw - 2rem);
         right: 1rem;
       }
     }
@@ -354,11 +513,28 @@
         <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub">
         <span>Nexus Web Hub</span>
       </a>
-      
-      <a href="/">Back to catalog</a>
+
+      <div class="nav-actions">
+        <div class="notif-bell" onclick="toggleNotifications()">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge" id="notif-badge" style="display: none;">0</span>
+        </div>
+        <a href="/">Back to catalog</a>
+      </div>
     </div>
   </nav>
-  
+
+  <!-- Notifications Dropdown -->
+  <div class="notif-dropdown" id="notif-dropdown">
+    <div class="notif-header">
+      <h3>Notifications</h3>
+      <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="markAllAsRead()">
+        Mark all as read
+      </button>
+    </div>
+    <div id="notif-list"></div>
+  </div>
+
   <!-- Container -->
   <div class="container">
     <!-- Profile Header -->
@@ -370,18 +546,21 @@
         <div class="badges" id="badges"></div>
         <p style="color: var(--text-secondary); margin-top: 1rem;">
           <span id="webapps-count">0</span> Webapps published •
-          <span id="reviews-count">0</span> Reviews given
+          <span id="collections-count">0</span> Collections
         </p>
       </div>
     </div>
-    
+
     <!-- Tabs -->
     <div class="tabs">
       <button class="tab active" onclick="switchTab('webapps')">
         <i class="fa-solid fa-th-large"></i> My Webapps
       </button>
+      <button class="tab" onclick="switchTab('collections')">
+        <i class="fa-solid fa-folder"></i> My Collections
+      </button>
     </div>
-    
+
     <!-- Webapps Tab -->
     <div class="tab-content active" id="webapps-tab">
       <div class="search-bar">
@@ -390,9 +569,9 @@
           <i class="fa-solid fa-plus"></i> New Webapp
         </a>
       </div>
-      
+
       <div class="webapps-grid" id="webapps-grid"></div>
-      
+
       <div class="empty-state" id="empty-state" style="display: none;">
         <i class="fa-solid fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
         <p>No webapps yet</p>
@@ -401,9 +580,29 @@
         </a>
       </div>
     </div>
+
+    <!-- Collections Tab -->
+    <div class="tab-content" id="collections-tab">
+      <div class="search-bar">
+        <input type="text" id="search-collections-input" placeholder="Search collections...">
+        <button class="btn btn-primary" onclick="showCreateCollectionModal()">
+          <i class="fa-solid fa-plus"></i> New Collection
+        </button>
+      </div>
+
+      <div class="collections-grid" id="collections-grid"></div>
+
+      <div class="empty-state" id="collections-empty" style="display: none;">
+        <i class="fa-solid fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+        <p>No collections yet</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;" onclick="showCreateCollectionModal()">
+          <i class="fa-solid fa-plus"></i> Create your first collection
+        </button>
+      </div>
+    </div>
   </div>
-  
-  <!-- Delete Modal -->
+
+  <!-- Delete Webapp Modal -->
   <div class="modal" id="delete-modal">
     <div class="modal-content">
       <h3><i class="fa-solid fa-triangle-exclamation"></i> Confirm Deletion</h3>
@@ -417,55 +616,159 @@
       </div>
     </div>
   </div>
-  
+
+  <!-- Create Collection Modal -->
+  <div class="modal" id="create-collection-modal">
+    <div class="modal-content">
+      <h3><i class="fa-solid fa-folder-plus"></i> Create Collection</h3>
+      <input type="text" id="collection-name" placeholder="Collection name" maxlength="50">
+      <textarea id="collection-description" placeholder="Description (optional)" rows="3"></textarea>
+      <label>
+        <input type="checkbox" id="collection-public">
+        Make this collection public
+      </label>
+      <div class="buttons">
+        <button class="btn btn-secondary" onclick="closeCreateCollectionModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="createCollection()">Create</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Logout Button -->
   <button class="logout-btn" onclick="logout()">
     <i class="fa-solid fa-right-from-bracket"></i> Logout
   </button>
-  
+
   <script>
     let user = null;
     let webapps = [];
+    let collections = [];
+    let notifications = [];
     let webappToDelete = null;
-    
+
     // Check auth
     function checkAuth() {
       const token = localStorage.getItem('token');
       const userStr = localStorage.getItem('user');
-      
+
       if (!token || !userStr) {
         window.location.href = '/auth.html?return=/profile.html';
         return;
       }
-      
+
       user = JSON.parse(userStr);
       renderProfile();
       loadWebapps();
+      loadCollections();
+      loadNotifications();
     }
-    
+
     // Render profile
     function renderProfile() {
       const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
       document.getElementById('avatar').textContent = initials;
       document.getElementById('user-name').textContent = user.name;
       document.getElementById('user-email').textContent = user.email;
-      
+
       const badgesHTML = user.badges.map(badge => 
-        `<span class="badge"><i class="fa-solid fa-award"></i> ${badge}</span>`
+        `<span class="badge-item"><img src="/assets/badges/system/badge-${badge}.svg" alt="${badge}"> ${badge}</span>`
       ).join('');
-      document.getElementById('badges').innerHTML = badgesHTML || '<span class="badge">New Member</span>';
+      document.getElementById('badges').innerHTML = badgesHTML || '<span class="badge-item">New Member</span>';
     }
-    
+
+    // Load notifications
+    async function loadNotifications() {
+      try {
+        const response = await fetch('/api/notifications', {
+          headers: { 'X-User-Id': user.id }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          notifications = data.notifications;
+          
+          if (data.unread_count > 0) {
+            document.getElementById('notif-badge').textContent = data.unread_count;
+            document.getElementById('notif-badge').style.display = 'flex';
+          }
+          
+          renderNotifications();
+        }
+      } catch (error) {
+        console.error('Error loading notifications:', error);
+      }
+    }
+
+    // Render notifications
+    function renderNotifications() {
+      const notifList = document.getElementById('notif-list');
+      
+      if (notifications.length === 0) {
+        notifList.innerHTML = '<div class="notif-empty">No notifications</div>';
+        return;
+      }
+
+      notifList.innerHTML = notifications.map(n => `
+        <div class="notif-item ${n.read === 0 ? 'unread' : ''}" onclick="markAsRead('${n.id}')">
+          <div class="notif-title">${n.title}</div>
+          <div class="notif-message">${n.message}</div>
+          <div class="notif-time">${timeAgo(n.created_at)}</div>
+        </div>
+      `).join('');
+    }
+
+    // Toggle notifications
+    function toggleNotifications() {
+      document.getElementById('notif-dropdown').classList.toggle('active');
+    }
+
+    // Mark notification as read
+    async function markAsRead(notifId) {
+      try {
+        await fetch(`/api/notifications/${notifId}/read`, {
+          method: 'POST',
+          headers: { 'X-User-Id': user.id }
+        });
+        
+        loadNotifications();
+      } catch (error) {
+        console.error('Error marking notification as read:', error);
+      }
+    }
+
+    // Mark all as read
+    async function markAllAsRead() {
+      try {
+        await fetch('/api/notifications/read-all', {
+          method: 'POST',
+          headers: { 'X-User-Id': user.id }
+        });
+        
+        loadNotifications();
+      } catch (error) {
+        console.error('Error marking all as read:', error);
+      }
+    }
+
+    // Time ago helper
+    function timeAgo(timestamp) {
+      const seconds = Math.floor((Date.now() - timestamp) / 1000);
+      
+      if (seconds < 60) return 'Just now';
+      if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+      if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+      return `${Math.floor(seconds / 86400)}d ago`;
+    }
+
     // Load webapps
     async function loadWebapps() {
       try {
         const response = await fetch(`/api/webapps/user/${user.id}`);
         const data = await response.json();
-        
+
         webapps = data.webapps;
-        
         document.getElementById('webapps-count').textContent = webapps.length;
-        
+
         if (webapps.length === 0) {
           document.getElementById('webapps-grid').style.display = 'none';
           document.getElementById('empty-state').style.display = 'block';
@@ -476,13 +779,13 @@
         console.error('Error loading webapps:', error);
       }
     }
-    
+
     // Render webapps
     function renderWebapps(webappsToRender) {
       const grid = document.getElementById('webapps-grid');
       grid.style.display = 'grid';
       document.getElementById('empty-state').style.display = 'none';
-      
+
       grid.innerHTML = webappsToRender.map(webapp => `
         <div class="webapp-card">
           <h3>${webapp.name}</h3>
@@ -508,8 +811,107 @@
         </div>
       `).join('');
     }
-    
-    // Search
+
+    // Load collections
+    async function loadCollections() {
+      try {
+        const response = await fetch('/api/collections', {
+          headers: { 'X-User-Id': user.id }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          collections = data.collections;
+          document.getElementById('collections-count').textContent = collections.length;
+
+          if (collections.length === 0) {
+            document.getElementById('collections-grid').style.display = 'none';
+            document.getElementById('collections-empty').style.display = 'block';
+          } else {
+            renderCollections(collections);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading collections:', error);
+      }
+    }
+
+    // Render collections
+    function renderCollections(collectionsToRender) {
+      const grid = document.getElementById('collections-grid');
+      grid.style.display = 'grid';
+      document.getElementById('collections-empty').style.display = 'none';
+
+      grid.innerHTML = collectionsToRender.map(col => `
+        <div class="collection-card" onclick="viewCollection('${col.id}')">
+          <h3>${col.name}</h3>
+          <p class="description">${col.description || 'No description'}</p>
+          <div class="meta">
+            <span><i class="fa-solid fa-layer-group"></i> ${col.items_count} items</span>
+            <span>${col.is_public ? '<i class="fa-solid fa-globe"></i> Public' : '<i class="fa-solid fa-lock"></i> Private'}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // View collection
+    function viewCollection(collectionId) {
+      window.location.href = `/collection.html?id=${collectionId}`;
+    }
+
+    // Show create collection modal
+    function showCreateCollectionModal() {
+      document.getElementById('create-collection-modal').style.display = 'flex';
+    }
+
+    function closeCreateCollectionModal() {
+      document.getElementById('collection-name').value = '';
+      document.getElementById('collection-description').value = '';
+      document.getElementById('collection-public').checked = false;
+      document.getElementById('create-collection-modal').style.display = 'none';
+    }
+
+    // Create collection
+    async function createCollection() {
+      const name = document.getElementById('collection-name').value.trim();
+      const description = document.getElementById('collection-description').value.trim();
+      const isPublic = document.getElementById('collection-public').checked;
+
+      if (!name) {
+        alert('Please enter a collection name');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/collections', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': user.id
+          },
+          body: JSON.stringify({
+            name,
+            description,
+            is_public: isPublic
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert('Collection created!');
+          closeCreateCollectionModal();
+          loadCollections();
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error('Error creating collection:', error);
+        alert('Error creating collection');
+      }
+    }
+
+    // Search webapps
     document.getElementById('search-input').addEventListener('input', (e) => {
       const search = e.target.value.toLowerCase();
       const filtered = webapps.filter(w => 
@@ -518,36 +920,46 @@
       );
       renderWebapps(filtered);
     });
-    
+
+    // Search collections
+    document.getElementById('search-collections-input').addEventListener('input', (e) => {
+      const search = e.target.value.toLowerCase();
+      const filtered = collections.filter(c => 
+        c.name.toLowerCase().includes(search) || 
+        (c.description && c.description.toLowerCase().includes(search))
+      );
+      renderCollections(filtered);
+    });
+
     // Switch tabs
     function switchTab(tabName) {
       document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      
+
       document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
       document.getElementById(`${tabName}-tab`).classList.add('active');
     }
-    
+
     // Delete modal
     function showDeleteModal(webappId) {
       webappToDelete = webappId;
       document.getElementById('delete-modal').style.display = 'flex';
     }
-    
+
     function closeDeleteModal() {
       webappToDelete = null;
       document.getElementById('delete-password').value = '';
       document.getElementById('delete-modal').style.display = 'none';
     }
-    
+
     async function confirmDelete() {
       const password = document.getElementById('delete-password').value;
-      
+
       if (!password) {
         alert('Please enter your password');
         return;
       }
-      
+
       try {
         const response = await fetch(`/api/webapps/${webappToDelete}`, {
           method: 'DELETE',
@@ -557,9 +969,9 @@
           },
           body: JSON.stringify({ password })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
           alert('Webapp deleted successfully');
           closeDeleteModal();
@@ -572,7 +984,7 @@
         alert('Error deleting webapp');
       }
     }
-    
+
     // Logout
     function logout() {
       if (confirm('Are you sure you want to logout?')) {
@@ -582,7 +994,17 @@
         window.location.href = '/';
       }
     }
-    
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('notif-dropdown');
+      const bell = document.querySelector('.notif-bell');
+      
+      if (!dropdown.contains(e.target) && !bell.contains(e.target)) {
+        dropdown.classList.remove('active');
+      }
+    });
+
     // Init
     document.addEventListener('DOMContentLoaded', checkAuth);
   </script>
