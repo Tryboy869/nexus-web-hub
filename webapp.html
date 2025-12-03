@@ -102,18 +102,48 @@
       border-radius: 12px;
       overflow: hidden;
       aspect-ratio: 16/9;
-    }
-    
-    .media-section iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
+      position: relative;
+      cursor: pointer;
     }
     
     .media-section img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+    
+    .media-section .play-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.3);
+      transition: background 0.3s;
+    }
+    
+    .media-section:hover .play-overlay {
+      background: rgba(0, 0, 0, 0.5);
+    }
+    
+    .media-section .play-button {
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 0, 0, 0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      transition: transform 0.3s;
+    }
+    
+    .media-section:hover .play-button {
+      transform: scale(1.1);
     }
     
     .info-section .badges {
@@ -128,6 +158,14 @@
       border-radius: 6px;
       font-size: 0.75rem;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    
+    .badge img {
+      width: 16px;
+      height: 16px;
     }
     
     .badge-trending {
@@ -274,6 +312,47 @@
       gap: 0.5rem;
     }
     
+    /* Version History */
+    .versions-section {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 3rem;
+    }
+    
+    .versions-section h2 {
+      margin-bottom: 1.5rem;
+    }
+    
+    .version-item {
+      padding: 1rem;
+      background: rgba(0, 217, 255, 0.05);
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border-left: 3px solid var(--accent-cyan);
+    }
+    
+    .version-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    
+    .version-number {
+      font-weight: bold;
+      color: var(--accent-cyan);
+    }
+    
+    .version-date {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+    
+    .version-changelog {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    
     /* Reviews Section */
     .reviews-section {
       background: var(--bg-card);
@@ -365,6 +444,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      transition: all 0.3s;
     }
     
     .vote-btn:hover {
@@ -528,6 +608,12 @@
       </div>
     </div>
     
+    <!-- Version History -->
+    <div class="versions-section" id="versions-section" style="display: none;">
+      <h2><i class="fa-solid fa-code-branch"></i> Version History</h2>
+      <div id="versions-list"></div>
+    </div>
+    
     <!-- Reviews -->
     <div class="reviews-section">
       <h2>Reviews</h2>
@@ -566,9 +652,29 @@
   <script>
     let webapp = null;
     let reviews = [];
+    let versions = [];
     let selectedRating = 0;
     const webappId = new URLSearchParams(window.location.search).get('id');
     const userId = localStorage.getItem('userId');
+    
+    // Extract YouTube video ID
+    function extractYouTubeId(url) {
+      if (!url) return null;
+      
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+        /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+        /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+        /(?:youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/
+      ];
+      
+      for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match && match[1]) return match[1];
+      }
+      
+      return null;
+    }
     
     // Load webapp
     async function loadWebapp() {
@@ -584,6 +690,7 @@
         
         renderWebapp();
         renderReviews();
+        await loadVersions();
         
         document.getElementById('loading').style.display = 'none';
         document.getElementById('content').style.display = 'block';
@@ -592,50 +699,59 @@
       }
     }
     
+    // Load versions
+    async function loadVersions() {
+      try {
+        const response = await fetch(`/api/webapps/${webappId}/versions`);
+        const data = await response.json();
+        
+        if (data.success && data.versions.length > 0) {
+          versions = data.versions;
+          renderVersions();
+          document.getElementById('versions-section').style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error loading versions:', error);
+      }
+    }
+    
+    // Render versions
+    function renderVersions() {
+      const versionsHTML = versions.map(v => `
+        <div class="version-item">
+          <div class="version-header">
+            <span class="version-number">v${v.version}</span>
+            <span class="version-date">${new Date(v.created_at).toLocaleDateString()}</span>
+          </div>
+          <div class="version-changelog">${v.changelog}</div>
+        </div>
+      `).join('');
+      
+      document.getElementById('versions-list').innerHTML = versionsHTML;
+    }
+    
     // Render webapp
     function renderWebapp() {
       // SEO
       document.getElementById('page-title').textContent = `${webapp.name} | Nexus Web Hub`;
       document.getElementById('page-description').content = webapp.description_short;
       
-      // Media
+      // Media - YouTube thumbnail clickable
       if (webapp.video_url) {
-        // Convertir n'importe quelle URL YouTube en format embed
-        let embedUrl = webapp.video_url;
+        const videoId = extractYouTubeId(webapp.video_url);
         
-        try {
-          // Si c'est déjà un embed, on garde tel quel
-          if (embedUrl.includes('youtube.com/embed/')) {
-            // Déjà au bon format
-          }
-          // Format: https://www.youtube.com/watch?v=VIDEO_ID
-          else if (embedUrl.includes('youtube.com/watch')) {
-            const url = new URL(embedUrl);
-            const videoId = url.searchParams.get('v');
-            if (videoId) {
-              embedUrl = `https://www.youtube.com/embed/${videoId}`;
-            }
-          }
-          // Format: https://youtu.be/VIDEO_ID
-          else if (embedUrl.includes('youtu.be/')) {
-            const videoId = embedUrl.split('youtu.be/')[1].split('?')[0].split('&')[0];
-            if (videoId) {
-              embedUrl = `https://www.youtube.com/embed/${videoId}`;
-            }
-          }
-          
+        if (videoId) {
+          const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
           document.getElementById('media').innerHTML = `
-            <iframe 
-              src="${embedUrl}" 
-              frameborder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              referrerpolicy="strict-origin-when-cross-origin"
-              allowfullscreen
-              style="width: 100%; height: 100%;">
-            </iframe>`;
-        } catch (error) {
-          console.error('Erreur chargement vidéo:', error);
-          document.getElementById('media').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: rgba(0, 217, 255, 0.1);"><p style="color: var(--text-secondary);">⚠️ Format vidéo non supporté</p></div>';
+            <img src="${thumbnailUrl}" alt="${webapp.name} video">
+            <div class="play-overlay" onclick="openYouTubeVideo('${videoId}')">
+              <div class="play-button">
+                <i class="fa-brands fa-youtube"></i>
+              </div>
+            </div>
+          `;
+        } else {
+          document.getElementById('media').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: rgba(0, 217, 255, 0.1);"><p style="color: var(--text-secondary);">Invalid video URL</p></div>';
         }
       } else if (webapp.image_url) {
         document.getElementById('media').innerHTML = `<img src="${webapp.image_url}" alt="${webapp.name}">`;
@@ -643,11 +759,11 @@
         document.getElementById('media').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: rgba(0, 217, 255, 0.1);"><i class="fa-solid fa-image" style="font-size: 4rem; color: var(--text-secondary);"></i></div>';
       }
       
-      // Badges
+      // Badges avec SVG
       let badgesHTML = '';
-      if (webapp.is_trending) badgesHTML += '<span class="badge badge-trending"><i class="fa-solid fa-fire"></i> Trending</span>';
-      if (webapp.is_featured) badgesHTML += '<span class="badge badge-featured"><i class="fa-solid fa-star"></i> Featured</span>';
-      if (webapp.is_new) badgesHTML += '<span class="badge badge-new"><i class="fa-solid fa-sparkles"></i> New</span>';
+      if (webapp.is_trending) badgesHTML += '<span class="badge badge-trending"><img src="/assets/badges/system/badge-trending.svg" alt="Trending"> Trending</span>';
+      if (webapp.is_featured) badgesHTML += '<span class="badge badge-featured"><img src="/assets/badges/system/badge-featured.svg" alt="Featured"> Featured</span>';
+      if (webapp.is_new) badgesHTML += '<span class="badge badge-new"><img src="/assets/badges/system/badge-new.svg" alt="New"> New</span>';
       document.getElementById('badges').innerHTML = badgesHTML;
       
       // Info
@@ -677,6 +793,11 @@
       document.getElementById('clicks').textContent = webapp.clicks_count;
       document.getElementById('rating').textContent = webapp.avg_rating.toFixed(1);
       document.getElementById('reviews-count').textContent = webapp.reviews_count;
+    }
+    
+    // Open YouTube video in new tab
+    function openYouTubeVideo(videoId) {
+      window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
     }
     
     // Toggle description
