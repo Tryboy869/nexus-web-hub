@@ -1,4 +1,5 @@
-// api.js - API Gateway for Nexus Web Hub (Simplified)
+// api.js - API Gateway for Nexus Web Hub
+// Routes complètes: Notifications, Collections, Versions
 
 import express from 'express';
 import cors from 'cors';
@@ -147,7 +148,7 @@ app.post('/api/webapps', async (req, res) => {
     if (!userId) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
-    
+
     const result = await backend.createWebapp(req.body, userId);
     res.json(result);
   } catch (error) {
@@ -219,6 +220,17 @@ app.get('/api/webapps/user/:userId', async (req, res) => {
   }
 });
 
+// Webapp Versions (Changelogs)
+app.get('/api/webapps/:id/versions', async (req, res) => {
+  try {
+    const result = await backend.getWebappVersions(req.params.id);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // Reviews
 app.post('/api/webapps/:id/reviews', async (req, res) => {
   try {
@@ -257,6 +269,165 @@ app.post('/api/reports', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     const result = await backend.createReport(req.body, userId);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+// ========================================
+// NOTIFICATIONS ROUTES
+// ========================================
+
+app.get('/api/notifications', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const limit = parseInt(req.query.limit) || 50;
+    const result = await backend.getNotifications(userId, limit);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.post('/api/notifications/:id/read', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const result = await backend.markNotificationAsRead(req.params.id, userId);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+app.post('/api/notifications/read-all', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const result = await backend.markAllNotificationsAsRead(userId);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.delete('/api/notifications/:id', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const result = await backend.deleteNotification(req.params.id, userId);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+// ========================================
+// COLLECTIONS ROUTES
+// ========================================
+
+app.get('/api/collections', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const result = await backend.getUserCollections(userId);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.get('/api/collections/:id', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || null;
+    const result = await backend.getCollection(req.params.id, userId);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(404).json({ success: false, message: error.message });
+  }
+});
+
+app.post('/api/collections', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const { name, description, is_public } = req.body;
+    const result = await backend.createCollection(userId, name, description, is_public);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+app.post('/api/collections/:id/add', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const { webapp_id } = req.body;
+    const result = await backend.addToCollection(req.params.id, webapp_id, userId);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+app.delete('/api/collections/:id/remove/:webappId', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const result = await backend.removeFromCollection(req.params.id, req.params.webappId, userId);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+app.get('/api/collections/:id/webapps', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || null;
+    const result = await backend.getCollectionWebapps(req.params.id, userId);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(404).json({ success: false, message: error.message });
+  }
+});
+
+app.delete('/api/collections/:id', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const result = await backend.deleteCollection(req.params.id, userId);
     res.json(result);
   } catch (error) {
     console.error('[API] Error:', error.message);
@@ -346,11 +517,11 @@ app.get('/api/tags/popular', async (req, res) => {
 app.get('/i18n/:lang.json', (req, res) => {
   const lang = req.params.lang;
   const supportedLangs = ['fr', 'en', 'es'];
-  
+
   if (!supportedLangs.includes(lang)) {
     return res.status(404).json({ success: false, message: 'Language not supported' });
   }
-  
+
   res.sendFile(path.join(__dirname, 'i18n', `${lang}.json`));
 });
 
@@ -358,7 +529,7 @@ app.get('/i18n/:lang.json', (req, res) => {
 app.get('/sitemap.xml', async (req, res) => {
   try {
     const webapps = await backend.getWebapps({ limit: 1000 });
-    
+
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -374,7 +545,7 @@ app.get('/sitemap.xml', async (req, res) => {
     <priority>0.7</priority>
   </url>`).join('')}
 </urlset>`;
-    
+
     res.header('Content-Type', 'application/xml');
     res.send(sitemap);
   } catch (error) {
@@ -400,7 +571,7 @@ app.use((req, res) => {
 // Start Server
 async function startServer() {
   await initBackend();
-  
+
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`
 ===============================================================
