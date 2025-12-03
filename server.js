@@ -1,5 +1,5 @@
 // server.js - Backend Service for Nexus Web Hub
-// Logique métier complète
+// Logique métier complète avec Notifications, Collections, Versions
 
 import { createClient } from '@libsql/client';
 import bcrypt from 'bcrypt';
@@ -729,6 +729,34 @@ export class BackendService {
       args: [avgRating, reviewsCount, webappId]
     });
 
+    // Notifier le créateur de la webapp
+    const webappResult = await this.db.execute({
+      sql: 'SELECT creator_id, name FROM webapps WHERE id = ?',
+      args: [webappId]
+    });
+
+    if (webappResult.rows.length > 0) {
+      const webapp = webappResult.rows[0];
+      const creatorId = webapp.creator_id;
+
+      if (creatorId !== userId) {
+        const reviewerResult = await this.db.execute({
+          sql: 'SELECT name FROM users WHERE id = ?',
+          args: [userId]
+        });
+
+        const reviewerName = reviewerResult.rows[0]?.name || 'Someone';
+
+        await this.createNotification(
+          creatorId,
+          'new_review',
+          'New review on your webapp',
+          `${reviewerName} gave ${rating} stars to "${webapp.name}"`,
+          { webappId, reviewId: review.id, rating }
+        );
+      }
+    }
+
     return { success: true, review };
   }
 
@@ -899,6 +927,312 @@ export class BackendService {
       .map(([name, count]) => ({ name, count }));
 
     return { success: true, tags: popularTags };
+  }
+
+  // ========================================
+  // NOTIFICATIONS SYSTEM
+  // ========================================
+
+  async createNotification(userId, type, title, message, data = null) {
+    const notification = {
+      id: generateId('notif'),
+      user_id: userId,
+      type,
+      title,
+      message,
+      data: data ? JSON.stringify(data) : null,
+      read: 0,
+      created_at: Date.now()
+    };
+
+    await this.db.execute({
+      sql: `INSERT INTO notifications (id, user_id, type, title, message, data, read, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        notification.id,
+        notification.user_id,
+        notification.type,
+        notification.title,
+        notification.message,
+        notification.data,
+        notification.read,
+        notification.created_at
+      ]
+    });
+
+    return { success: true, notification };
+  }
+
+  async getNotifications(userId, limit = 50) {
+    const result = await this.db.execute({
+      sql: `SELECT * FROM notifications 
+            WHERE user_id = ? 
+            ORDER BY created_at DESC 
+            LIMIT ?`,
+      args: [userId, limit]
+    });
+
+    return {
+      success: true,
+      notifications: result.rows.map(n => ({
+        ...n,
+        data: n.data ? JSON.parse(n.data) : null
+      })),
+      unread_count: result.rows.filter(n => n.read === 0).length
+    };
+  }
+
+  async markNotificationAsRead(notificationId, userId) {
+    const existing = await this.db.execute({
+      sql: 'SELECT user_id FROM notifications WHERE id = ?',
+      args: [notificationId]
+    });
+
+    if (existing.rows.length === 0) {
+      throw new Error('Notification not found');
+    }
+
+    if (existing.rows[0].user_id !== userId) {
+      throw new Error('Unauthorized');
+    }
+
+    await this.db.execute({
+      sql: 'UPDATE notifications SET read = 1 WHERE id = ?',
+      args: [notificationId]
+    });
+
+    return { success: true };
+  }
+
+  async markAllNotificationsAsRead(userId) {
+    await this.db.execute({
+      sql: 'UPDATE notifications SET read = 1 WHERE user_id = ? AND read = 0',
+      args: [userId]
+    });
+
+    return { success: true };
+  }
+
+  async deleteNotification(notificationId, userId) {
+    const existing = await this.db.execute({
+      sql: 'SELECT user_id FROM notifications WHERE id = ?',
+      args: [notificationId]
+    });
+
+    if (existing.rows.length === 0) {
+      throw new Error('Notification not found');
+    }
+
+    if (existing.rows[0].user_id !== userId) {
+      throw new Error('Unauthorized');
+    }
+
+    await this.db.execute({
+      sql: 'DELETE FROM notifications WHERE id = ?',
+      args: [notificationId]
+    });
+
+    return { success: true };
+  }
+
+  // ========================================
+  // COLLECTIONS SYSTEM
+  // ========================================
+
+  async createCollection(userId, name, description = null, isPublic = false) {
+    const collection = {
+      id: generateId('collection'),
+      user_id: userId,
+      name: sanitizeString(name),
+      description: description ? sanitizeString(description) : null,
+      is_public: isPublic ? 1 : 0,
+      created_at: Date.now(),
+      updated_at: Date.now()
+    };
+
+    await this.db.execute({
+      sql: `INSERT INTO collections (id, user_id, name, description, is_public, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        collection.id,
+        collection.user_id,
+        collection.name,
+        collection.description,
+        collection.is_public,
+        collection.created_at,
+        collection.updated_at
+      ]
+    });
+
+    return { success: true, collection };
+  }
+
+  async getUserCollections(userId) {
+    const result = await this.db.execute({
+      sql: `SELECT c.*, COUNT(ci.id) as items_count
+            FROM collections c
+            LEFT JOIN collection_items ci ON c.id = ci.collection_id
+            WHERE c.user_id = ?
+            GROUP BY c.id
+            ORDER BY c.created_at DESC`,
+      args: [userId]
+    });
+
+    return { success: true, collections: result.rows };
+  }
+
+  async getCollection(collectionId, userId = null) {
+    const result = await this.db.execute({
+      sql: 'SELECT * FROM collections WHERE id = ?',
+      args: [collectionId]
+    });
+
+    if (result.rows.length === 0) {
+      throw new Error('Collection not found');
+    }
+
+    const collection = result.rows[0];
+
+    if (collection.is_public === 0 && collection.user_id !== userId) {
+      throw new Error('Unauthorized - Collection is private');
+    }
+
+    return { success: true, collection };
+  }
+
+  async addToCollection(collectionId, webappId, userId) {
+    const collection = await this.db.execute({
+      sql: 'SELECT user_id FROM collections WHERE id = ?',
+      args: [collectionId]
+    });
+
+    if (collection.rows.length === 0) {
+      throw new Error('Collection not found');
+    }
+
+    if (collection.rows[0].user_id !== userId) {
+      throw new Error('Unauthorized');
+    }
+
+    const webapp = await this.db.execute({
+      sql: 'SELECT id FROM webapps WHERE id = ?',
+      args: [webappId]
+    });
+
+    if (webapp.rows.length === 0) {
+      throw new Error('Webapp not found');
+    }
+
+    await this.db.execute({
+      sql: `INSERT OR IGNORE INTO collection_items (id, collection_id, webapp_id, added_at)
+            VALUES (?, ?, ?, ?)`,
+      args: [generateId('item'), collectionId, webappId, Date.now()]
+    });
+
+    await this.db.execute({
+      sql: 'UPDATE collections SET updated_at = ? WHERE id = ?',
+      args: [Date.now(), collectionId]
+    });
+
+    return { success: true };
+  }
+
+  async removeFromCollection(collectionId, webappId, userId) {
+    const collection = await this.db.execute({
+      sql: 'SELECT user_id FROM collections WHERE id = ?',
+      args: [collectionId]
+    });
+
+    if (collection.rows.length === 0) {
+      throw new Error('Collection not found');
+    }
+
+    if (collection.rows[0].user_id !== userId) {
+      throw new Error('Unauthorized');
+    }
+
+    await this.db.execute({
+      sql: 'DELETE FROM collection_items WHERE collection_id = ? AND webapp_id = ?',
+      args: [collectionId, webappId]
+    });
+
+    await this.db.execute({
+      sql: 'UPDATE collections SET updated_at = ? WHERE id = ?',
+      args: [Date.now(), collectionId]
+    });
+
+    return { success: true };
+  }
+
+  async getCollectionWebapps(collectionId, userId = null) {
+    const collectionResult = await this.db.execute({
+      sql: 'SELECT user_id, is_public FROM collections WHERE id = ?',
+      args: [collectionId]
+    });
+
+    if (collectionResult.rows.length === 0) {
+      throw new Error('Collection not found');
+    }
+
+    const collection = collectionResult.rows[0];
+
+    if (collection.is_public === 0 && collection.user_id !== userId) {
+      throw new Error('Unauthorized - Collection is private');
+    }
+
+    const result = await this.db.execute({
+      sql: `SELECT w.*, ci.added_at
+            FROM webapps w
+            JOIN collection_items ci ON w.id = ci.webapp_id
+            WHERE ci.collection_id = ?
+            ORDER BY ci.added_at DESC`,
+      args: [collectionId]
+    });
+
+    return {
+      success: true,
+      webapps: result.rows.map(w => ({
+        ...w,
+        tags: JSON.parse(w.tags)
+      }))
+    };
+  }
+
+  async deleteCollection(collectionId, userId) {
+    const collection = await this.db.execute({
+      sql: 'SELECT user_id FROM collections WHERE id = ?',
+      args: [collectionId]
+    });
+
+    if (collection.rows.length === 0) {
+      throw new Error('Collection not found');
+    }
+
+    if (collection.rows[0].user_id !== userId) {
+      throw new Error('Unauthorized');
+    }
+
+    await this.db.execute({
+      sql: 'DELETE FROM collections WHERE id = ?',
+      args: [collectionId]
+    });
+
+    return { success: true };
+  }
+
+  // ========================================
+  // WEBAPP VERSIONS / CHANGELOGS
+  // ========================================
+
+  async getWebappVersions(webappId) {
+    const result = await this.db.execute({
+      sql: `SELECT * FROM webapp_versions 
+            WHERE webapp_id = ? 
+            ORDER BY created_at DESC`,
+      args: [webappId]
+    });
+
+    return { success: true, versions: result.rows };
   }
 
   async healthCheck() {
