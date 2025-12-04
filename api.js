@@ -355,6 +355,17 @@ app.get('/api/collections', async (req, res) => {
   }
 });
 
+app.get('/api/collections/public', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 20;
+    const result = await backend.getPublicCollections(limit);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 app.get('/api/collections/:id', async (req, res) => {
   try {
     const userId = req.headers['x-user-id'] || null;
@@ -418,6 +429,21 @@ app.get('/api/collections/:id/webapps', async (req, res) => {
   } catch (error) {
     console.error('[API] Error:', error.message);
     res.status(404).json({ success: false, message: error.message });
+  }
+});
+
+app.put('/api/collections/:id', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const { name, description, is_public } = req.body;
+    const result = await backend.updateCollection(req.params.id, userId, name, description, is_public);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(400).json({ success: false, message: error.message });
   }
 });
 
