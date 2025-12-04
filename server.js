@@ -1081,6 +1081,22 @@ export class BackendService {
     return { success: true, collections: result.rows };
   }
 
+  async getPublicCollections(limit = 20) {
+    const result = await this.db.execute({
+      sql: `SELECT c.*, COUNT(ci.id) as items_count, u.name as creator_name
+            FROM collections c
+            LEFT JOIN collection_items ci ON c.id = ci.collection_id
+            LEFT JOIN users u ON c.user_id = u.id
+            WHERE c.is_public = 1
+            GROUP BY c.id
+            ORDER BY c.updated_at DESC
+            LIMIT ?`,
+      args: [limit]
+    });
+
+    return { success: true, collections: result.rows };
+  }
+
   async getCollection(collectionId, userId = null) {
     const result = await this.db.execute({
       sql: 'SELECT * FROM collections WHERE id = ?',
