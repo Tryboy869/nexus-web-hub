@@ -56,11 +56,6 @@
       text-decoration: none;
     }
 
-    nav .logo svg {
-      width: 32px;
-      height: 32px;
-    }
-
     nav .nav-actions {
       display: flex;
       align-items: center;
@@ -149,6 +144,9 @@
     .notif-item .notif-title {
       font-weight: 600;
       margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .notif-item .notif-message {
@@ -222,11 +220,6 @@
       display: flex;
       align-items: center;
       gap: 0.3rem;
-    }
-
-    .badge-item svg {
-      width: 16px;
-      height: 16px;
     }
 
     .tabs {
@@ -391,13 +384,12 @@
     .collection-card .meta {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       color: var(--text-secondary);
       font-size: 0.85rem;
       margin-bottom: 1rem;
     }
 
-    .collection-card .actions {
+    .collection-card .card-actions {
       display: flex;
       gap: 0.5rem;
     }
@@ -439,8 +431,6 @@
       padding: 2rem;
       border-radius: 16px;
       max-width: 500px;
-      max-height: 80vh;
-      overflow-y: auto;
       margin: 1rem;
       border: 1px solid var(--accent-cyan);
     }
@@ -475,20 +465,6 @@
       color: var(--text-secondary);
     }
 
-    .webapp-item {
-      padding: 1rem;
-      background: rgba(0, 217, 255, 0.05);
-      border-radius: 8px;
-      margin-bottom: 0.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .webapp-item:hover {
-      background: rgba(0, 217, 255, 0.1);
-    }
-
     .empty-state {
       text-align: center;
       padding: 3rem;
@@ -521,10 +497,6 @@
   <nav>
     <div class="container">
       <a href="/" class="logo">
-        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="100" cy="100" r="90" stroke="#00d9ff" stroke-width="8"/>
-          <path d="M100 40 L140 100 L100 160 L60 100 Z" fill="#00d9ff"/>
-        </svg>
         <span>Nexus Web Hub</span>
       </a>
 
@@ -610,6 +582,7 @@
     </div>
   </div>
 
+  <!-- Delete Webapp Modal -->
   <div class="modal" id="delete-modal">
     <div class="modal-content">
       <h3><i class="fa-solid fa-triangle-exclamation"></i> Confirm Deletion</h3>
@@ -624,9 +597,10 @@
     </div>
   </div>
 
+  <!-- Create/Edit Collection Modal -->
   <div class="modal" id="create-collection-modal">
     <div class="modal-content">
-      <h3><i class="fa-solid fa-folder-plus"></i> Create Collection</h3>
+      <h3 id="collection-modal-title"><i class="fa-solid fa-folder-plus"></i> Create Collection</h3>
       <input type="text" id="collection-name" placeholder="Collection name" maxlength="50">
       <textarea id="collection-description" placeholder="Description (optional)" rows="3"></textarea>
       <label>
@@ -635,33 +609,9 @@
       </label>
       <div class="buttons">
         <button class="btn btn-secondary" onclick="closeCreateCollectionModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="createCollection()">Create</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="edit-collection-modal">
-    <div class="modal-content">
-      <h3><i class="fa-solid fa-edit"></i> Edit Collection</h3>
-      <input type="text" id="edit-collection-name" placeholder="Collection name" maxlength="50">
-      <textarea id="edit-collection-description" placeholder="Description (optional)" rows="3"></textarea>
-      <label>
-        <input type="checkbox" id="edit-collection-public">
-        Make this collection public
-      </label>
-      <div class="buttons">
-        <button class="btn btn-secondary" onclick="closeEditCollectionModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="saveCollectionEdits()">Save Changes</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="view-collection-modal">
-    <div class="modal-content">
-      <h3 id="view-collection-title"></h3>
-      <div id="collection-webapps-list"></div>
-      <div class="buttons" style="margin-top: 1rem;">
-        <button class="btn btn-secondary" onclick="closeViewCollectionModal()">Close</button>
+        <button class="btn btn-primary" onclick="saveCollection()">
+          <span id="save-collection-text">Create</span>
+        </button>
       </div>
     </div>
   </div>
@@ -677,7 +627,6 @@
     let notifications = [];
     let webappToDelete = null;
     let collectionToEdit = null;
-    let currentViewCollection = null;
 
     function checkAuth() {
       const token = localStorage.getItem('token');
@@ -694,8 +643,13 @@
       loadCollections();
       loadNotifications();
       
-      if (window.location.hash === '#collections') {
+      // Check if should open create collection modal
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('tab') === 'collections') {
         switchTab('collections');
+        if (urlParams.get('create') === 'true') {
+          setTimeout(() => showCreateCollectionModal(), 300);
+        }
       }
     }
 
@@ -706,7 +660,7 @@
       document.getElementById('user-email').textContent = user.email;
 
       const badgesHTML = user.badges.map(badge => 
-        `<span class="badge-item">${badge}</span>`
+        `<span class="badge-item"><i class="fa-solid fa-award"></i> ${badge}</span>`
       ).join('');
       document.getElementById('badges').innerHTML = badgesHTML || '<span class="badge-item">New Member</span>';
     }
@@ -741,39 +695,46 @@
         return;
       }
 
-      notifList.innerHTML = notifications.map(n => `
-        <div class="notif-item ${n.read === 0 ? 'unread' : ''}" onclick="handleNotificationClick('${n.id}', '${n.type}', ${JSON.stringify(n.data).replace(/"/g, '&quot;')})">
-          <div class="notif-title">${n.title}</div>
-          <div class="notif-message">${n.message}</div>
-          <div class="notif-time">${timeAgo(n.created_at)}</div>
-        </div>
-      `).join('');
+      notifList.innerHTML = notifications.map(n => {
+        let icon = '<i class="fa-solid fa-bell"></i>';
+        if (n.type === 'new_review') icon = '<i class="fa-solid fa-comment"></i>';
+        if (n.type === 'trending') icon = '<i class="fa-solid fa-fire"></i>';
+        if (n.type === 'badge') icon = '<i class="fa-solid fa-award"></i>';
+        
+        return `
+          <div class="notif-item ${n.read === 0 ? 'unread' : ''}" onclick="handleNotificationClick('${n.id}', '${n.type}', ${JSON.stringify(n.data).replace(/"/g, '&quot;')})">
+            <div class="notif-title">${icon} ${n.title}</div>
+            <div class="notif-message">${n.message}</div>
+            <div class="notif-time">${timeAgo(n.created_at)}</div>
+          </div>
+        `;
+      }).join('');
     }
 
     async function handleNotificationClick(notifId, type, data) {
-      await markAsRead(notifId);
-      
-      if (data && data.webappId) {
-        window.location.href = `/webapp.html?id=${data.webappId}`;
-      } else if (data && data.reviewId) {
-        window.location.href = `/webapp.html?id=${data.webappId}#reviews`;
-      }
-    }
-
-    function toggleNotifications() {
-      document.getElementById('notif-dropdown').classList.toggle('active');
-    }
-
-    async function markAsRead(notifId) {
+      // Marquer comme lu
       try {
         await fetch(`/api/notifications/${notifId}/read`, {
           method: 'POST',
           headers: { 'X-User-Id': user.id }
         });
-        loadNotifications();
       } catch (error) {
-        console.error('Error marking notification as read:', error);
+        console.error('Error marking as read:', error);
       }
+      
+      // Rediriger selon le type
+      if (type === 'new_review' && data && data.webappId) {
+        window.location.href = `/webapp.html?id=${data.webappId}#reviews`;
+      } else if (type === 'trending' && data && data.webappId) {
+        window.location.href = `/webapp.html?id=${data.webappId}`;
+      } else if (type === 'badge') {
+        toggleNotifications();
+        loadNotifications();
+      }
+    }
+
+    function toggleNotifications() {
+      document.getElementById('notif-dropdown').classList.toggle('active');
     }
 
     async function markAllAsRead() {
@@ -782,6 +743,7 @@
           method: 'POST',
           headers: { 'X-User-Id': user.id }
         });
+        
         loadNotifications();
       } catch (error) {
         console.error('Error marking all as read:', error);
@@ -790,6 +752,7 @@
 
     function timeAgo(timestamp) {
       const seconds = Math.floor((Date.now() - timestamp) / 1000);
+      
       if (seconds < 60) return 'Just now';
       if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
       if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
@@ -876,18 +839,21 @@
 
       grid.innerHTML = collectionsToRender.map(col => `
         <div class="collection-card">
-          <h3 onclick="viewCollectionWebapps('${col.id}')">${col.name}</h3>
+          <h3 onclick="viewCollection('${col.id}')">${col.name}</h3>
           <p class="description">${col.description || 'No description'}</p>
           <div class="meta">
             <span><i class="fa-solid fa-layer-group"></i> ${col.items_count} items</span>
             <span>${col.is_public ? '<i class="fa-solid fa-globe"></i> Public' : '<i class="fa-solid fa-lock"></i> Private'}</span>
           </div>
-          <div class="actions">
-            <button class="icon-btn" onclick="viewCollectionWebapps('${col.id}')" title="View">
+          <div class="card-actions">
+            <button class="icon-btn" onclick="viewCollection('${col.id}')" title="View">
               <i class="fa-solid fa-eye"></i>
             </button>
-            <button class="icon-btn" onclick="showEditCollectionModal('${col.id}')" title="Edit">
+            <button class="icon-btn" onclick="editCollection('${col.id}')" title="Edit">
               <i class="fa-solid fa-edit"></i>
+            </button>
+            <button class="icon-btn" onclick="toggleVisibility('${col.id}', ${col.is_public})" title="Toggle visibility">
+              <i class="fa-solid fa-${col.is_public ? 'lock' : 'globe'}"></i>
             </button>
             <button class="icon-btn" onclick="deleteCollection('${col.id}')" title="Delete" style="color: var(--accent-red);">
               <i class="fa-solid fa-trash"></i>
@@ -897,132 +863,59 @@
       `).join('');
     }
 
-    async function viewCollectionWebapps(collectionId) {
-      try {
-        const response = await fetch(`/api/collections/${collectionId}/webapps`, {
-          headers: { 'X-User-Id': user.id }
-        });
-        const data = await response.json();
-
-        if (data.success) {
-          currentViewCollection = collectionId;
-          const collection = collections.find(c => c.id === collectionId);
-          document.getElementById('view-collection-title').textContent = collection.name;
-
-          if (data.webapps.length === 0) {
-            document.getElementById('collection-webapps-list').innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">This collection is empty</p>';
-          } else {
-            const webappsHTML = data.webapps.map(w => `
-              <div class="webapp-item">
-                <div>
-                  <strong>${w.name}</strong>
-                  <small style="display: block; color: var(--text-secondary);">${w.description_short}</small>
-                </div>
-                <div style="display: flex; gap: 0.5rem;">
-                  <button class="icon-btn" onclick="window.open('/webapp.html?id=${w.id}', '_blank')" title="View">
-                    <i class="fa-solid fa-eye"></i>
-                  </button>
-                  <button class="icon-btn" onclick="removeWebappFromCollection('${collectionId}', '${w.id}')" title="Remove" style="color: var(--accent-red);">
-                    <i class="fa-solid fa-trash"></i>
-                  </button>
-                </div>
-              </div>
-            `).join('');
-            document.getElementById('collection-webapps-list').innerHTML = webappsHTML;
-          }
-
-          document.getElementById('view-collection-modal').style.display = 'flex';
-        }
-      } catch (error) {
-        console.error('Error loading collection webapps:', error);
-        alert('Error loading collection webapps');
-      }
+    function viewCollection(collectionId) {
+      window.location.href = `/collection.html?id=${collectionId}`;
     }
 
-    function closeViewCollectionModal() {
-      document.getElementById('view-collection-modal').style.display = 'none';
-    }
-
-    async function removeWebappFromCollection(collectionId, webappId) {
-      if (!confirm('Remove this webapp from the collection?')) return;
-
-      try {
-        const response = await fetch(`/api/collections/${collectionId}/remove/${webappId}`, {
-          method: 'DELETE',
-          headers: { 'X-User-Id': user.id }
-        });
-        const data = await response.json();
-
-        if (data.success) {
-          viewCollectionWebapps(collectionId);
-          loadCollections();
-        } else {
-          alert(data.message);
-        }
-      } catch (error) {
-        console.error('Error removing webapp:', error);
-        alert('Error removing webapp');
-      }
-    }
-
-    function showEditCollectionModal(collectionId) {
-      const collection = collections.find(c => c.id === collectionId);
+    function editCollection(collectionId) {
+      const col = collections.find(c => c.id === collectionId);
+      if (!col) return;
+      
       collectionToEdit = collectionId;
-
-      document.getElementById('edit-collection-name').value = collection.name;
-      document.getElementById('edit-collection-description').value = collection.description || '';
-      document.getElementById('edit-collection-public').checked = collection.is_public === 1;
-
-      document.getElementById('edit-collection-modal').style.display = 'flex';
+      document.getElementById('collection-modal-title').innerHTML = '<i class="fa-solid fa-edit"></i> Edit Collection';
+      document.getElementById('collection-name').value = col.name;
+      document.getElementById('collection-description').value = col.description || '';
+      document.getElementById('collection-public').checked = col.is_public === 1;
+      document.getElementById('save-collection-text').textContent = 'Save';
+      document.getElementById('create-collection-modal').style.display = 'flex';
     }
 
-    function closeEditCollectionModal() {
-      collectionToEdit = null;
-      document.getElementById('edit-collection-modal').style.display = 'none';
-    }
-
-    async function saveCollectionEdits() {
-      const name = document.getElementById('edit-collection-name').value.trim();
-      const description = document.getElementById('edit-collection-description').value.trim();
-      const isPublic = document.getElementById('edit-collection-public').checked;
-
-      if (!name) {
-        alert('Please enter a collection name');
-        return;
-      }
-
+    async function toggleVisibility(collectionId, isPublic) {
+      if (!confirm(`Make this collection ${isPublic ? 'private' : 'public'}?`)) return;
+      
+      const col = collections.find(c => c.id === collectionId);
+      if (!col) return;
+      
       try {
-        const response = await fetch(`/api/collections/${collectionToEdit}`, {
+        const response = await fetch(`/api/collections/${collectionId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'X-User-Id': user.id
           },
           body: JSON.stringify({
-            name,
-            description,
-            is_public: isPublic
+            name: col.name,
+            description: col.description,
+            is_public: !isPublic
           })
         });
 
         const data = await response.json();
 
         if (data.success) {
-          alert('Collection updated!');
-          closeEditCollectionModal();
           loadCollections();
         } else {
           alert(data.message);
         }
       } catch (error) {
-        console.error('Error updating collection:', error);
-        alert('Error updating collection');
+        console.error('Error toggling visibility:', error);
+        alert('Error toggling visibility');
       }
     }
 
     async function deleteCollection(collectionId) {
-      if (!confirm('Are you sure you want to delete this collection? This action cannot be undone.')) return;
-
+      if (!confirm('Delete this collection? This action cannot be undone.')) return;
+      
       try {
         const response = await fetch(`/api/collections/${collectionId}`, {
           method: 'DELETE',
@@ -1032,7 +925,7 @@
         const data = await response.json();
 
         if (data.success) {
-          alert('Collection deleted successfully');
+          alert('Collection deleted');
           loadCollections();
         } else {
           alert(data.message);
@@ -1044,17 +937,24 @@
     }
 
     function showCreateCollectionModal() {
+      collectionToEdit = null;
+      document.getElementById('collection-modal-title').innerHTML = '<i class="fa-solid fa-folder-plus"></i> Create Collection';
+      document.getElementById('collection-name').value = '';
+      document.getElementById('collection-description').value = '';
+      document.getElementById('collection-public').checked = false;
+      document.getElementById('save-collection-text').textContent = 'Create';
       document.getElementById('create-collection-modal').style.display = 'flex';
     }
 
     function closeCreateCollectionModal() {
+      collectionToEdit = null;
       document.getElementById('collection-name').value = '';
       document.getElementById('collection-description').value = '';
       document.getElementById('collection-public').checked = false;
       document.getElementById('create-collection-modal').style.display = 'none';
     }
 
-    async function createCollection() {
+    async function saveCollection() {
       const name = document.getElementById('collection-name').value.trim();
       const description = document.getElementById('collection-description').value.trim();
       const isPublic = document.getElementById('collection-public').checked;
@@ -1065,31 +965,50 @@
       }
 
       try {
-        const response = await fetch('/api/collections', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-User-Id': user.id
-          },
-          body: JSON.stringify({
-            name,
-            description,
-            is_public: isPublic
-          })
-        });
+        let response;
+        
+        if (collectionToEdit) {
+          // Update existing
+          response = await fetch(`/api/collections/${collectionToEdit}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': user.id
+            },
+            body: JSON.stringify({
+              name,
+              description,
+              is_public: isPublic
+            })
+          });
+        } else {
+          // Create new
+          response = await fetch('/api/collections', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': user.id
+            },
+            body: JSON.stringify({
+              name,
+              description,
+              is_public: isPublic
+            })
+          });
+        }
 
         const data = await response.json();
 
         if (data.success) {
-          alert('Collection created!');
+          alert(collectionToEdit ? 'Collection updated!' : 'Collection created!');
           closeCreateCollectionModal();
           loadCollections();
         } else {
           alert(data.message);
         }
       } catch (error) {
-        console.error('Error creating collection:', error);
-        alert('Error creating collection');
+        console.error('Error saving collection:', error);
+        alert('Error saving collection');
       }
     }
 
