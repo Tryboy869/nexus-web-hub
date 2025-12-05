@@ -1248,6 +1248,21 @@ export class BackendService {
     return { success: true };
   }
 
+  async getPublicCollections() {
+    const result = await this.db.execute({
+      sql: `SELECT c.*, u.name as creator_name, COUNT(ci.id) as items_count
+            FROM collections c
+            JOIN users u ON c.user_id = u.id
+            LEFT JOIN collection_items ci ON c.id = ci.collection_id
+            WHERE c.is_public = 1
+            GROUP BY c.id
+            ORDER BY c.updated_at DESC`,
+      args: []
+    });
+
+    return { success: true, collections: result.rows };
+  }
+
   // ========================================
   // WEBAPP VERSIONS / CHANGELOGS
   // ========================================
