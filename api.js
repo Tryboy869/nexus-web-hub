@@ -355,6 +355,16 @@ app.get('/api/collections', async (req, res) => {
   }
 });
 
+app.get('/api/collections/public', async (req, res) => {
+  try {
+    const result = await backend.getPublicCollections();
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 app.get('/api/collections/:id', async (req, res) => {
   try {
     const userId = req.headers['x-user-id'] || null;
