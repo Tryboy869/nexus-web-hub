@@ -355,16 +355,6 @@ app.get('/api/collections', async (req, res) => {
   }
 });
 
-app.get('/api/collections/public', async (req, res) => {
-  try {
-    const result = await backend.getPublicCollections();
-    res.json(result);
-  } catch (error) {
-    console.error('[API] Error:', error.message);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
 app.get('/api/collections/:id', async (req, res) => {
   try {
     const userId = req.headers['x-user-id'] || null;
@@ -456,6 +446,18 @@ app.put('/api/collections/:id', async (req, res) => {
   } catch (error) {
     console.error('[API] Error:', error.message);
     res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+// Get public collections
+app.get('/api/collections/public/list', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 20;
+    const result = await backend.getPublicCollections(limit);
+    res.json(result);
+  } catch (error) {
+    console.error('[API] Error:', error.message);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
