@@ -1235,20 +1235,14 @@ export class BackendService {
     }
 
     await this.db.execute({
-      sql: 'UPDATE collections SET name = ?, description = ?, is_public = ?, updated_at = ? WHERE id = ?',
-      args: [
-        sanitizeString(data.name),
-        data.description ? sanitizeString(data.description) : null,
-        data.is_public ? 1 : 0,
-        Date.now(),
-        collectionId
-      ]
+      sql: 'UPDATE collections SET is_public = ?, updated_at = ? WHERE id = ?',
+      args: [data.is_public ? 1 : 0, Date.now(), collectionId]
     });
 
     return { success: true };
   }
 
-  async getPublicCollections() {
+  async getPublicCollections(limit = 20) {
     const result = await this.db.execute({
       sql: `SELECT c.*, u.name as creator_name, COUNT(ci.id) as items_count
             FROM collections c
@@ -1256,8 +1250,9 @@ export class BackendService {
             LEFT JOIN collection_items ci ON c.id = ci.collection_id
             WHERE c.is_public = 1
             GROUP BY c.id
-            ORDER BY c.updated_at DESC`,
-      args: []
+            ORDER BY c.updated_at DESC
+            LIMIT ?`,
+      args: [limit]
     });
 
     return { success: true, collections: result.rows };
