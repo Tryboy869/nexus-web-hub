@@ -1,113 +1,213 @@
-<!-- 
-  AJOUTEZ CETTE SECTION dans index.html APRÈS le catalogue de webapps
-  et AVANT le footer
--->
+<!-- SECTION COLLECTIONS PUBLIQUES -->
+<!-- À ajouter dans index.html après les filtres et avant la grille des webapps -->
 
-<!-- Collections Publiques Section -->
-<section style="margin-top: 5rem;">
-  <div class="container">
-    <div class="section-header" style="text-align: center; margin-bottom: 3rem;">
-      <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">
-        <i class="fa-solid fa-folder-open"></i> Public Collections
-      </h2>
-      <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
-        Discover curated collections created by the community
-      </p>
-    </div>
-
-    <!-- Collections Grid -->
-    <div class="collections-grid" id="public-collections-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;"></div>
-
-    <!-- Empty State -->
-    <div id="public-collections-empty" style="display: none; text-align: center; padding: 3rem; color: var(--text-secondary);">
-      <i class="fa-solid fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-      <p>No public collections yet</p>
-    </div>
-  </div>
-</section>
-
-<!-- AJOUTEZ CE CSS dans la balise <style> de index.html -->
 <style>
-.collection-card {
-  background: var(--bg-card);
-  border-radius: 12px;
-  padding: 1.5rem;
-  border: 1px solid rgba(0, 217, 255, 0.1);
-  cursor: pointer;
-  transition: all 0.3s;
-}
+  .collections-section {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 3rem;
+  }
 
-.collection-card:hover {
-  border-color: var(--accent-cyan);
-  transform: translateY(-5px);
-}
+  .collections-section h2 {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 
-.collection-card h3 {
-  margin-bottom: 0.5rem;
-  color: var(--text-primary);
-}
+  .collections-slider {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
 
-.collection-card .description {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+  .collection-preview {
+    background: rgba(0, 217, 255, 0.05);
+    border: 1px solid rgba(0, 217, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
 
-.collection-card .meta {
-  display: flex;
-  justify-content: space-between;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-}
+  .collection-preview:hover {
+    border-color: var(--accent-cyan);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+  }
 
-.collection-card .creator {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
+  .collection-preview h3 {
+    margin-bottom: 0.5rem;
+    color: var(--accent-cyan);
+  }
+
+  .collection-preview .creator {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .collection-preview .description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .collection-preview .meta {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
 </style>
 
-<!-- AJOUTEZ CE SCRIPT dans la balise <script> de index.html -->
+<!-- Dans le HTML, après les filtres -->
+<div class="collections-section" id="collections-section">
+  <h2>
+    <i class="fa-solid fa-star"></i>
+    Featured Collections
+  </h2>
+  <div class="collections-slider" id="collections-slider"></div>
+</div>
+
+<!-- Dans le script JavaScript -->
 <script>
-// Charger collections publiques
-async function loadPublicCollections() {
-  try {
-    const response = await fetch('/api/collections/public');
-    const data = await response.json();
-    
-    if (data.success && data.collections.length > 0) {
-      renderPublicCollections(data.collections);
-    } else {
-      document.getElementById('public-collections-grid').style.display = 'none';
-      document.getElementById('public-collections-empty').style.display = 'block';
+  // Ajouter cette fonction
+  async function loadPublicCollections() {
+    try {
+      const response = await fetch('/api/collections/public/list?limit=6');
+      const data = await response.json();
+
+      if (data.success && data.collections.length > 0) {
+        renderPublicCollections(data.collections);
+        document.getElementById('collections-section').style.display = 'block';
+      } else {
+        document.getElementById('collections-section').style.display = 'none';
+      }
+    } catch (error) {
+      console.error('Error loading public collections:', error);
+      document.getElementById('collections-section').style.display = 'none';
     }
-  } catch (error) {
-    console.error('Error loading public collections:', error);
   }
-}
 
-function renderPublicCollections(collections) {
-  const grid = document.getElementById('public-collections-grid');
-  
-  grid.innerHTML = collections.map(col => `
-    <div class="collection-card" onclick="window.location.href='/collection.html?id=${col.id}'">
-      <h3>${col.name}</h3>
-      <p class="description">${col.description || 'No description'}</p>
-      <div class="meta">
-        <span><i class="fa-solid fa-layer-group"></i> ${col.items_count} webapps</span>
-        <span class="creator"><i class="fa-solid fa-user"></i> ${col.creator_name}</span>
+  function renderPublicCollections(collections) {
+    const slider = document.getElementById('collections-slider');
+    
+    slider.innerHTML = collections.map(col => `
+      <div class="collection-preview" onclick="window.location.href='/collection.html?id=${col.id}'">
+        <h3>${col.name}</h3>
+        <p class="creator"><i class="fa-solid fa-user"></i> by ${col.creator_name}</p>
+        <p class="description">${col.description || 'No description'}</p>
+        <div class="meta">
+          <span><i class="fa-solid fa-layer-group"></i> ${col.items_count} webapps</span>
+          <span><i class="fa-solid fa-globe"></i> Public</span>
+        </div>
       </div>
-    </div>
-  `).join('');
-}
+    `).join('');
+  }
 
-// Appeler au chargement de la page
-document.addEventListener('DOMContentLoaded', () => {
-  loadPublicCollections();
-  // ... autres initialisations existantes
-});
+  // Appeler au chargement de la page (ajouter dans DOMContentLoaded)
+  document.addEventListener('DOMContentLoaded', () => {
+    loadWebapps();
+    loadPublicCollections(); // Ajouter cette ligne
+  });
+</script>
+
+<!-- ALTERNATIVE : Ajouter Collections comme onglet dans les filtres -->
+<!-- Remplacer les boutons de filtres par ceci : -->
+
+<div class="filters">
+  <button class="filter-btn active" data-filter="all" onclick="filterWebapps('all')">
+    <i class="fa-solid fa-th"></i> All
+  </button>
+  <button class="filter-btn" data-filter="trending" onclick="filterWebapps('trending')">
+    <i class="fa-solid fa-fire"></i> Trending
+  </button>
+  <button class="filter-btn" data-filter="new" onclick="filterWebapps('new')">
+    <i class="fa-solid fa-sparkles"></i> New
+  </button>
+  <button class="filter-btn" data-filter="top-rated" onclick="filterWebapps('top-rated')">
+    <i class="fa-solid fa-star"></i> Top Rated
+  </button>
+  <!-- NOUVEAU FILTRE -->
+  <button class="filter-btn" data-filter="collections" onclick="showCollections()">
+    <i class="fa-solid fa-folder"></i> Collections
+  </button>
+</div>
+
+<!-- Ajouter ces fonctions JavaScript -->
+<script>
+  let showingCollections = false;
+
+  function showCollections() {
+    showingCollections = true;
+    
+    // Update filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector('[data-filter="collections"]').classList.add('active');
+    
+    // Hide webapps, show collections
+    document.getElementById('webapps-grid').style.display = 'none';
+    
+    // Create collections grid if not exists
+    if (!document.getElementById('collections-grid-main')) {
+      const collectionsGrid = document.createElement('div');
+      collectionsGrid.id = 'collections-grid-main';
+      collectionsGrid.className = 'collections-slider';
+      collectionsGrid.style.display = 'grid';
+      document.querySelector('.catalog-section').appendChild(collectionsGrid);
+    } else {
+      document.getElementById('collections-grid-main').style.display = 'grid';
+    }
+    
+    loadPublicCollectionsMain();
+  }
+
+  async function loadPublicCollectionsMain() {
+    try {
+      const response = await fetch('/api/collections/public/list?limit=50');
+      const data = await response.json();
+
+      if (data.success) {
+        const grid = document.getElementById('collections-grid-main');
+        grid.innerHTML = data.collections.map(col => `
+          <div class="collection-preview" onclick="window.location.href='/collection.html?id=${col.id}'">
+            <h3>${col.name}</h3>
+            <p class="creator"><i class="fa-solid fa-user"></i> by ${col.creator_name}</p>
+            <p class="description">${col.description || 'No description'}</p>
+            <div class="meta">
+              <span><i class="fa-solid fa-layer-group"></i> ${col.items_count} webapps</span>
+              <span><i class="fa-solid fa-globe"></i> Public</span>
+            </div>
+          </div>
+        `).join('');
+      }
+    } catch (error) {
+      console.error('Error loading collections:', error);
+    }
+  }
+
+  function filterWebapps(filter) {
+    showingCollections = false;
+    
+    // Hide collections if showing
+    if (document.getElementById('collections-grid-main')) {
+      document.getElementById('collections-grid-main').style.display = 'none';
+    }
+    
+    // Show webapps grid
+    document.getElementById('webapps-grid').style.display = 'grid';
+    
+    // Update filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+    
+    // Filter logic (existing code)
+    // ...
+  }
 </script>
