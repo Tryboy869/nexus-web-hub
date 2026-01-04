@@ -1,0 +1,13 @@
+# robots.txt for Nexus Web Hub
+
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /api/
+Disallow: /logs/
+
+# Sitemaps
+Sitemap: https://nexuswebhub.com/sitemap.xml
+
+# Crawl-delay (optional, for polite crawlers)
+Crawl-delay: 1

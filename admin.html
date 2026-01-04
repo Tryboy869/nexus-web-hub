@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel | Nexus Web Hub</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-deep-space: #0a0e27;
+      --bg-card: #1a1f3a;
+      --text-primary: #E0E6ED;
+      --text-secondary: #a0aec0;
+      --accent-cyan: #00d9ff;
+      --accent-purple: #8b5cf6;
+      --accent-green: #10b981;
+      --accent-gold: #fbbf24;
+      --accent-red: #ef4444;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-deep-space);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    /* Login Screen */
+    .login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    
+    .login-card {
+      background: var(--bg-card);
+      padding: 3rem;
+      border-radius: 16px;
+      max-width: 400px;
+      width: 100%;
+      border: 1px solid var(--accent-cyan);
+    }
+    
+    .login-card h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: var(--accent-cyan);
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.8rem;
+      background: var(--bg-deep-space);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 10px;
+      font-weight: 600;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: white;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    /* Dashboard */
+    .dashboard {
+      display: none;
+    }
+    
+    .dashboard.active {
+      display: block;
+    }
+    
+    nav {
+      background: var(--bg-card);
+      padding: 1rem 2rem;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+    }
+    
+    nav .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    nav h1 {
+      color: var(--accent-cyan);
+      font-size: 1.5rem;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: var(--bg-card);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 217, 255, 0.1);
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--accent-cyan);
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid rgba(0, 217, 255, 0.1);
+    }
+    
+    .tab {
+      padding: 0.8rem 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+    
+    .tab.active {
+      color: var(--accent-cyan);
+      border-bottom-color: var(--accent-cyan);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    table {
+      width: 100%;
+      background: var(--bg-card);
+      border-radius: 12px;
+      overflow: hidden;
+      border-collapse: collapse;
+    }
+    
+    table th {
+      background: rgba(0, 217, 255, 0.1);
+      padding: 1rem;
+      text-align: left;
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+    
+    table td {
+      padding: 1rem;
+      border-top: 1px solid rgba(0, 217, 255, 0.1);
+    }
+    
+    table tr:hover {
+      background: rgba(0, 217, 255, 0.05);
+    }
+    
+    .action-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .btn-view {
+      background: var(--accent-cyan);
+      color: var(--bg-deep-space);
+    }
+    
+    .btn-resolve {
+      background: var(--accent-green);
+      color: white;
+    }
+    
+    .btn-delete {
+      background: var(--accent-red);
+      color: white;
+    }
+    
+    .action-btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .status-badge {
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .status-pending {
+      background: var(--accent-gold);
+      color: var(--bg-deep-space);
+    }
+    
+    .status-resolved {
+      background: var(--accent-green);
+      color: white;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Screen -->
+  <div class="login-screen" id="login-screen">
+    <div class="login-card">
+      <h1><i class="fa-solid fa-shield-halved"></i> Admin Login</h1>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Admin Email</label>
+          <input type="email" id="admin-email" required>
+        </div>
+        <div class="form-group">
+          <label>Admin Password</label>
+          <input type="password" id="admin-password" required>
+        </div>
+        <button type="submit" class="btn" id="login-btn">
+          <i class="fa-solid fa-right-to-bracket"></i> Login
+        </button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Dashboard -->
+  <div class="dashboard" id="dashboard">
+    <nav>
+      <div class="container">
+        <h1><i class="fa-solid fa-shield-halved"></i> Admin Dashboard</h1>
+        <a href="/" style="color: var(--text-secondary); text-decoration: none;">Back to site</a>
+      </div>
+    </nav>
+    
+    <div class="container">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-webapps">0</div>
+          <div class="stat-label">Total Webapps</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-reports">0</div>
+          <div class="stat-label">Pending Reports</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-users">0</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-security">0</div>
+          <div class="stat-label">Security Events (24h)</div>
+        </div>
+      </div>
+      
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('reports')">
+          <i class="fa-solid fa-flag"></i> Reports
+        </button>
+        <button class="tab" onclick="switchTab('webapps')">
+          <i class="fa-solid fa-th-large"></i> All Webapps
+        </button>
+        <button class="tab" onclick="switchTab('logs')">
+          <i class="fa-solid fa-shield-halved"></i> Security Logs
+        </button>
+      </div>
+      
+      <!-- Reports Tab -->
+      <div class="tab-content active" id="reports-tab">
+        <div id="reports-table"></div>
+      </div>
+      
+      <!-- Webapps Tab -->
+      <div class="tab-content" id="webapps-tab">
+        <div id="webapps-table"></div>
+      </div>
+      
+      <!-- Logs Tab -->
+      <div class="tab-content" id="logs-tab">
+        <div id="logs-table"></div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    let adminKey = null;
+    
+    // Handle login
+    async function handleLogin(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById('admin-email').value;
+      const password = document.getElementById('admin-password').value;
+      const btn = document.getElementById('login-btn');
+      
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
+      
+      try {
+        const response = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Store admin key in session
+          adminKey = btoa(`${email}:${password}`);
+          sessionStorage.setItem('adminKey', adminKey);
+          
+          showDashboard();
+        } else {
+          alert('Invalid credentials');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login';
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        alert('Login failed');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login';
+      }
+    }
+    
+    // Show dashboard
+    function showDashboard() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard').classList.add('active');
+      
+      loadStats();
+      loadReports();
+    }
+    
+    // Load stats
+    async function loadStats() {
+      try {
+        // Global stats
+        const statsResponse = await fetch('/api/stats');
+        const statsData = await statsResponse.json();
+        
+        document.getElementById('stat-webapps').textContent = statsData.stats.webapps_count;
+        document.getElementById('stat-users').textContent = statsData.stats.users_count;
+        
+        // Reports
+        const reportsResponse = await fetch('/api/admin/reports?status=pending', {
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        const reportsData = await reportsResponse.json();
+        document.getElementById('stat-reports').textContent = reportsData.reports.length;
+        
+        // Security logs
+        const securityResponse = await fetch('/api/admin/stats', {
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        const securityData = await securityResponse.json();
+        document.getElementById('stat-security').textContent = securityData.stats.byLevel.SECURITY || 0;
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      }
+    }
+    
+    // Load reports
+    async function loadReports() {
+      try {
+        const response = await fetch('/api/admin/reports', {
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        const data = await response.json();
+        
+        if (data.reports.length === 0) {
+          document.getElementById('reports-table').innerHTML = '<div class="empty-state">No reports</div>';
+          return;
+        }
+        
+        const tableHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Webapp/Target</th>
+                <th>Reporter</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.reports.map(report => `
+                <tr>
+                  <td>${report.target_id}</td>
+                  <td>${report.reporter_name}</td>
+                  <td>${report.reason}</td>
+                  <td>
+                    <span class="status-badge status-${report.status}">
+                      ${report.status}
+                    </span>
+                  </td>
+                  <td>${new Date(report.created_at).toLocaleDateString()}</td>
+                  <td>
+                    <button class="action-btn btn-view" onclick="window.open('/webapp.html?id=${report.target_id}', '_blank')">
+                      View
+                    </button>
+                    ${report.status === 'pending' ? `
+                      <button class="action-btn btn-resolve" onclick="resolveReport('${report.id}')">
+                        Resolve
+                      </button>
+                      <button class="action-btn btn-delete" onclick="deleteWebappFromReport('${report.target_id}')">
+                        Delete Webapp
+                      </button>
+                    ` : ''}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        
+        document.getElementById('reports-table').innerHTML = tableHTML;
+      } catch (error) {
+        console.error('Error loading reports:', error);
+      }
+    }
+    
+    // Load all webapps
+    async function loadAllWebapps() {
+      try {
+        const response = await fetch('/api/admin/webapps', {
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        const data = await response.json();
+        
+        if (data.webapps.length === 0) {
+          document.getElementById('webapps-table').innerHTML = '<div class="empty-state">No webapps</div>';
+          return;
+        }
+        
+        const tableHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Creator</th>
+                <th>URL</th>
+                <th>Rating</th>
+                <th>Views</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.webapps.map(webapp => `
+                <tr>
+                  <td>${webapp.name}</td>
+                  <td>${webapp.developer}</td>
+                  <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    ${webapp.url}
+                  </td>
+                  <td>${webapp.avg_rating.toFixed(1)} ⭐</td>
+                  <td>${webapp.views_count}</td>
+                  <td>${new Date(webapp.created_at).toLocaleDateString()}</td>
+                  <td>
+                    <button class="action-btn btn-view" onclick="window.open('/webapp.html?id=${webapp.id}', '_blank')">
+                      View
+                    </button>
+                    <button class="action-btn btn-delete" onclick="deleteWebapp('${webapp.id}')">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        
+        document.getElementById('webapps-table').innerHTML = tableHTML;
+      } catch (error) {
+        console.error('Error loading webapps:', error);
+      }
+    }
+    
+    // Load security logs
+    async function loadLogs() {
+      try {
+        const response = await fetch('/api/admin/logs', {
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        const data = await response.json();
+        
+        if (data.logs.length === 0) {
+          document.getElementById('logs-table').innerHTML = '<div class="empty-state">No logs</div>';
+          return;
+        }
+        
+        const tableHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Type</th>
+                <th>Timestamp</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.logs.slice(0, 100).map(log => `
+                <tr>
+                  <td>
+                    <span class="status-badge status-${log.level.toLowerCase()}">
+                      ${log.level}
+                    </span>
+                  </td>
+                  <td>${log.type}</td>
+                  <td>${new Date(log.timestamp).toLocaleString()}</td>
+                  <td style="font-family: monospace; font-size: 0.85rem; max-width: 400px; overflow: hidden; text-overflow: ellipsis;">
+                    ${JSON.stringify(log).substring(0, 100)}...
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        
+        document.getElementById('logs-table').innerHTML = tableHTML;
+      } catch (error) {
+        console.error('Error loading logs:', error);
+      }
+    }
+    
+    // Switch tabs
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+      
+      if (tabName === 'webapps') {
+        loadAllWebapps();
+      } else if (tabName === 'logs') {
+        loadLogs();
+      }
+    }
+    
+    // Resolve report
+    async function resolveReport(reportId) {
+      if (!confirm('Mark this report as resolved?')) return;
+      
+      try {
+        const response = await fetch(`/api/admin/reports/${reportId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': adminKey
+          },
+          body: JSON.stringify({ admin_notes: 'Resolved by admin' })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Report resolved');
+          loadReports();
+          loadStats();
+        }
+      } catch (error) {
+        console.error('Error resolving report:', error);
+        alert('Error resolving report');
+      }
+    }
+    
+    // Delete webapp from report
+    async function deleteWebappFromReport(webappId) {
+      if (!confirm('Delete this webapp? This action is irreversible.')) return;
+      
+      try {
+        const response = await fetch(`/api/admin/webapps/${webappId}`, {
+          method: 'DELETE',
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Webapp deleted');
+          loadReports();
+          loadStats();
+        }
+      } catch (error) {
+        console.error('Error deleting webapp:', error);
+        alert('Error deleting webapp');
+      }
+    }
+    
+    // Delete webapp
+    async function deleteWebapp(webappId) {
+      if (!confirm('Delete this webapp? This action is irreversible.')) return;
+      
+      try {
+        const response = await fetch(`/api/admin/webapps/${webappId}`, {
+          method: 'DELETE',
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Webapp deleted');
+          loadAllWebapps();
+          loadStats();
+        }
+      } catch (error) {
+        console.error('Error deleting webapp:', error);
+        alert('Error deleting webapp');
+      }
+    }
+    
+    // Check if already logged in
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedKey = sessionStorage.getItem('adminKey');
+      if (savedKey) {
+        adminKey = savedKey;
+        showDashboard();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaving Nexus Web Hub...</title>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 3rem;
+      max-width: 600px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 2rem;
+    }
+    
+    .rocket-animation {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 2rem;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      color: #2d3748;
+      margin-bottom: 1rem;
+    }
+    
+    .url-display {
+      background: #f7fafc;
+      padding: 1rem;
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      word-break: break-all;
+      color: #4a5568;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+    
+    .warning-box {
+      background: #fff5f5;
+      border-left: 4px solid #fc8181;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      text-align: left;
+    }
+    
+    .warning-box strong {
+      color: #c53030;
+    }
+    
+    .warning-box p {
+      color: #742a2a;
+      margin-top: 0.5rem;
+      line-height: 1.6;
+    }
+    
+    .countdown {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #667eea;
+      margin: 2rem 0;
+    }
+    
+    .buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid #667eea;
+      color: #667eea;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Rocket Animation SVG (inline) -->
+    <svg class="rocket-animation" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="rocketGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      
+      <!-- Rocket body -->
+      <g id="rocket">
+        <path d="M60 20 L70 60 L60 80 L50 60 Z" fill="url(#rocketGradient)"/>
+        <!-- Windows -->
+        <circle cx="60" cy="45" r="8" fill="white" opacity="0.9"/>
+        <!-- Fins -->
+        <path d="M50 60 L40 75 L50 70 Z" fill="#667eea"/>
+        <path d="M70 60 L80 75 L70 70 Z" fill="#667eea"/>
+        
+        <!-- Flames -->
+        <ellipse cx="60" cy="85" rx="10" ry="18" fill="#ff6b6b" opacity="0.8">
+          <animate attributeName="ry" values="18;25;18" dur="0.4s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.8;1;0.8" dur="0.4s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="60" cy="90" rx="8" ry="15" fill="#ffa500" opacity="0.7">
+          <animate attributeName="ry" values="15;20;15" dur="0.3s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="60" cy="95" rx="6" ry="12" fill="#ffff00" opacity="0.6">
+          <animate attributeName="ry" values="12;16;12" dur="0.2s" repeatCount="indefinite"/>
+        </ellipse>
+        
+        <!-- Animation up and down -->
+        <animateTransform
+          attributeName="transform"
+          type="translate"
+          values="0 0; 0 -8; 0 0"
+          dur="0.8s"
+          repeatCount="indefinite"/>
+      </g>
+      
+      <!-- Stars -->
+      <circle cx="20" cy="30" r="2" fill="#fbbf24" opacity="0.8">
+        <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="100" cy="40" r="1.5" fill="#fbbf24" opacity="0.6">
+        <animate attributeName="opacity" values="0.6;0.2;0.6" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="30" cy="80" r="1" fill="#fbbf24" opacity="0.7">
+        <animate attributeName="opacity" values="0.7;0.3;0.7" dur="2.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="90" cy="70" r="1.5" fill="#fbbf24" opacity="0.5">
+        <animate attributeName="opacity" values="0.5;0.2;0.5" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+    
+    <h1>You are leaving Nexus Web Hub</h1>
+    
+    <p style="color: #718096; margin-bottom: 1rem;">You will be redirected to:</p>
+    <div class="url-display" id="url-display"></div>
+    
+    <div class="warning-box">
+      <strong>⚠️ Important</strong>
+      <p>This webapp is hosted outside of Nexus Web Hub. We do not control its content, availability, or security. Please proceed with caution.</p>
+    </div>
+    
+    <div class="countdown" id="countdown">5</div>
+    
+    <div class="buttons">
+      <button class="btn btn-primary" onclick="redirectNow()">
+        Continue to webapp
+      </button>
+      <a href="/" class="btn btn-secondary">
+        Back to catalog
+      </a>
+    </div>
+  </div>
+  
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const webappId = urlParams.get('id');
+    const targetUrl = urlParams.get('url');
+    const source = urlParams.get('source') || 'direct';
+    
+    if (!webappId || !targetUrl) {
+      window.location.href = '/';
+    }
+    
+    // Display URL
+    document.getElementById('url-display').textContent = targetUrl;
+    
+    // Track click
+    async function trackClick() {
+      try {
+        const userId = localStorage.getItem('userId');
+        const headers = { 'Content-Type': 'application/json' };
+        if (userId) headers['X-User-Id'] = userId;
+        
+        await fetch(`/api/webapps/${webappId}/click`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ source })
+        });
+      } catch (error) {
+        console.error('Error tracking click:', error);
+      }
+    }
+    
+    // Countdown
+    let seconds = 5;
+    const countdownEl = document.getElementById('countdown');
+    
+    const interval = setInterval(() => {
+      seconds--;
+      countdownEl.textContent = seconds;
+      
+      if (seconds === 0) {
+        clearInterval(interval);
+        redirectNow();
+      }
+    }, 1000);
+    
+    // Redirect
+    async function redirectNow() {
+      clearInterval(interval);
+      await trackClick();
+      window.location.href = targetUrl;
+    }
+  </script>
+</body>
+</html>

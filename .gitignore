@@ -1,0 +1,29 @@
+# Logs - NEVER COMMIT
+logs/
+*.log
+
+# Environment variables - CRITICAL
+.env
+
+# Dependencies
+node_modules/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+.nyc_output/
+
+# Build
+dist/
+build/

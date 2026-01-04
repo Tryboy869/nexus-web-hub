@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collection | Nexus Web Hub</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-deep-space: #0a0e27;
+      --bg-card: #1a1f3a;
+      --text-primary: #E0E6ED;
+      --text-secondary: #a0aec0;
+      --accent-cyan: #00d9ff;
+      --accent-purple: #8b5cf6;
+      --accent-green: #10b981;
+      --accent-gold: #fbbf24;
+      --accent-red: #ef4444;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-deep-space);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    /* Navbar */
+    nav {
+      background: rgba(26, 31, 58, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+    }
+
+    nav .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    nav .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+
+    nav .logo img {
+      width: 32px;
+      height: 32px;
+    }
+
+    nav .back-btn {
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    nav .back-btn:hover {
+      color: var(--accent-cyan);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    /* Collection Header */
+    .collection-header {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 3rem;
+    }
+
+    .collection-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .collection-header .description {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .collection-header .meta {
+      display: flex;
+      gap: 2rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Webapps Grid */
+    .webapps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .webapp-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid rgba(0, 217, 255, 0.1);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .webapp-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-5px);
+    }
+
+    .webapp-card h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    .webapp-card .description {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .webapp-card .stats {
+      display: flex;
+      gap: 1rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 3rem;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(0, 217, 255, 0.1);
+      border-top-color: var(--accent-cyan);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .collection-header h1 {
+        font-size: 1.8rem;
+      }
+
+      .webapps-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav>
+    <div class="container">
+      <a href="/" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i> Back to catalog
+      </a>
+
+      <a href="/" class="logo">
+        <img src="/assets/logos/logo-nwh.svg" alt="Nexus Web Hub">
+        <span>NWH</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="container" id="content" style="display: none;">
+    <!-- Collection Header -->
+    <div class="collection-header">
+      <h1 id="collection-name"></h1>
+      <p class="description" id="collection-description"></p>
+      <div class="meta">
+        <span><i class="fa-solid fa-layer-group"></i> <span id="items-count">0</span> webapps</span>
+        <span id="visibility"></span>
+      </div>
+    </div>
+
+    <!-- Webapps Grid -->
+    <div class="webapps-grid" id="webapps-grid"></div>
+
+    <!-- Empty State -->
+    <div class="empty-state" id="empty-state" style="display: none;">
+      <i class="fa-solid fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+      <p>This collection is empty</p>
+    </div>
+  </div>
+
+  <script>
+    const collectionId = new URLSearchParams(window.location.search).get('id');
+    const userId = localStorage.getItem('userId');
+
+    let collection = null;
+    let webapps = [];
+
+    // Load collection
+    async function loadCollection() {
+      try {
+        const headers = {};
+        if (userId) headers['X-User-Id'] = userId;
+
+        const collectionResponse = await fetch(`/api/collections/${collectionId}`, { headers });
+        const collectionData = await collectionResponse.json();
+
+        if (!collectionData.success) {
+          alert('Collection not found or private');
+          window.location.href = '/';
+          return;
+        }
+
+        collection = collectionData.collection;
+
+        const webappsResponse = await fetch(`/api/collections/${collectionId}/webapps`, { headers });
+        const webappsData = await webappsResponse.json();
+
+        if (webappsData.success) {
+          webapps = webappsData.webapps;
+        }
+
+        renderCollection();
+        renderWebapps();
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+      } catch (error) {
+        console.error('Error loading collection:', error);
+        alert('Error loading collection');
+        window.location.href = '/';
+      }
+    }
+
+    // Render collection
+    function renderCollection() {
+      document.title = `${collection.name} | Nexus Web Hub`;
+      document.getElementById('collection-name').textContent = collection.name;
+      document.getElementById('collection-description').textContent = collection.description || 'No description';
+      document.getElementById('items-count').textContent = webapps.length;
+
+      const visibilityHTML = collection.is_public 
+        ? '<i class="fa-solid fa-globe"></i> Public' 
+        : '<i class="fa-solid fa-lock"></i> Private';
+      document.getElementById('visibility').innerHTML = visibilityHTML;
+    }
+
+    // Render webapps
+    function renderWebapps() {
+      if (webapps.length === 0) {
+        document.getElementById('webapps-grid').style.display = 'none';
+        document.getElementById('empty-state').style.display = 'block';
+        return;
+      }
+
+      const grid = document.getElementById('webapps-grid');
+      grid.innerHTML = webapps.map(webapp => `
+        <div class="webapp-card" onclick="window.location.href='/webapp.html?id=${webapp.id}'">
+          <h3>${webapp.name}</h3>
+          <p class="description">${webapp.description_short}</p>
+          <div class="stats">
+            <span><i class="fa-solid fa-star"></i> ${webapp.avg_rating.toFixed(1)}</span>
+            <span><i class="fa-solid fa-eye"></i> ${webapp.views_count}</span>
+            <span><i class="fa-solid fa-comment"></i> ${webapp.reviews_count}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!collectionId) {
+        window.location.href = '/';
+        return;
+      }
+      loadCollection();
+    });
+  </script>
+</body>
+</html>

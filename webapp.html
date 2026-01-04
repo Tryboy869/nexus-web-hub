@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Webapp | Nexus Web Hub</title>
+  <meta name="description" id="page-description">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-deep-space: #0a0e27;
+      --bg-card: #1a1f3a;
+      --text-primary: #E0E6ED;
+      --text-secondary: #a0aec0;
+      --accent-cyan: #00d9ff;
+      --accent-purple: #8b5cf6;
+      --accent-green: #10b981;
+      --accent-gold: #fbbf24;
+      --accent-red: #ef4444;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-deep-space);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    nav {
+      background: rgba(26, 31, 58, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+    }
+    
+    nav .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    nav .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+    
+    nav .back-btn {
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    nav .back-btn:hover { color: var(--accent-cyan); }
+    
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    .webapp-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    
+    .media-section {
+      background: var(--bg-card);
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .media-section img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .media-section .play-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.3);
+      transition: background 0.3s;
+    }
+    
+    .media-section:hover .play-overlay {
+      background: rgba(0, 0, 0, 0.5);
+    }
+    
+    .media-section .play-button {
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 0, 0, 0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      transition: transform 0.3s;
+    }
+    
+    .media-section:hover .play-button {
+      transform: scale(1.1);
+    }
+    
+    .info-section .badges {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .badge {
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    
+    .badge svg {
+      width: 16px;
+      height: 16px;
+    }
+    
+    .badge-trending { background: var(--accent-red); color: white; }
+    .badge-new { background: var(--accent-green); color: white; }
+    .badge-featured { background: var(--accent-gold); color: var(--bg-deep-space); }
+    
+    .info-section h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .info-section .developer {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+    
+    .info-section .category {
+      display: inline-block;
+      background: rgba(0, 217, 255, 0.1);
+      color: var(--accent-cyan);
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    
+    .description {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      line-height: 1.8;
+    }
+    
+    .description.collapsed {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .see-more-btn {
+      background: none;
+      border: none;
+      color: var(--accent-cyan);
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    
+    .tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    
+    .tag {
+      padding: 0.3rem 0.8rem;
+      background: rgba(0, 217, 255, 0.1);
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+    }
+    
+    .actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); color: white; }
+    .btn-secondary { background: transparent; border: 2px solid var(--accent-cyan); color: var(--accent-cyan); }
+    .btn-danger { background: transparent; border: 2px solid var(--accent-red); color: var(--accent-red); }
+    .btn:hover { transform: translateY(-2px); }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+    
+    .stat-card {
+      background: var(--bg-card);
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid rgba(0, 217, 255, 0.1);
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--accent-cyan);
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .versions-section {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 3rem;
+    }
+    
+    .versions-section h2 {
+      margin-bottom: 1.5rem;
+    }
+    
+    .version-item {
+      padding: 1rem;
+      background: rgba(0, 217, 255, 0.05);
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border-left: 3px solid var(--accent-cyan);
+    }
+    
+    .version-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    
+    .version-number {
+      font-weight: bold;
+      color: var(--accent-cyan);
+    }
+    
+    .version-date {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+    
+    .version-changelog {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    
+    .reviews-section {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 3rem;
+    }
+    
+    .reviews-section h2 {
+      margin-bottom: 2rem;
+    }
+    
+    .review-form {
+      background: rgba(0, 217, 255, 0.05);
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+    }
+    
+    .review-form .rating-input {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .review-form .rating-input .star {
+      font-size: 2rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+    
+    .review-form .rating-input .star.active {
+      color: var(--accent-gold);
+    }
+    
+    .review-form textarea {
+      width: 100%;
+      padding: 1rem;
+      background: var(--bg-deep-space);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: inherit;
+      resize: vertical;
+      min-height: 100px;
+      margin-bottom: 1rem;
+    }
+    
+    .review-item {
+      padding: 1.5rem;
+      background: rgba(0, 217, 255, 0.05);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+    
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .review-author {
+      font-weight: 600;
+    }
+    
+    .review-rating {
+      color: var(--accent-gold);
+    }
+    
+    .review-comment {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+    
+    .review-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .vote-btn {
+      background: transparent;
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      color: var(--text-secondary);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s;
+    }
+    
+    .vote-btn:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 3rem;
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(0, 217, 255, 0.1);
+      border-top-color: var(--accent-cyan);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 90%;
+      margin: 1rem;
+      border: 1px solid var(--accent-cyan);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .modal-content h3 {
+      margin-bottom: 1rem;
+      color: var(--accent-cyan);
+    }
+    
+    .modal-content input,
+    .modal-content textarea {
+      width: 100%;
+      padding: 1rem;
+      background: var(--bg-deep-space);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: inherit;
+      margin-bottom: 1rem;
+    }
+    
+    .modal-content .buttons {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .collection-item {
+      padding: 1rem;
+      background: rgba(0, 217, 255, 0.05);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+    
+    .collection-item:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(0, 217, 255, 0.1);
+    }
+    
+    .collection-item.selected {
+      border-color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.1);
+    }
+    
+    @media (max-width: 768px) {
+      .webapp-header {
+        grid-template-columns: 1fr;
+      }
+      
+      .info-section h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="container">
+      <a href="/" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i> Back to catalog
+      </a>
+      
+      <a href="/" class="logo">
+        <span>NWH</span>
+      </a>
+    </div>
+  </nav>
+  
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+  </div>
+  
+  <div class="container" id="content" style="display: none;">
+    <div class="webapp-header">
+      <div class="media-section" id="media"></div>
+      
+      <div class="info-section">
+        <div class="badges" id="badges"></div>
+        <h1 id="webapp-name"></h1>
+        <p class="developer" id="developer"></p>
+        <span class="category" id="category"></span>
+        
+        <div class="description collapsed" id="description"></div>
+        <button class="see-more-btn" id="see-more-btn" onclick="toggleDescription()">See more</button>
+        
+        <div class="tags" id="tags"></div>
+        
+        <div class="actions">
+          <button class="btn btn-primary" onclick="openWebapp()">
+            <i class="fa-solid fa-rocket"></i> Open Webapp
+          </button>
+          <button class="btn btn-secondary" onclick="showAddToCollectionModal()" id="add-collection-btn" style="display: none;">
+            <i class="fa-solid fa-folder-plus"></i> Add to Collection
+          </button>
+          <a class="btn btn-secondary" id="github-link" style="display: none;" target="_blank">
+            <i class="fa-brands fa-github"></i> Source Code
+          </a>
+          <button class="btn btn-danger" onclick="showReportModal()">
+            <i class="fa-solid fa-flag"></i> Report
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="views">0</div>
+        <div class="stat-label">
+          <i class="fa-solid fa-eye"></i> Unique views
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="clicks">0</div>
+        <div class="stat-label">
+          <i class="fa-solid fa-mouse-pointer"></i> Clicks
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="rating">0.0</div>
+        <div class="stat-label">
+          <i class="fa-solid fa-star"></i> Average rating
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="reviews-count">0</div>
+        <div class="stat-label">
+          <i class="fa-solid fa-comment"></i> Reviews
+        </div>
+      </div>
+    </div>
+    
+    <div class="versions-section" id="versions-section" style="display: none;">
+      <h2><i class="fa-solid fa-code-branch"></i> Version History</h2>
+      <div id="versions-list"></div>
+    </div>
+    
+    <div class="reviews-section">
+      <h2>Reviews</h2>
+      
+      <div class="review-form" id="review-form">
+        <h3>Your review</h3>
+        <div class="rating-input" id="rating-input"></div>
+        <textarea id="comment" placeholder="Share your experience..."></textarea>
+        <button class="btn btn-primary" onclick="submitReview()">Post review</button>
+      </div>
+      
+      <div id="login-required" style="display: none; text-align: center; padding: 2rem;">
+        <p style="margin-bottom: 1rem;">Login to leave a review</p>
+        <a href="/auth.html" class="btn btn-primary">Login</a>
+      </div>
+      
+      <div id="reviews-list"></div>
+    </div>
+  </div>
+  
+  <!-- Add to Collection Modal -->
+  <div class="modal" id="add-collection-modal">
+    <div class="modal-content">
+      <h3><i class="fa-solid fa-folder-plus"></i> Add to Collection</h3>
+      <div id="collections-list"></div>
+      <div style="text-align: center; margin-top: 1rem;">
+        <button class="btn btn-secondary" onclick="closeAddToCollectionModal()">Close</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Report Modal -->
+  <div class="modal" id="report-modal">
+    <div class="modal-content">
+      <h3>Report an issue</h3>
+      <textarea id="report-reason" placeholder="Describe the problem..." rows="5"></textarea>
+      <div class="buttons">
+        <button class="btn btn-secondary" onclick="closeReportModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitReport()">Send report</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // SVG BADGES INLINE
+    const BADGE_SVG = {
+      trending: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 2c-5.621 0-10.211 4.443-10.475 10H0l4 5.5 4-5.5H5.025C5.289 7.563 9.098 4 13.5 4s8.211 3.563 8.475 8.5H15l4 5.5 4-5.5h-3.025C19.711 6.443 15.121 2 13.5 2z"/></svg>',
+      new: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 12l-2.44-2.78.34-3.68-3.61-.82-1.89-3.18L12 3 8.6 1.54 6.71 4.72l-3.61.81.34 3.68L1 12l2.44 2.78-.34 3.69 3.61.82 1.89 3.18L12 21l3.4 1.46 1.89-3.18 3.61-.82-.34-3.68L23 12zm-10 5h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>',
+      featured: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>'
+    };
+    
+    let webapp = null;
+    let reviews = [];
+    let versions = [];
+    let selectedRating = 0;
+    let userCollections = [];
+    let youtubeApiReady = false;
+    let youtubeApiLoading = false;
+    const webappId = new URLSearchParams(window.location.search).get('id');
+    const userId = localStorage.getItem('userId');
+    
+    // Charger l'API YouTube (Solution 3)
+    function loadYouTubeAPI() {
+      if (youtubeApiLoading || document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+        return;
+      }
+      
+      youtubeApiLoading = true;
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+    
+    // Callback API YouTube
+    window.onYouTubeIframeAPIReady = function() {
+      youtubeApiReady = true;
+      console.log('YouTube API Ready');
+    };
+    
+    function extractYouTubeId(url) {
+      if (!url) return null;
+      
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+        /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+        /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+        /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/
+      ];
+      
+      for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match && match[1]) return match[1];
+      }
+      
+      return null;
+    }
+    
+    // Vérifier si la vidéo est embeddable
+    async function isVideoEmbeddable(videoId) {
+      try {
+        const response = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+        return response.ok;
+      } catch {
+        return false;
+      }
+    }
+    
+    async function loadWebapp() {
+      try {
+        const headers = {};
+        if (userId) headers['X-User-Id'] = userId;
+        
+        const response = await fetch(`/api/webapps/${webappId}`, { headers });
+        const data = await response.json();
+        
+        webapp = data.webapp;
+        reviews = data.reviews;
+        
+        await renderWebapp();
+        renderReviews();
+        await loadVersions();
+        
+        if (userId) {
+          document.getElementById('add-collection-btn').style.display = 'inline-flex';
+        }
+        
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+      } catch (error) {
+        console.error('Error loading webapp:', error);
+      }
+    }
+    
+    async function loadVersions() {
+      try {
+        const response = await fetch(`/api/webapps/${webappId}/versions`);
+        const data = await response.json();
+        
+        if (data.success && data.versions.length > 0) {
+          versions = data.versions;
+          renderVersions();
+          document.getElementById('versions-section').style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error loading versions:', error);
+      }
+    }
+    
+    function renderVersions() {
+      const versionsHTML = versions.map(v => `
+        <div class="version-item">
+          <div class="version-header">
+            <span class="version-number">v${v.version}</span>
+            <span class="version-date">${new Date(v.created_at).toLocaleDateString()}</span>
+          </div>
+          <div class="version-changelog">${v.changelog}</div>
+        </div>
+      `).join('');
+      
+      document.getElementById('versions-list').innerHTML = versionsHTML;
+    }
+    
+    async function renderWebapp() {
+      document.getElementById('page-title').textContent = `${webapp.name} | Nexus Web Hub`;
+      document.getElementById('page-description').content = webapp.description_short;
+      
+      // Media - VERSION CORRIGÉE avec 3 solutions en fallback
+      if (webapp.video_url) {
+        const videoId = extractYouTubeId(webapp.video_url);
+        
+        if (videoId) {
+          try {
+            // Vérifier si la vidéo est embeddable
+            const embeddable = await isVideoEmbeddable(videoId);
+            
+            if (!embeddable) {
+              throw new Error('Video not embeddable');
+            }
+            
+            // Charger l'API YouTube pour solution 3 (en arrière-plan)
+            loadYouTubeAPI();
+            
+            // Solution 2 : Thumbnail cliquable vers iframe (meilleure UX)
+            const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+            
+            document.getElementById('media').innerHTML = `
+              <div id="video-container" style="position: relative; width: 100%; height: 100%; cursor: pointer;">
+                <img src="${thumbnailUrl}" 
+                     alt="${webapp.name} video" 
+                     style="width: 100%; height: 100%; object-fit: cover;"
+                     onerror="this.src='https://img.youtube.com/vi/${videoId}/hqdefault.jpg'">
+                <div class="play-overlay" onclick="loadVideoIframe('${videoId}')">
+                  <div class="play-button">
+                    <i class="fa-brands fa-youtube"></i>
+                  </div>
+                </div>
+              </div>
+            `;
+          } catch (error) {
+            // Fallback : Vidéo non embeddable - afficher lien vers YouTube
+            document.getElementById('media').innerHTML = `
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: rgba(255, 0, 0, 0.1); flex-direction: column; gap: 1rem; padding: 2rem; text-align: center;">
+                <i class="fa-brands fa-youtube" style="font-size: 4rem; color: #ff0000;"></i>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">This video cannot be embedded due to creator restrictions</p>
+                <a href="${webapp.video_url}" target="_blank" class="btn btn-secondary">
+                  <i class="fa-brands fa-youtube"></i>
+                  Watch on YouTube
+                </a>
+              </div>
+            `;
+          }
+        } else {
+          document.getElementById('media').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: rgba(0, 217, 255, 0.1);"><p style="color: var(--text-secondary);">Invalid video URL</p></div>';
+        }
+      } else if (webapp.image_url) {
+        document.getElementById('media').innerHTML = `<img src="${webapp.image_url}" alt="${webapp.name}">`;
+      } else {
+        document.getElementById('media').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: rgba(0, 217, 255, 0.1);"><i class="fa-solid fa-image" style="font-size: 4rem; color: var(--text-secondary);"></i></div>';
+      }
+      
+      // Badges avec SVG inline
+      let badgesHTML = '';
+      if (webapp.is_trending) badgesHTML += `<span class="badge badge-trending">${BADGE_SVG.trending} Trending</span>`;
+      if (webapp.is_featured) badgesHTML += `<span class="badge badge-featured">${BADGE_SVG.featured} Featured</span>`;
+      if (webapp.is_new) badgesHTML += `<span class="badge badge-new">${BADGE_SVG.new} New</span>`;
+      document.getElementById('badges').innerHTML = badgesHTML;
+      
+      document.getElementById('webapp-name').textContent = webapp.name;
+      document.getElementById('developer').textContent = `by ${webapp.developer}`;
+      document.getElementById('category').textContent = webapp.category;
+      
+      const longDesc = webapp.description_long || webapp.description_short;
+      document.getElementById('description').textContent = longDesc;
+      
+      if (longDesc.length <= 200) {
+        document.getElementById('see-more-btn').style.display = 'none';
+        document.getElementById('description').classList.remove('collapsed');
+      }
+      
+      document.getElementById('tags').innerHTML = webapp.tags.map(tag => 
+        `<span class="tag">${tag}</span>`
+      ).join('');
+      
+      if (webapp.github_url) {
+        document.getElementById('github-link').href = webapp.github_url;
+        document.getElementById('github-link').style.display = 'inline-flex';
+      }
+      
+      document.getElementById('views').textContent = webapp.views_count;
+      document.getElementById('clicks').textContent = webapp.clicks_count;
+      document.getElementById('rating').textContent = webapp.avg_rating.toFixed(1);
+      document.getElementById('reviews-count').textContent = webapp.reviews_count;
+    }
+    
+    // Fonction pour charger l'iframe au click (Solution 2 + fallback vers Solution 1)
+    function loadVideoIframe(videoId) {
+      const container = document.getElementById('video-container');
+      
+      // Solution 3 : Essayer d'abord YouTube API si disponible
+      if (youtubeApiReady && window.YT && window.YT.Player) {
+        try {
+          container.innerHTML = `<div id="youtube-player-${videoId}" style="width: 100%; height: 100%;"></div>`;
+          
+          new YT.Player(`youtube-player-${videoId}`, {
+            height: '100%',
+            width: '100%',
+            videoId: videoId,
+            playerVars: {
+              autoplay: 1,
+              modestbranding: 1,
+              rel: 0
+            },
+            events: {
+              'onReady': (event) => {
+                event.target.playVideo();
+              },
+              'onError': (event) => {
+                console.error('YouTube Player Error:', event.data);
+                // Fallback vers iframe simple
+                loadSimpleIframe(videoId);
+              }
+            }
+          });
+          
+          console.log('Using YouTube API Player (Solution 3)');
+          return;
+        } catch (error) {
+          console.error('YouTube API failed, falling back to iframe:', error);
+        }
+      }
+      
+      // Fallback : Solution 1 - Iframe simple
+      loadSimpleIframe(videoId);
+    }
+    
+    // Solution 1 : Iframe YouTube direct (fallback ultime)
+    function loadSimpleIframe(videoId) {
+      const container = document.getElementById('video-container');
+      
+      container.innerHTML = `
+        <iframe 
+          width="100%" 
+          height="100%" 
+          src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
+          title="YouTube video player"
+          frameborder="0" 
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          allowfullscreen
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+        </iframe>
+      `;
+      
+      console.log('Using Simple Iframe (Solution 1)');
+    }
+    
+    function toggleDescription() {
+      const desc = document.getElementById('description');
+      const btn = document.getElementById('see-more-btn');
+      
+      if (desc.classList.contains('collapsed')) {
+        desc.classList.remove('collapsed');
+        btn.textContent = 'See less';
+      } else {
+        desc.classList.add('collapsed');
+        btn.textContent = 'See more';
+      }
+    }
+    
+    function openWebapp() {
+      window.open(`/redirect.html?id=${webappId}&url=${encodeURIComponent(webapp.url)}&source=detail`, '_blank');
+    }
+    
+    // Add to Collection
+    async function showAddToCollectionModal() {
+      if (!userId) {
+        window.location.href = '/auth.html';
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/collections', {
+          headers: { 'X-User-Id': userId }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          userCollections = data.collections;
+          renderCollectionsList();
+          document.getElementById('add-collection-modal').style.display = 'flex';
+        }
+      } catch (error) {
+        console.error('Error loading collections:', error);
+      }
+    }
+    
+    function renderCollectionsList() {
+      const listHTML = userCollections.length === 0 
+        ? '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No collections yet. <a href="/profile.html" style="color: var(--accent-cyan);">Create one</a></p>'
+        : userCollections.map(col => `
+            <div class="collection-item" onclick="toggleCollection('${col.id}')">
+              <h4>${col.name}</h4>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.3rem;">
+                ${col.items_count} items • ${col.is_public ? 'Public' : 'Private'}
+              </p>
+            </div>
+          `).join('');
+      
+      document.getElementById('collections-list').innerHTML = listHTML;
+    }
+    
+    async function toggleCollection(collectionId) {
+      try {
+        const response = await fetch(`/api/collections/${collectionId}/add`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId
+          },
+          body: JSON.stringify({ webapp_id: webappId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Added to collection!');
+          closeAddToCollectionModal();
+        } else {
+          alert(data.message || 'Error adding to collection');
+        }
+      } catch (error) {
+        console.error('Error adding to collection:', error);
+        alert('Error adding to collection');
+      }
+    }
+    
+    function closeAddToCollectionModal() {
+      document.getElementById('add-collection-modal').style.display = 'none';
+    }
+    
+    function renderReviews() {
+      if (!userId) {
+        document.getElementById('review-form').style.display = 'none';
+        document.getElementById('login-required').style.display = 'block';
+      } else {
+        renderRatingInput();
+      }
+      
+      const reviewsHTML = reviews.map(review => `
+        <div class="review-item">
+          <div class="review-header">
+            <span class="review-author">${review.user_name}</span>
+            <span class="review-rating">${'⭐'.repeat(review.rating)}</span>
+          </div>
+          <p class="review-comment">${review.comment || ''}</p>
+          <div class="review-actions">
+            <button class="vote-btn" onclick="voteReview('${review.id}', 'helpful')">
+              <i class="fa-solid fa-thumbs-up"></i> Helpful (${review.helpful_count})
+            </button>
+            <button class="vote-btn" onclick="voteReview('${review.id}', 'not_helpful')">
+              <i class="fa-solid fa-thumbs-down"></i> Not helpful (${review.not_helpful_count})
+            </button>
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('reviews-list').innerHTML = reviewsHTML || '<p style="text-align: center; color: var(--text-secondary);">No reviews yet</p>';
+    }
+    
+    function renderRatingInput() {
+      const ratingInput = document.getElementById('rating-input');
+      ratingInput.innerHTML = '';
+      
+      for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('span');
+        star.className = 'star';
+        star.innerHTML = '★';
+        star.onclick = () => selectRating(i);
+        ratingInput.appendChild(star);
+      }
+    }
+    
+    function selectRating(rating) {
+      selectedRating = rating;
+      const stars = document.querySelectorAll('.rating-input .star');
+      stars.forEach((star, index) => {
+        if (index < rating) {
+          star.classList.add('active');
+        } else {
+          star.classList.remove('active');
+        }
+      });
+    }
+    
+    async function submitReview() {
+      if (!userId) {
+        window.location.href = '/auth.html';
+        return;
+      }
+      
+      if (selectedRating === 0) {
+        alert('Please select a rating');
+        return;
+      }
+      
+      const comment = document.getElementById('comment').value;
+      
+      try {
+        const response = await fetch(`/api/webapps/${webappId}/reviews`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId
+          },
+          body: JSON.stringify({
+            rating: selectedRating,
+            comment
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Review posted!');
+          location.reload();
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error('Error submitting review:', error);
+        alert('Error submitting review');
+      }
+    }
+    
+    async function voteReview(reviewId, voteType) {
+      if (!userId) {
+        window.location.href = '/auth.html';
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/reviews/${reviewId}/vote`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId
+          },
+          body: JSON.stringify({ vote_type: voteType })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          location.reload();
+        }
+      } catch (error) {
+        console.error('Error voting review:', error);
+      }
+    }
+    
+    function showReportModal() {
+      if (!userId) {
+        window.location.href = '/auth.html';
+        return;
+      }
+      document.getElementById('report-modal').style.display = 'flex';
+    }
+    
+    function closeReportModal() {
+      document.getElementById('report-modal').style.display = 'none';
+    }
+    
+    async function submitReport() {
+      const reason = document.getElementById('report-reason').value;
+      
+      if (!reason) {
+        alert('Please describe the problem');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/reports', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId
+          },
+          body: JSON.stringify({
+            target_type: 'webapp',
+            target_id: webappId,
+            reason
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Report sent. Thank you!');
+          closeReportModal();
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error('Error submitting report:', error);
+        alert('Error submitting report');
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!webappId) {
+        window.location.href = '/';
+        return;
+      }
+      loadWebapp();
+    });
+  </script>
+</body>
+</html>
